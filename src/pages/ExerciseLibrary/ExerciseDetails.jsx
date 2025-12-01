@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import './ExerciseLibrary.css';
+import '../../styles/ExerciseLibrary.css';
 
 export default function ExerciseDetails() {
   const { id } = useParams();

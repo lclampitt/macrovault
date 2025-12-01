@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../supabaseClient';
-import './goalplanner.css';
+import '../../styles/goalplanner.css';
 
 const emptyMacros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 

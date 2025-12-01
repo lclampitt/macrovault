@@ -1,8 +1,7 @@
-// src/pages/progress.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import ProgressCharts from '../components/ProgressCharts';
-import './progress.css';
+import '../styles/progress.css';
 
 export default function ProgressPage() {
   const [session, setSession] = useState(null);

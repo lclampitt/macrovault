@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ProteinCalculator.css';
+import '../styles/ProteinCalculator.css';
 
 function ProteinCalculator() {
   const [weight, setWeight] = useState('');

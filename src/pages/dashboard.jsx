@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import GoalPlanner from '../components/GoalPlanner/goalplanner';
-import './dashboard.css';
+import '../styles/dashboard.css';
 
 function Card({ title, cta, children }) {
   return (

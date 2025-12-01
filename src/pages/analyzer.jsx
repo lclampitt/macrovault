@@ -1,6 +1,5 @@
-// src/pages/analyzer.js
 import React, { useState } from 'react';
-import './analyzer.css';
+import '../styles/analyzer.css';
 
 const API_BASE = 'https://gainlytics-1.onrender.com';
 

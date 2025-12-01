@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import './CalculatorsPage.css';
+import '../styles/CalculatorsPage.css';
 
 const calculators = [
   {

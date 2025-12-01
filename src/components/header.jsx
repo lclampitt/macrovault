@@ -1,6 +1,5 @@
-// src/components/header.js
 import { Link, useLocation } from 'react-router-dom';
-import './header.css';
+import '../styles/header.css';
 
 export default function Header({ onLogout, session }) {
   const location = useLocation();

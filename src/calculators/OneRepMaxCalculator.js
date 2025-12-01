@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './OneRepMaxCalculator.css';
+import '../styles/OneRepMaxCalculator.css';
 
 function OneRepMaxCalculator() {
   const [unit, setUnit] = useState('lbs');

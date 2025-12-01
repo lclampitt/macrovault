@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './TdeeCalculator.css';
+import '../styles/TdeeCalculator.css';
 
 function DeficitTimeCalculator() {
   const [unit, setUnit] = useState('imperial');

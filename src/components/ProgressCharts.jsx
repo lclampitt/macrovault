@@ -1,4 +1,3 @@
-// src/components/ProgressCharts.jsx
 import React from 'react';
 import {
   LineChart,

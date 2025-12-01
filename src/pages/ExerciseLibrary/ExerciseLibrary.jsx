@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ExerciseLibrary.css';
+import '../../styles/ExerciseLibrary.css';
 import { Link } from 'react-router-dom';
 
 // Temporary dataset (replace later with Supabase)

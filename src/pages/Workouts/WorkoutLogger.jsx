@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
-import './WorkoutLogger.css';
+import '../../styles/WorkoutLogger.css';
 
 export default function WorkoutLogger() {
   const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
