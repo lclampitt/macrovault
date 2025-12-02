@@ -158,7 +158,7 @@ export default function GoalPlanner({ compact = false }) {
     <div className={`goalplanner-container ${compact ? 'compact' : ''}`}>
       {!compact && (
         <div className="goalplanner-header">
-          <h2>🎯 Goal Planner</h2>
+          <h2>Goal Planner</h2>
           {userId && (
             <button
               onClick={() => setEditing((e) => !e)}

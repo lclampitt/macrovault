@@ -108,3 +108,67 @@
   font-size: 1rem;
   grid-column: 1 / -1;
 }
+
+/* ===== Exercise Detail Page ===== */
+.exercise-detail {
+  background-color: #0e0f1a;
+  min-height: 100vh;
+  padding: 2.5rem 1rem 3rem;
+  color: #fff;
+}
+
+.exercise-detail-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Back link aligned with the card */
+.back-btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #00cfff;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
+/* The main card */
+.exercise-detail-card {
+  background-color: #141421;
+  border: 1px solid #2e2e2e;
+  border-radius: 12px;
+  padding: 1.8rem 2rem 2.2rem;
+  box-shadow: 0 4px 12px rgba(0, 204, 255, 0.12);
+}
+
+.exercise-detail h2 {
+  font-size: 1.8rem;
+  color: #00cfff;
+  margin-bottom: 0.75rem;
+}
+
+.exercise-detail h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #00cfff;
+}
+
+.exercise-detail-description {
+  max-width: 700px;
+  margin-bottom: 1rem;
+  color: #ddd;
+}
+
+.exercise-detail ul {
+  padding-left: 1.2rem;
+  max-width: 700px;
+}
+
+.exercise-detail li {
+  margin-bottom: 0.4rem;
+  color: #ccc;
+}

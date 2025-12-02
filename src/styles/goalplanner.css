@@ -16,9 +16,12 @@
 
 .goalplanner-header h2 {
   margin: 0;
-  font-size: 1.6rem;
+  margin-bottom: 0.4rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: #e8f1ff;
+  background: linear-gradient(90deg, #00cfff, #00a4ff);
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 /* Edit / Add button */

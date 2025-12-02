@@ -14,10 +14,14 @@
 }
 
 .workout-title {
-  color: #00cfff;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
   font-size: 2rem;
+  font-weight: 700;
   text-align: center;
-  margin-bottom: 4px;
+  background: linear-gradient(90deg, #00cfff, #00a4ff);
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .workout-subtext {

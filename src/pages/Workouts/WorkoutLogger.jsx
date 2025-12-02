@@ -9,7 +9,7 @@ export default function WorkoutLogger() {
   const [newExercise, setNewExercise] = useState('');
   const [message, setMessage] = useState('');
   const [userId, setUserId] = useState(null);
-  const [editingWorkoutId, setEditingWorkoutId] = useState(null); // 🧠 NEW state
+  const [editingWorkoutId, setEditingWorkoutId] = useState(null);
 
   const [workoutHistory, setWorkoutHistory] = useState([]);
   const [expanded, setExpanded] = useState({});
@@ -50,14 +50,14 @@ export default function WorkoutLogger() {
     if (!newExercise.trim()) return;
     setExercises([
       ...exercises,
-      { name: newExercise.trim(), sets: [{ weight: '', reps: '', rpe: '', notes: '' }] },
+      { name: newExercise.trim(), sets: [{ weight: '', reps: '', notes: '' }] },
     ]);
     setNewExercise('');
   };
 
   const addSet = (i) => {
     const updated = [...exercises];
-    updated[i].sets.push({ weight: '', reps: '', rpe: '', notes: '' });
+    updated[i].sets.push({ weight: '', reps: '', notes: '' });
     setExercises(updated);
   };
 
@@ -72,7 +72,6 @@ export default function WorkoutLogger() {
     setExercises(updated);
   };
 
-  // ✅ Save or Update workout
   const saveWorkout = async () => {
     if (!workoutName.trim() || exercises.length === 0) {
       setMessage('⚠️ Please enter a workout name and add at least one exercise.');
@@ -93,7 +92,6 @@ export default function WorkoutLogger() {
     let error;
 
     if (editingWorkoutId) {
-      // ✏️ Update existing workout
       ({ error } = await supabase
         .from('workouts')
         .update(workoutData)
@@ -103,7 +101,6 @@ export default function WorkoutLogger() {
         setEditingWorkoutId(null);
       }
     } else {
-      // 💾 Insert new workout
       ({ error } = await supabase.from('workouts').insert([workoutData]));
       if (!error) setMessage('✅ Workout saved successfully!');
     }
@@ -119,7 +116,6 @@ export default function WorkoutLogger() {
     }
   };
 
-  // 🧠 Load existing workout into editor
   const editWorkout = (workout) => {
     setWorkoutDate(workout.workout_date);
     setWorkoutName(workout.workout_name);
@@ -137,7 +133,7 @@ export default function WorkoutLogger() {
     <div className="workout-logger">
       <h1 className="workout-title">Workout Logger</h1>
       <p className="workout-subtext">
-        Track sets, reps, weight, and RPE for your training sessions.
+        Track sets, reps, and weight for your training sessions.
       </p>
 
       <div className="workout-header">
@@ -175,7 +171,6 @@ export default function WorkoutLogger() {
           <div className="exercise-header">
             <h3>{ex.name}</h3>
             <button className="trash-btn" onClick={() => deleteExercise(i)}>Trash</button>
-
           </div>
 
           <table className="sets-table">
@@ -184,7 +179,6 @@ export default function WorkoutLogger() {
                 <th>Set</th>
                 <th>Weight (lbs)</th>
                 <th>Reps</th>
-                <th>RPE</th>
                 <th>Notes</th>
               </tr>
             </thead>
@@ -204,13 +198,6 @@ export default function WorkoutLogger() {
                       type="number"
                       value={set.reps}
                       onChange={(e) => handleSetChange(i, j, 'reps', e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={set.rpe}
-                      onChange={(e) => handleSetChange(i, j, 'rpe', e.target.value)}
                     />
                   </td>
                   <td>
@@ -268,7 +255,10 @@ export default function WorkoutLogger() {
                   <table>
                     <thead>
                       <tr>
-                        <th>Set</th><th>Weight</th><th>Reps</th><th>RPE</th><th>Notes</th>
+                        <th>Set</th>
+                        <th>Weight</th>
+                        <th>Reps</th>
+                        <th>Notes</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -277,7 +267,6 @@ export default function WorkoutLogger() {
                           <td>{j + 1}</td>
                           <td>{set.weight}</td>
                           <td>{set.reps}</td>
-                          <td>{set.rpe}</td>
                           <td>{set.notes}</td>
                         </tr>
                       ))}
