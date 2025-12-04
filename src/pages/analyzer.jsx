@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../styles/analyzer.css';
 
 // Use env var in production, fall back to local dev backend
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://127.0.0.1:8000';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
 export default function Analyzer() {
   // Which mode is active: "measurements" or "photo"
