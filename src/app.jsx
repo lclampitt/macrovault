@@ -30,7 +30,9 @@ import ExerciseDetails from './pages/ExerciseLibrary/ExerciseDetails';
 // Workouts
 import WorkoutLogger from './pages/Workouts/WorkoutLogger';
 
-// Protected Route Wrapper to guard authenticated pages
+
+/* ============ FUNCTIONAL REQUIREMENT: FR-3 / FR-4 ============ */
+/* System shall protect private pages and redirect unauthenticated users to /auth. */
 function ProtectedRoute({ session, loading, children }) {
   // While we don't yet know the session, show a simple loading state
   if (loading) {
@@ -61,7 +63,8 @@ function App() {
   const [, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
-  // Load initial session and subscribe to auth changes once on mount
+  /* ============ FUNCTIONAL REQUIREMENT: FR-3 ============ */
+  /* System shall load and persist a Supabase session for authenticated access. */
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
@@ -82,7 +85,8 @@ function App() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  // Log user out and send them back to the home page
+  /* ============ FUNCTIONAL REQUIREMENT: FR-3 (Logout) ============ */
+  /* System shall allow users to sign out and clear their active session. */
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setSession(null);
@@ -95,7 +99,8 @@ function App() {
       <Header onLogout={handleLogout} session={session} />
       <main>
         <Routes>
-          {/* Public routes */}
+          {/* ============ FUNCTIONAL REQUIREMENT: FR-1 / FR-2 / FR-3 ============ */}
+          {/* Public routes include authentication + informational pages. */}
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/about" element={<About />} />
           <Route path="/help" element={<Contact />} />
@@ -106,7 +111,8 @@ function App() {
           <Route path="/exercises" element={<ExerciseLibrary />} />
           <Route path="/exercises/:id" element={<ExerciseDetails />} />
 
-          {/* Protected routes (require Supabase session) */}
+          {/* ============ FUNCTIONAL REQUIREMENT: FR-4 ============ */}
+          {/* Protected dashboard + core tools require an active session. */}
           <Route
             path="/"
             element={

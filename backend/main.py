@@ -37,8 +37,8 @@ app.add_middleware(
 # Build an absolute path to the saved RandomForest model
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "bodyfat_model.joblib")
-
 bodyfat_model = None
+
 # Try to load the model at startup so each request can reuse it
 if os.path.exists(MODEL_PATH):
     try:
@@ -281,6 +281,9 @@ def interpretation_and_plan(bodyfat: float) -> tuple[str, str, int, list[str]]:
 # -------------------------------------------------
 # Measurement-based analysis endpoint (dataset model)
 # -------------------------------------------------
+
+# ============ FUNCTIONAL REQUIREMENT: FR-5 / FR-6 ============
+# System shall accept measurement inputs and return an ML-based body fat estimate.
 @app.post("/analyze-measurements", response_model=AnalysisResponse)
 async def analyze_measurements(data: MeasurementRequest):
     """
@@ -330,6 +333,9 @@ async def analyze_measurements(data: MeasurementRequest):
     category, goal, cals, notes = interpretation_and_plan(bodyfat)
 
     # The response model standardizes the shape sent back to the React app
+    
+    # ============ FUNCTIONAL REQUIREMENT: FR-7 ============
+    # System shall return body fat %, category, and calorie guidance to the frontend.
     return AnalysisResponse(
         bodyfat=round(bodyfat, 1),
         category=category,
@@ -342,6 +348,9 @@ async def analyze_measurements(data: MeasurementRequest):
 # -------------------------------------------------
 # Image-based analysis (experimental – heuristic only)
 # -------------------------------------------------
+
+# ============ FUNCTIONAL REQUIREMENT: FR-8 / FR-9 ============
+# System shall process an uploaded image in-memory and not permanently store it.
 @app.post("/analyze-image", response_model=AnalysisResponse)
 async def analyze_image(file: UploadFile = File(...)):
     """

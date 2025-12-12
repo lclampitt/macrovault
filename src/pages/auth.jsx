@@ -14,7 +14,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
 
-  // Handle both sign in and registration with one handler
+  /* ============ FUNCTIONAL REQUIREMENT: FR-2 / FR-3 ============ */
+  /* System shall allow users to register and sign in using Supabase Auth. */
   const handleAuth = async (e) => {
     e.preventDefault();       // allows Enter to submit
     setMessage('');
@@ -23,7 +24,8 @@ function AuthPage() {
 
     try {
       if (isLogin) {
-        // Sign in with Supabase email/password
+        /* ============ FUNCTIONAL REQUIREMENT: FR-3 ============ */
+        /* System shall authenticate valid credentials and establish a session. */
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
@@ -32,7 +34,8 @@ function AuthPage() {
         // On successful login, go to the home/dashboard
         navigate('/', { replace: true });
       } else {
-        // Create a new user account in Supabase
+        /* ============ FUNCTIONAL REQUIREMENT: FR-2 ============ */
+        /* System shall create a new user account in Supabase Auth. */
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 

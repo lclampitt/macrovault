@@ -22,7 +22,9 @@ export default function ProgressCharts({ rows = [] }) {
       date: r.date,
       // Interpret the weight_kg DB column as pounds in the chart
       weight_lbs:
-        r.weight_kg === '' || r.weight_kg === null || r.weight_kg === undefined
+        r.weight_kg === '' ||
+        r.weight_kg === null ||
+        r.weight_kg === undefined
           ? null
           : Number(r.weight_kg),
       body_fat_pct:
@@ -95,6 +97,7 @@ export default function ProgressCharts({ rows = [] }) {
           <Tooltip content={renderTooltip} />
           <Legend
             wrapperStyle={{ paddingTop: 8 }}
+            // value is the dataKey when no `name` prop is provided on Line
             formatter={(value) =>
               value === 'weight_lbs' ? 'Weight (lbs)' : 'BF%'
             }
@@ -104,7 +107,6 @@ export default function ProgressCharts({ rows = [] }) {
             yAxisId="left"
             type="monotone"
             dataKey="weight_lbs"
-            name="Weight (lbs)"
             dot={false}
             connectNulls
           />
@@ -114,7 +116,6 @@ export default function ProgressCharts({ rows = [] }) {
             type="monotone"
             stroke="#ffffff"
             dataKey="body_fat_pct"
-            name="BF%"
             dot={false}
             connectNulls
           />

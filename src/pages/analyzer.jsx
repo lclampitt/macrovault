@@ -30,6 +30,8 @@ export default function Analyzer() {
   const [loadingImage, setLoadingImage] = useState(false);
 
   // ----- Measurement-based analysis -----
+  /* ============ FUNCTIONAL REQUIREMENT: FR-5 / FR-6 / FR-7 ============ */
+  /* System shall validate measurement input, call /analyze-measurements, and display results. */
   const handleAnalyzeMeasurements = async () => {
     setMeasureError('');
     setResult(null);
@@ -66,7 +68,9 @@ export default function Analyzer() {
       return;
     }
 
-    // Map gender to numeric value expected by the model
+
+    /* ============ FUNCTIONAL REQUIREMENT: FR-5 ============ */
+    /* Gender is mapped to numeric for the ML model: male=1, female=0. */
     const genderNumeric = gender === 'male' ? 1 : 0;
 
     // Convert imperial inputs to metric for backend model
@@ -102,6 +106,9 @@ export default function Analyzer() {
       }
 
       const data = await res.json();
+
+      /* ============ FUNCTIONAL REQUIREMENT: FR-7 ============ */
+      /* System shall render body fat %, category, and calorie guidance returned by the API. */
       setResult(data);
     } catch (err) {
       console.error(err);
@@ -113,7 +120,8 @@ export default function Analyzer() {
     }
   };
 
-  // ----- Image-based analysis (experimental) -----
+  /* ============ FUNCTIONAL REQUIREMENT: FR-8 / FR-9 ============ */
+  /* System shall accept a user image and send it to /analyze-image for experimental analysis. */
   const handleFileChange = (e) => {
     const f = e.target.files[0];
     setFile(f || null);
