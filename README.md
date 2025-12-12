@@ -1,3 +1,77 @@
+1. Clone the Repository
+    git clone https://github.com/lclampitt/gainlytics
+    cd gainlytics
+2. Backend Setup (FastAPI + ML Model)
+    2.1 Navigate to backend folder
+        cd backend
+
+    2.2 Create and activate a virtual environment
+        python -m venv venv
+    Windows
+        venv\Scripts\activate
+    macOS/Linux
+        source venv/bin/activate
+
+    2.3 Install backend dependencies
+        pip install -r requirements.txt
+    If requirements.txt is missing:
+        pip install fastapi uvicorn numpy pandas scikit-learn joblib pillow opencv-python
+
+    2.4 Train the body-fat ML model
+        python train_bodyfat.py
+
+    2.5 Start the backend server
+        uvicorn main:app --reload --port 8000
+    Backend will be available at:
+        http://localhost:8000
+
+3. Frontend Setup (React)
+    3.1 Navigate to frontend folder
+        cd frontend
+
+    3.2 Install frontend dependencies
+        npm install
+
+    3.3 Configure environment variables
+        Create a .env file in the frontend directory:
+            REACT_APP_API_BASE=http://localhost:8000
+            REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
+            REACT_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+                Supabase credentials must be provided by the user to enable authentication and database features.
+
+    3.4 Start the frontend
+        npm start
+    Frontend will run at:
+        http://localhost:3000
+        
+4. Running the Application
+    Once both servers are running:
+    Open http://localhost:3000
+    Register a new user account
+    Log in
+    Navigate to Analyzer
+    Use Measurements (Recommended) for ML-based estimation
+    Use Photo (Experimental) for heuristic image analysis
+    Explore Goal Planner, Calculators, Workout Logger, and Progress Tracking
+
+5. Important Notes for Graders
+    Measurement-based analysis uses a Random Forest Regression model trained from CSV data
+    Photo-based analysis is experimental and heuristic
+    Uploaded images are processed in memory and are not stored
+    All user data is stored securely in Supabase PostgreSQL
+
+6. Common Errors
+    “Bodyfat model is not loaded”
+    You forgot to run:
+        python train_bodyfat.py
+            Frontend shows fetch/CORS errors
+    Make sure:
+        Backend is running on port 8000
+    .env contains:
+        REACT_APP_API_BASE=http://localhost:8000
+
+
+REACT NOTES:
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
