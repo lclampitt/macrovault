@@ -1,42 +1,84 @@
-.about-page {
-  min-height: 80vh;
-  padding: 40px 20px;
+/* ── About page — overrides & additions on top of landing.css ── */
+
+/* Limit features grid to 3 cols max on about (values section) */
+.about-lp .lp-features-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Mission block */
+.about-mission__body {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  color: #e7f5ff;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 720px;
 }
 
-.about-card {
-  width: 100%;
-  max-width: 750px;
-  padding: 30px 28px;
-  border-radius: 20px;
-
-  background: radial-gradient(
-      circle at top left,
-      #1d2538 0,
-      #151a2a 50%,
-      #0e111a 100%
-  );
-
-  border: 1px solid rgba(0, 207, 255, 0.25);
-  box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.6),
-    0 0 22px rgba(0, 207, 255, 0.06);
+.about-mission__text {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
-.about-title {
-  margin: 0 0 10px;
-  font-size: 1.8rem;
+.about-mission__text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* CTA card */
+.about-cta {
+  padding-top: 0;
+  padding-bottom: 96px;
+}
+
+.about-cta__card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-cta__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(29,158,117,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.about-cta__heading {
+  font-size: clamp(22px, 3vw, 32px);
   font-weight: 700;
-  background: linear-gradient(90deg, #00cfff, #00a4ff);
-  -webkit-background-clip: text;
-  color: transparent;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  position: relative;
 }
 
-.about-text {
-  color: #c3d0e0;
-  line-height: 1.55;
-  margin-bottom: 14px;
+.about-cta__sub {
+  font-size: 15px;
+  color: var(--text-secondary);
+  position: relative;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .about-lp .lp-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-cta__card {
+    padding: 40px 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-lp .lp-features-grid {
+    grid-template-columns: 1fr;
+  }
 }
