@@ -10,6 +10,40 @@
   align-items: center;
   background-color: var(--bg-base);
   padding: 5rem 1rem 10rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid dot pattern — same as hero */
+.auth-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(29,158,117,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29,158,117,0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Radial glow centered behind the card */
+.auth-glow {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse at center, rgba(29,158,117,0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure logo + card sit above the decorations */
+.auth-logo,
+.auth-card {
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Logo / brand above card ───────────────────────────────── */
