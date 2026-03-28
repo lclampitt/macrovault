@@ -5,7 +5,7 @@ import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
 import './UpgradeModal.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics.onrender.com';
 
 const PRO_FEATURES = [
   'AI Body Analyzer (measurements + photo)',
