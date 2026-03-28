@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics.onrender.com';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
 /**
  * Fetches the current user's usage summary from the backend.

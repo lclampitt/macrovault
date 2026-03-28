@@ -3,7 +3,7 @@ import { supabase } from '../supabaseClient';
 import { usePlan } from '../hooks/usePlan';
 import '../styles/billing.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics.onrender.com';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
 export default function BillingPage() {
   const { plan, stripeCustomerId, isLoading } = usePlan();

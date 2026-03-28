@@ -5,7 +5,7 @@ import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import '../../styles/WorkoutLogger.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics.onrender.com';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
 /* Infer a muscle group tag from the workout name */
 function inferMuscleGroup(name = '') {

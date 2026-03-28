@@ -6,7 +6,7 @@ import { supabase } from '../supabaseClient';
 import { useUpgrade } from '../context/UpgradeContext';
 
 // Use env var in production, fall back to hosted backend URL
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics.onrender.com';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
 function AnalyzerGate() {
   const { triggerUpgrade } = useUpgrade();
