@@ -123,7 +123,7 @@ export default function UpgradeModal({ isOpen, onClose, feature = null }) {
                     <Crown size={11} /> Most Popular
                   </div>
                   <div className="tier-card__name">Pro</div>
-                  <div className="tier-card__price">$9<span>/mo</span></div>
+                  <div className="tier-card__price">$4.99<span>/mo</span></div>
                   <ul className="tier-card__features">
                     {PRO_FEATURES.map((f) => (
                       <li key={f}>
@@ -150,7 +150,7 @@ export default function UpgradeModal({ isOpen, onClose, feature = null }) {
                     Redirecting…
                   </span>
                 ) : (
-                  'Upgrade to Pro — $9/mo'
+                  'Upgrade to Pro — $4.99/mo'
                 )}
               </button>
               <p className="upgrade-modal__cancel-note">Cancel anytime. No commitment.</p>

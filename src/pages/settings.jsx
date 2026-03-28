@@ -333,7 +333,7 @@ export default function SettingsPage() {
           <div className="settings-row">
             <div className="settings-row__left">
               <span className="settings-row__label">Upgrade to Pro</span>
-              <span className="settings-row__sub">$9/mo — AI Analyzer, unlimited logs, advanced charts</span>
+              <span className="settings-row__sub">$4.99/mo — AI Analyzer, unlimited logs, advanced charts</span>
             </div>
             <div className="settings-row__control">
               <button

@@ -315,7 +315,7 @@ function Pricing() {
           <div className="lp-pricing-card__badge">Most popular</div>
           <div className="lp-pricing-card__tier">Pro</div>
           <div className="lp-pricing-card__price">
-            <span className="lp-pricing-card__amount">$9</span>
+            <span className="lp-pricing-card__amount">$4.99</span>
             <span className="lp-pricing-card__period">/mo</span>
           </div>
           <div className="lp-pricing-card__tagline">

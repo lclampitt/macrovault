@@ -19,7 +19,7 @@ function AnalyzerGate() {
           <p>The AI Body Analyzer is a Pro feature. Upgrade to unlock instant body fat estimates using measurements or photos.</p>
         </div>
         <button className="pro-gate__cta" onClick={() => triggerUpgrade('analyzer')}>
-          Upgrade to Pro — $9/mo
+          Upgrade to Pro — $4.99/mo
         </button>
       </div>
     </div>

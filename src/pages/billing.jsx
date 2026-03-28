@@ -97,7 +97,7 @@ export default function BillingPage() {
         {plan === 'free' ? (
           <>
             <div className="billing__perks">
-              <p className="billing__perks-title">Upgrade to Pro — $9/month</p>
+              <p className="billing__perks-title">Upgrade to Pro — $4.99/month</p>
               <ul>
                 <li>✓ AI Body Analyzer (measurements + photo)</li>
                 <li>✓ TDEE, Protein &amp; 1RM calculators</li>
