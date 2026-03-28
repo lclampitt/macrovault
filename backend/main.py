@@ -22,8 +22,14 @@ import stripe
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from datetime import datetime
+from posthog import Posthog
 
 load_dotenv()
+
+# PostHog client
+_posthog_key = os.environ.get("POSTHOG_KEY", "")
+_posthog_host = os.environ.get("POSTHOG_HOST", "https://us.i.posthog.com")
+posthog_client: Posthog | None = Posthog(_posthog_key, host=_posthog_host) if _posthog_key else None
 
 # Stripe config
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
@@ -162,7 +168,7 @@ def _get_plan(user_id: str) -> str:
     """Return 'pro' or 'free' for a given user."""
     if not supabase_admin:
         return "free"
-    result = supabase_admin.table("profiles").select("subscription_tier").eq("id", user_id).maybeSingle().execute()
+    result = supabase_admin.table("profiles").select("subscription_tier").eq("id", user_id).maybe_single().execute()
     return (result.data or {}).get("subscription_tier", "free")
 
 def can_use_analyzer(user_id: str) -> bool:
@@ -171,7 +177,7 @@ def can_use_analyzer(user_id: str) -> bool:
         return True
     result = supabase_admin.table("profiles") \
         .select("subscription_tier,analyzer_uses_this_month,analyzer_month") \
-        .eq("id", user_id).maybeSingle().execute()
+        .eq("id", user_id).maybe_single().execute()
     profile = result.data or {}
     if profile.get("subscription_tier") == "pro":
         return True
@@ -192,7 +198,7 @@ def increment_analyzer_use(user_id: str) -> None:
     month = _current_month()
     result = supabase_admin.table("profiles") \
         .select("analyzer_uses_this_month,analyzer_month") \
-        .eq("id", user_id).maybeSingle().execute()
+        .eq("id", user_id).maybe_single().execute()
     profile = result.data or {}
     if profile.get("analyzer_month", "") != month:
         new_count = 1
@@ -219,7 +225,7 @@ def get_usage_summary(user_id: str) -> dict:
         return {"analyzerUsed": 0, "analyzerLimit": 3, "workoutCount": 0, "workoutLimit": 10, "plan": "free"}
     profile_res = supabase_admin.table("profiles") \
         .select("subscription_tier,analyzer_uses_this_month,analyzer_month") \
-        .eq("id", user_id).maybeSingle().execute()
+        .eq("id", user_id).maybe_single().execute()
     profile = profile_res.data or {}
     plan = profile.get("subscription_tier", "free")
     month = _current_month()
@@ -499,6 +505,21 @@ async def analyze_measurements(data: MeasurementRequest):
         except Exception:
             pass  # Never fail the request because of a tracking error
 
+    # Track analysis event
+    if posthog_client:
+        try:
+            posthog_client.capture(
+                data.user_id or "anonymous",
+                "analysis_completed",
+                {
+                    "method": "measurements",
+                    "bodyfat_category": category,
+                    "gender": data.gender,
+                },
+            )
+        except Exception:
+            pass
+
     # The response model standardizes the shape sent back to the React app
 
     # ============ FUNCTIONAL REQUIREMENT: FR-7 ============
@@ -557,6 +578,20 @@ async def analyze_image(file: UploadFile = File(...), user_id: Optional[str] = F
     if user_id:
         try:
             increment_analyzer_use(user_id)
+        except Exception:
+            pass
+
+    # Track analysis event
+    if posthog_client:
+        try:
+            posthog_client.capture(
+                user_id or "anonymous",
+                "analysis_completed",
+                {
+                    "method": "image",
+                    "bodyfat_category": category,
+                },
+            )
         except Exception:
             pass
 
@@ -627,6 +662,11 @@ async def stripe_webhook(request: Request):
                 "stripe_customer_id": customer_id,
                 "stripe_subscription_id": subscription_id,
             }).execute()
+            if posthog_client:
+                try:
+                    posthog_client.capture(user_id, "subscription_started", {"plan": "pro"})
+                except Exception:
+                    pass
 
     elif event_type == "customer.subscription.deleted":
         customer_id = obj.get("customer")
@@ -699,6 +739,15 @@ async def save_workout(body: WorkoutSaveRequest):
             "workout_name":  body.workout_name,
             "exercises":     body.exercises,
         }).execute()
+        if posthog_client:
+            try:
+                posthog_client.capture(
+                    body.user_id,
+                    "workout_saved",
+                    {"exercise_count": len(body.exercises)},
+                )
+            except Exception:
+                pass
         return result.data[0] if result.data else {}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
