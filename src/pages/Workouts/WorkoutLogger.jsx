@@ -61,10 +61,10 @@ export default function WorkoutLogger() {
   }, []);
 
   // Once we know the user, load their saved workouts
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!userId) return;
     fetchWorkouts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   // Fetch all workouts for the current user
