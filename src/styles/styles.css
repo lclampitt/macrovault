@@ -4,6 +4,54 @@
   box-sizing: border-box;
 }
 
+/* ============================================================
+   PRO GATE — shared across gated pages
+   ============================================================ */
+.pro-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 64px 24px;
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.pro-gate__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pro-gate__header h2 {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.pro-gate__header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.pro-gate__cta {
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.pro-gate__cta:hover {
+  background: var(--accent-dark);
+}
+
 html,
 body {
   margin: 0;

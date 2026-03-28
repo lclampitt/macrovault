@@ -1,6 +1,39 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { supabase } from '../../supabaseClient';
 import '../../styles/goalplanner.css';
+
+/* Stagger container for card entrance */
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+};
+
+/* Macro progress bar */
+function MacroBar({ label, value, max, color }) {
+  const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  return (
+    <div className="gp-macro-bar">
+      <div className="gp-macro-bar__top">
+        <span className="gp-macro-bar__label">{label}</span>
+        <span className="gp-macro-bar__value">{value}g</span>
+      </div>
+      <div className="gp-macro-bar__track">
+        <motion.div
+          className="gp-macro-bar__fill"
+          style={{ background: color }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        />
+      </div>
+    </div>
+  );
+}
 
 const emptyMacros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
@@ -16,6 +49,7 @@ export default function GoalPlanner({ compact = false }) {
   const [goal, setGoal] = useState('');
   const [macros, setMacros] = useState(emptyMacros);
   const [timeframe, setTimeframe] = useState(0);
+  const [createdAt, setCreatedAt] = useState(null);
 
   // UI state for edit/view/delete
   const [editing, setEditing] = useState(false);
@@ -40,7 +74,7 @@ export default function GoalPlanner({ compact = false }) {
 
       if (userError || !userData?.user) {
         // No logged-in user → show friendly message and stop
-        setError('⚠️ Please log in to manage your goal.');
+        setError('Please log in to manage your goal.');
         setLoading(false);
         return;
       }
@@ -71,6 +105,7 @@ export default function GoalPlanner({ compact = false }) {
           fat: Number(data.fat) || 0,
         });
         setTimeframe(Number(data.timeframe_weeks) || 0);
+        setCreatedAt(data.created_at ?? null);
         setEditing(false);
       } else {
         // No goal yet → start in editing mode so user sees the form immediately
@@ -91,6 +126,22 @@ export default function GoalPlanner({ compact = false }) {
     () => !!goal && timeframe > 0 && macros.calories > 0,
     [goal, timeframe, macros]
   );
+
+  // Timeline derived values
+  const timeline = useMemo(() => {
+    const weeksElapsed = createdAt
+      ? Math.floor((Date.now() - new Date(createdAt)) / (7 * 24 * 60 * 60 * 1000))
+      : 0;
+    const currentWeek = Math.min(weeksElapsed + 1, timeframe || 1);
+    const pct = timeframe > 0 ? Math.min((weeksElapsed / timeframe) * 100, 100) : 0;
+    const daysLeft = timeframe > 0 ? Math.max(timeframe * 7 - weeksElapsed * 7, 0) : 0;
+    const motivations = {
+      Cutting:     'Stay consistent — every deficit counts.',
+      Bulking:     'Keep eating and lifting — progress takes time.',
+      Maintenance: 'Consistency is key. You\'re doing great.',
+    };
+    return { currentWeek, pct, daysLeft, motivation: motivations[goal] ?? 'Keep going — you\'ve got this.' };
+  }, [createdAt, timeframe, goal]);
 
   // --------------------------------------
   // SAVE / UPSERT
@@ -125,11 +176,11 @@ export default function GoalPlanner({ compact = false }) {
       .maybeSingle();
 
     if (error) {
-      setError(`❌ Error saving goal: ${error.message}`);
+      setError(`Error saving goal: ${error.message}`);
     } else {
       // Ensure we keep track of the row id after first insert
       setRowId(data?.id ?? rowId);
-      setMessage('✅ Goal saved successfully!');
+      setMessage('Goal saved successfully!');
       // After saving, switch to read-only view mode
       setEditing(false);
     }
@@ -153,14 +204,14 @@ export default function GoalPlanner({ compact = false }) {
       .eq('user_id', userId);
 
     if (error) {
-      setError(`❌ Error deleting goal: ${error.message}`);
+      setError(`Error deleting goal: ${error.message}`);
     } else {
       // Reset local state after successful deletion
       setRowId(null);
       setGoal('');
       setMacros(emptyMacros);
       setTimeframe(0);
-      setMessage('🗑️ Goal deleted.');
+      setMessage('Goal deleted.');
       // Show blank form so user can create a new goal
       setEditing(true);
     }
@@ -171,153 +222,248 @@ export default function GoalPlanner({ compact = false }) {
   // --------------------------------------
   // RENDER
   // --------------------------------------
+
+  /* Total macros for bar sizing */
+  const totalMacroG = macros.protein + macros.carbs + macros.fat || 1;
+
   return (
-    <div className={`goalplanner-container ${compact ? 'compact' : ''}`}>
-      {/* Header is hidden when used in compact mode (e.g., dashboard widget) */}
-      {!compact && (
-        <div className="goalplanner-header">
-          <h2>Goal Planner</h2>
-          {userId && (
-            <button
-              onClick={() => setEditing((e) => !e)}
-              className="goalplanner-toggle"
-            >
-              {editing ? 'Close' : hasGoal ? 'Edit' : 'Add Goal'}
-            </button>
-          )}
-        </div>
-      )}
+    <div className={`gp-container ${compact ? "gp-container--compact" : ""}`}>
 
       {/* Status + feedback messages */}
-      {loading && <p className="goalplanner-loading">Loading…</p>}
-      {!loading && error && <p className="goalplanner-error">{error}</p>}
+      {loading && <p className="gp-loading">Loading…</p>}
+      {!loading && error && <p className="gp-error">{error}</p>}
       {!loading && message && (
-        <p
-          className={`goalplanner-message ${
-            message.startsWith('✅') ? 'success' : ''
-          }`}
-        >
+        <p className={`gp-message ${message.includes('saved') || message.includes('deleted') ? 'gp-message--success' : ''}`}>
           {message}
         </p>
       )}
 
-      {/* EDIT / CREATE FORM */}
+      {/* ── EDIT / CREATE FORM ── */}
       {!loading && editing && (
-        <div className="goalplanner-form">
-          <h3>{rowId ? 'Edit Goal' : 'Create Goal'}</h3>
-
-          {/* Goal type shortcut buttons */}
-          <div className="goalplanner-goal-options">
+        <motion.div
+          className="gp-form-card"
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+        >
+          {/* Goal type pills */}
+          <motion.div variants={fadeUp} className="gp-section-label">Goal type</motion.div>
+          <motion.div variants={fadeUp} className="gp-pills">
             {['Cutting', 'Bulking', 'Maintenance'].map((g) => (
-              <button
+              <motion.button
                 key={g}
                 onClick={() => setGoal(g)}
-                className={`goalplanner-option ${
-                  goal === g ? 'selected' : ''
-                }`}
+                className={`gp-pill ${goal === g ? 'gp-pill--active' : ''}`}
+                whileTap={{ scale: 0.97 }}
               >
                 {g}
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
 
-          {/* Macronutrient inputs – user can paste values from the calculators or coach */}
-          <h4>Macronutrients</h4>
-          {['calories', 'protein', 'carbs', 'fat'].map((m) => (
-            <div key={m} className="goalplanner-input-group">
-              <label>{m}:</label>
-              <input
-                type="number"
-                value={macros[m]}
-                onChange={(e) =>
-                  setMacros({
-                    ...macros,
-                    [m]: parseInt(e.target.value, 10) || 0,
-                  })
-                }
-              />
-              <span>{m === 'calories' ? 'kcal/day' : 'g/day'}</span>
-            </div>
-          ))}
+          {/* Macro grid */}
+          <motion.div variants={fadeUp} className="gp-section-label" style={{ marginTop: 16 }}>
+            Macronutrients
+          </motion.div>
+          <motion.div variants={fadeUp} className="gp-macro-grid">
+            {[
+              { key: 'calories', label: 'Calories', unit: 'kcal/day' },
+              { key: 'protein',  label: 'Protein',  unit: 'g/day' },
+              { key: 'carbs',    label: 'Carbs',    unit: 'g/day' },
+              { key: 'fat',      label: 'Fat',      unit: 'g/day' },
+            ].map(({ key, label, unit }) => (
+              <div key={key} className="gp-field">
+                <label className="gp-field__label">{label}</label>
+                <input
+                  type="number"
+                  className="input"
+                  value={macros[key]}
+                  onChange={(e) => setMacros({ ...macros, [key]: parseInt(e.target.value, 10) || 0 })}
+                />
+                <span className="gp-field__unit">{unit}</span>
+              </div>
+            ))}
+          </motion.div>
 
-          {/* Timeframe input in weeks – used for planning progress expectations */}
-          <h4>Estimated Timeframe (weeks)</h4>
-          <input
-            type="number"
-            value={timeframe}
-            onChange={(e) =>
-              setTimeframe(parseInt(e.target.value, 10) || 0)
-            }
-            className="goalplanner-timeframe"
-          />
+          {/* Timeframe */}
+          <motion.div variants={fadeUp} className="gp-field gp-field--full" style={{ marginTop: 12 }}>
+            <label className="gp-field__label">Timeframe (weeks)</label>
+            <input
+              type="number"
+              className="input"
+              style={{ maxWidth: 160 }}
+              value={timeframe}
+              onChange={(e) => setTimeframe(parseInt(e.target.value, 10) || 0)}
+            />
+          </motion.div>
 
-          {/* Save / delete actions */}
-          <div className="goalplanner-actions">
-            <button
+          {/* Actions */}
+          <motion.div variants={fadeUp} className="gp-actions">
+            <motion.button
+              className="btn btn-primary"
               onClick={handleSave}
               disabled={saving}
-              className="save"
+              whileTap={{ scale: 0.97 }}
             >
               {saving ? 'Saving…' : 'Save Goal'}
-            </button>
+            </motion.button>
             {rowId && (
-              <button
+              <motion.button
+                className="btn btn-destructive"
                 onClick={() => setConfirmDelete(true)}
                 disabled={deleting}
-                className="delete"
+                whileTap={{ scale: 0.97 }}
               >
                 {deleting ? 'Deleting…' : 'Delete Goal'}
-              </button>
+              </motion.button>
             )}
-          </div>
+          </motion.div>
 
-          {/* Extra confirmation layer to prevent accidental deletes */}
+          {/* Confirm delete */}
           {confirmDelete && (
-            <div className="goalplanner-confirm">
+            <motion.div
+              className="gp-confirm"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <span>Delete your current goal permanently?</span>
-              <div>
-                <button
+              <div className="gp-confirm__actions">
+                <motion.button
+                  className="btn btn-destructive"
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="confirm-yes"
+                  whileTap={{ scale: 0.97 }}
                 >
                   Yes, delete
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  className="btn btn-primary"
                   onClick={() => setConfirmDelete(false)}
-                  className="confirm-cancel"
+                  whileTap={{ scale: 0.97 }}
                 >
                   Cancel
-                </button>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       )}
 
-      {/* READ-ONLY VIEW – shows the user’s saved goal when not editing */}
+      {/* ── READ-ONLY VIEW ── */}
       {!loading && hasGoal && !editing && (
-        <div className="goalplanner-view">
-          {!compact && <h3>Your Current Goal</h3>}
-          <p>
-            <strong>Goal:</strong> {goal}
-          </p>
-          <p>
-            <strong>Calories:</strong> {macros.calories} kcal/day
-          </p>
-          <p>
-            <strong>Protein:</strong> {macros.protein} g/day
-          </p>
-          <p>
-            <strong>Carbs:</strong> {macros.carbs} g/day
-          </p>
-          <p>
-            <strong>Fat:</strong> {macros.fat} g/day
-          </p>
-          <p>
-            <strong>Timeframe:</strong> {timeframe} weeks
-          </p>
-        </div>
+        <>
+          {/* Summary card */}
+          <motion.div
+            className="gp-view-card"
+            variants={stagger}
+            initial="hidden"
+            animate="show"
+          >
+            {/* Top row: badge + active pill */}
+            <motion.div variants={fadeUp} className="gp-view-top">
+              <div>
+                <span className="gp-goal-badge">{goal} phase</span>
+                <p className="gp-view-sub">{timeframe} weeks · {macros.calories} kcal/day</p>
+              </div>
+              <span className="gp-active-pill">Active</span>
+            </motion.div>
+
+            {/* Macro bars */}
+            <motion.div variants={fadeUp} className="gp-macro-bars">
+              <MacroBar label="Protein" value={macros.protein} max={totalMacroG} color="#1D9E75" />
+              <MacroBar label="Carbs"   value={macros.carbs}   max={totalMacroG} color="#5DCAA5" />
+              <MacroBar label="Fat"     value={macros.fat}     max={totalMacroG} color="#0F6E56" />
+            </motion.div>
+
+            {/* Actions */}
+            {!compact && (
+              <motion.div variants={fadeUp} className="gp-actions">
+                <motion.button
+                  className="btn btn-primary"
+                  onClick={() => setEditing(true)}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Edit goal
+                </motion.button>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* 2-col grid: timeline + macro chips */}
+          {!compact && (
+            <div className="gp-grid">
+              {/* Timeline card */}
+              <motion.div
+                className="gp-timeline-card"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.06, ease: 'easeOut' }}
+              >
+                <p className="gp-timeline-title">Goal timeline</p>
+                <div className="gp-timeline-week">
+                  Week {timeline.currentWeek}
+                  <span>of {timeframe}</span>
+                </div>
+                <div className="gp-timeline-bar__track">
+                  <motion.div
+                    className="gp-timeline-bar__fill"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${timeline.pct}%` }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                  />
+                </div>
+                <div className="gp-timeline-meta">
+                  <span>{Math.round(timeline.pct)}% complete</span>
+                  <span>{timeline.daysLeft} days left</span>
+                </div>
+                <p className="gp-timeline-motivation">{timeline.motivation}</p>
+              </motion.div>
+
+              {/* Macro chips card */}
+              <motion.div
+                className="gp-macro-chips-card"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.12, ease: 'easeOut' }}
+              >
+                <p className="gp-macro-chips-title">Macro targets</p>
+                <div className="gp-macro-chips-grid">
+                  {[
+                    { label: 'Calories', value: macros.calories, unit: 'kcal' },
+                    { label: 'Protein',  value: macros.protein,  unit: 'g' },
+                    { label: 'Carbs',    value: macros.carbs,    unit: 'g' },
+                    { label: 'Fat',      value: macros.fat,      unit: 'g' },
+                  ].map(({ label, value, unit }) => (
+                    <div key={label} className="gp-macro-chip">
+                      <span className="gp-macro-chip__value">{value}<span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 2 }}>{unit}</span></span>
+                      <span className="gp-macro-chip__label">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* No goal yet + not in edit mode */}
+      {!loading && !hasGoal && !editing && (
+        <motion.div
+          className="gp-empty"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <p>No goal set yet.</p>
+          {userId && (
+            <motion.button
+              className="btn btn-primary"
+              onClick={() => setEditing(true)}
+              whileTap={{ scale: 0.97 }}
+            >
+              Add Goal
+            </motion.button>
+          )}
+        </motion.div>
       )}
     </div>
   );

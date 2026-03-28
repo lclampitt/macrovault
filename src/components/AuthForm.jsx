@@ -36,7 +36,7 @@ function AuthForm({ isRegistering, onLogin }) {
       }
     } catch (err) {
       // Show any Supabase error message to the user
-      setMessage(`❌ ${err.message}`);
+      setMessage(`${err.message}`);
     } finally {
       setBusy(false);
     }

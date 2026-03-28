@@ -94,16 +94,16 @@ function ProteinCalculator() {
 
       {/* ABOUT SECTION – explains how to interpret the protein targets */}
       <div className="tdee-info-section">
-        <h2>💡 About This Calculator</h2>
+        <h2>About This Calculator</h2>
         <p>
           This calculator estimates your daily <strong>protein intake</strong> based on lean body mass,
           training frequency, and dietary preferences.
         </p>
         <p>Use it to fine-tune your nutrition for performance and recovery:</p>
         <ul>
-          <li>💪 Support <strong>muscle growth</strong> with optimal protein</li>
-          <li>⚖️ Maintain lean mass while <strong>cutting calories</strong></li>
-          <li>🌿 Adjust for <strong>plant-based diets</strong> if needed</li>
+          <li>Support <strong>muscle growth</strong> with optimal protein</li>
+          <li>Maintain lean mass while <strong>cutting calories</strong></li>
+          <li>Adjust for <strong>plant-based diets</strong> if needed</li>
         </ul>
       </div>
     </div>

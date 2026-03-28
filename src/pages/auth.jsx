@@ -30,7 +30,7 @@ function AuthPage() {
         if (error) throw error;
 
         setStatus('success');
-        setMessage('✅ Logged in successfully.');
+        setMessage('Logged in successfully.');
         // On successful login, go to the home/dashboard
         navigate('/', { replace: true });
       } else {
@@ -40,12 +40,12 @@ function AuthPage() {
         if (error) throw error;
 
         setStatus('success');
-        setMessage('✅ Account created! Please check your email to confirm.');
+        setMessage('Account created! Please check your email to confirm.');
       }
     } catch (err) {
       // Show Supabase error if something fails
       setStatus('error');
-      setMessage(`❌ ${err.message}`);
+      setMessage(`${err.message}`);
     } finally {
       setBusy(false);
     }
@@ -60,8 +60,18 @@ function AuthPage() {
 
   return (
     <div className="auth-page">
+      {/* Brand logo above card */}
+      <div className="auth-logo">
+        <div className="auth-logo__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 20V10M12 20V4M18 20v-6" />
+          </svg>
+        </div>
+        <span className="auth-logo__name">Gainlytics</span>
+      </div>
+
       <div className="auth-card">
-        <h2 className="auth-title">{isLogin ? 'Sign In' : 'Create Account'}</h2>
+        <h2 className="auth-title">{isLogin ? 'Sign in' : 'Create account'}</h2>
         <p className="auth-subtitle">
           {isLogin
             ? 'Welcome back! Sign in to access your analysis, goals, and progress.'

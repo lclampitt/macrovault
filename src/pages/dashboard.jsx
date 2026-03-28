@@ -1,79 +1,188 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import GoalPlanner from '../components/GoalPlanner/goalplanner';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ScanLine, BarChart2, Dumbbell, BookOpen, Flame } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import BentoCard from '../components/ui/BentoCard';
 import '../styles/dashboard.css';
 
-// Reusable card component used across the dashboard grid
-function Card({ title, cta, children }) {
+/* ============================================================
+   CONSISTENCY CALENDAR
+   ============================================================ */
+function ConsistencyCalendar() {
+  const STORAGE_KEY = 'gainlytics_consistency_calendar_v1';
+  const today = new Date();
+
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [currentYear, setCurrentYear]   = useState(today.getFullYear());
+  const [activeDays, setActiveDays]     = useState({});
+  const [ripple, setRipple]             = useState(null);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved) setActiveDays(saved);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(activeDays));
+  }, [activeDays]);
+
+  const formatKey = (y, m, d) =>
+    `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+  const toggleDay = (day) => {
+    const key = formatKey(currentYear, currentMonth, day);
+    setRipple(key);
+    setTimeout(() => setRipple(null), 400);
+    setActiveDays((prev) => {
+      const next = { ...prev };
+      next[key] ? delete next[key] : (next[key] = true);
+      return next;
+    });
+  };
+
+  const daysInMonth  = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const startWeekday = new Date(currentYear, currentMonth, 1).getDay();
+  const monthLabel   = new Date(currentYear, currentMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  const activeCount = Object.keys(activeDays).filter((k) => {
+    const [y, m] = k.split('-').map(Number);
+    return y === currentYear && m - 1 === currentMonth;
+  }).length;
+  const consistency = daysInMonth > 0 ? Math.round((activeCount / daysInMonth) * 100) : 0;
+
+  const goBack = () => {
+    if (currentMonth === 0) { setCurrentYear((y) => y - 1); setCurrentMonth(11); }
+    else setCurrentMonth((m) => m - 1);
+  };
+  const goForward = () => {
+    if (currentMonth === 11) { setCurrentYear((y) => y + 1); setCurrentMonth(0); }
+    else setCurrentMonth((m) => m + 1);
+  };
+
+  const cells = [];
+  for (let i = 0; i < startWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
   return (
-    <div className="dashboard-card">
-      <div className="dashboard-card-header">
-        <h2 className="dashboard-card-title">{title}</h2>
-        {cta && (
-          <Link to={cta.href} className="dashboard-cta">
-            {cta.label}
-          </Link>
-        )}
+    <div className="cal">
+      <div className="cal__top">
+        <div className="cal__nav">
+          <button onClick={goBack}>‹</button>
+          <span>{monthLabel}</span>
+          <button onClick={goForward}>›</button>
+        </div>
+        <span className="cal__consistency">{consistency}% consistent</span>
       </div>
-      <div className="dashboard-card-content">{children}</div>
+      <div className="cal__weekdays">
+        {['S','M','T','W','T','F','S'].map((d, i) => <span key={i}>{d}</span>)}
+      </div>
+      <div className="cal__grid">
+        {cells.map((day, i) => {
+          if (!day) return <div key={i} className="cal__cell cal__cell--empty" />;
+          const key = formatKey(currentYear, currentMonth, day);
+          const isActive = !!activeDays[key];
+          return (
+            <motion.button
+              key={i}
+              className={`cal__cell ${isActive ? 'cal__cell--active' : ''}`}
+              onClick={() => toggleDay(day)}
+              whileTap={{ scale: 0.8 }}
+            >
+              <span className="cal__day-num">{day}</span>
+              {!isActive && <span className="cal__rest">✕</span>}
+            </motion.button>
+          );
+        })}
+      </div>
+      <p className="cal__hint">Click a day to mark it active</p>
     </div>
   );
 }
 
-// Local onboarding checklist with localStorage persistence
+/* ============================================================
+   ONBOARDING CHECKLIST
+   ============================================================ */
 function OnboardingChecklist() {
   const STORAGE_KEY = 'gainlytics_checklist_v1';
+  const navigate = useNavigate();
 
-  const defaultSteps = [
-    { id: 'photo', label: 'Add measurements or photo', route: '/analyzer' },
-    { id: 'goal', label: 'Make a goal', route: '/goalplanner' },
-    { id: 'workout', label: 'Log workout', route: '/workouts' },
-    { id: 'progress', label: 'Update progress', route: '/progress' },
+  const steps = [
+    { id: 'photo',    label: 'Add measurements or photo', route: '/analyzer' },
+    { id: 'goal',     label: 'Set a goal',                route: '/goalplanner' },
+    { id: 'workout',  label: 'Log your first workout',    route: '/workouts' },
+    { id: 'progress', label: 'Update your progress',      route: '/progress' },
   ];
 
-  const [completed, setCompleted] = React.useState({});
+  const [completed, setCompleted] = useState({});
+  const confettiFired = useRef(false);
 
-  // Load previously completed checklist state from localStorage
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (saved) setCompleted(saved);
     } catch {}
   }, []);
 
-  // Save checklist state whenever it changes
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
   }, [completed]);
 
-  const toggle = (id) => {
-    setCompleted((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  const toggle = (id) => setCompleted((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const doneCount = steps.filter((s) => completed[s.id]).length;
+  const allDone   = doneCount === steps.length;
+  const pct       = Math.round((doneCount / steps.length) * 100);
+
+  useEffect(() => {
+    if (allDone && !confettiFired.current) {
+      confettiFired.current = true;
+      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#1D9E75', '#5DCAA5', '#fff'] });
+    }
+  }, [allDone]);
+
+  if (allDone) {
+    return (
+      <motion.div
+        className="checklist-done"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 200 }}
+      >
+        <span className="checklist-done__emoji">🎉</span>
+        <p className="checklist-done__title">You're all set!</p>
+        <p className="checklist-done__sub">You've completed the getting started guide.</p>
+      </motion.div>
+    );
+  }
 
   return (
-    <div className="onboarding-box">
-      <p className="onboarding-title">Getting started</p>
-      <ul className="onboarding-list">
-        {defaultSteps.map((step) => (
-          <li key={step.id} className="onboarding-item">
-            {/* Checkbox button to mark step complete */}
-            <button
-              className={`onboarding-checkbox ${
-                completed[step.id] ? 'checked' : ''
-              }`}
+    <div className="checklist">
+      <div className="checklist__bar-track">
+        <motion.div
+          className="checklist__bar-fill"
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        />
+      </div>
+      <p className="checklist__progress-label">{doneCount} of {steps.length} complete</p>
+      <ul className="checklist__list">
+        {steps.map((step) => (
+          <li key={step.id} className="checklist__item">
+            <motion.button
+              className={`checklist__check ${completed[step.id] ? 'checklist__check--done' : ''}`}
               onClick={() => toggle(step.id)}
+              whileTap={{ scale: 0.75 }}
+              animate={completed[step.id] ? { scale: [1, 1.35, 1] } : {}}
+              transition={{ type: 'spring', stiffness: 300 }}
             >
-              {completed[step.id] && <span className="checkmark">✓</span>}
-            </button>
-
-            {/* Clickable text that navigates to the relevant page */}
-            <div
-              className="onboarding-text"
-              onClick={() => (window.location.href = step.route)}
-            >
-              <span className="onboarding-label">{step.label}</span>
-              <span className="onboarding-open">Open</span>
-            </div>
+              {completed[step.id] && <span>✓</span>}
+            </motion.button>
+            <span className="checklist__label" onClick={() => navigate(step.route)}>
+              {step.label}
+            </span>
           </li>
         ))}
       </ul>
@@ -81,230 +190,123 @@ function OnboardingChecklist() {
   );
 }
 
-/**
- * ConsistencyCalendar
- * - Simple month view
- * - Click a day to toggle an "X" for a rest/off day
- * - Data persisted in localStorage
- */
-function ConsistencyCalendar() {
-  const STORAGE_KEY = 'gainlytics_consistency_calendar_v1';
-  const today = new Date();
+/* ============================================================
+   STAT CARD (count-up animation)
+   ============================================================ */
+function StatCard({ label, value, unit, color, max }) {
+  const [display, setDisplay] = useState(0);
 
-  const [currentMonth, setCurrentMonth] = React.useState(today.getMonth()); // 0-11
-  const [currentYear, setCurrentYear] = React.useState(today.getFullYear());
-  const [offDays, setOffDays] = React.useState({});
+  useEffect(() => {
+    let start = 0;
+    const duration = 800;
+    const step = Math.ceil(value / (duration / 16));
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= value) { setDisplay(value); clearInterval(timer); }
+      else setDisplay(start);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [value]);
 
-  // Load saved calendar state
-  React.useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved) setOffDays(saved);
-    } catch {}
-  }, []);
-
-  // Persist off-day markings when they change
-  React.useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(offDays));
-  }, [offDays]);
-
-  const formatDateKey = (year, monthIndex, day) => {
-    const m = String(monthIndex + 1).padStart(2, '0');
-    const d = String(day).padStart(2, '0');
-    return `${year}-${m}-${d}`;
-  };
-
-  const toggleDay = (day) => {
-    const key = formatDateKey(currentYear, currentMonth, day);
-    setOffDays((prev) => {
-      const next = { ...prev };
-      if (next[key]) {
-        delete next[key];
-      } else {
-        next[key] = true;
-      }
-      return next;
-    });
-  };
-
-  // Helpers to go to previous/next month
-  const goToPrevMonth = () => {
-    setCurrentMonth((prev) => {
-      if (prev === 0) {
-        setCurrentYear((y) => y - 1);
-        return 11;
-      }
-      return prev - 1;
-    });
-  };
-
-  const goToNextMonth = () => {
-    setCurrentMonth((prev) => {
-      if (prev === 11) {
-        setCurrentYear((y) => y + 1);
-        return 0;
-      }
-      return prev + 1;
-    });
-  };
-
-  // Build basic calendar structure
-  const firstOfMonth = new Date(currentYear, currentMonth, 1);
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const startWeekday = firstOfMonth.getDay(); // 0 = Sun
-  const monthLabel = firstOfMonth.toLocaleString('default', {
-    month: 'long',
-    year: 'numeric',
-  });
-
-  const weeks = [];
-  let dayCounter = 1 - startWeekday; // can be negative to create leading blanks
-
-  while (dayCounter <= daysInMonth) {
-    const week = [];
-    for (let i = 0; i < 7; i++) {
-      if (dayCounter < 1 || dayCounter > daysInMonth) {
-        week.push(null);
-      } else {
-        week.push(dayCounter);
-      }
-      dayCounter += 1;
-    }
-    weeks.push(week);
-  }
-
-  const weekdayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const fillPct = Math.min((value / max) * 100, 100);
 
   return (
-    <div className="calendar-wrapper">
-      <div className="calendar-header-row">
-        <button
-          type="button"
-          className="calendar-nav-btn"
-          onClick={goToPrevMonth}
-        >
-          ‹
-        </button>
-        <div className="calendar-month-label">{monthLabel}</div>
-        <button
-          type="button"
-          className="calendar-nav-btn"
-          onClick={goToNextMonth}
-        >
-          ›
-        </button>
-      </div>
-
-      <div className="calendar-weekdays">
-        {weekdayLabels.map((label) => (
-          <div key={label} className="calendar-weekday">
-            {label}
-          </div>
-        ))}
-      </div>
-
-      {/* Day grid where clicking toggles an X for a rest day */}
-      <div className="calendar-grid">
-        {weeks.map((week, wi) =>
-          week.map((day, di) => {
-            if (!day) {
-              return <div key={`${wi}-${di}`} className="calendar-day empty" />;
-            }
-            const key = formatDateKey(currentYear, currentMonth, day);
-            const isOff = !!offDays[key];
-            return (
-              <button
-                key={`${wi}-${di}`}
-                type="button"
-                className={`calendar-day ${isOff ? 'off' : ''}`}
-                onClick={() => toggleDay(day)}
-              >
-                <span className="calendar-day-number">{day}</span>
-                {isOff && <span className="calendar-day-x">✕</span>}
-              </button>
-            );
-          })
-        )}
-      </div>
-
-      <p className="calendar-caption">
-        Click a day to mark an <span className="calendar-caption-x">X</span> for
-        a rest day and keep an eye on your consistency.
+    <div className="stat-card">
+      <p className="stat-card__value" style={{ color }}>
+        {display.toLocaleString()}
+        <span className="stat-card__unit">{unit}</span>
       </p>
+      <div className="stat-card__bar-track">
+        <div className="stat-card__bar-fill" style={{ background: color, width: `${fillPct}%` }} />
+      </div>
     </div>
   );
 }
 
-export default function Dashboard() {
+/* ============================================================
+   QUICK LINKS
+   ============================================================ */
+function QuickLinks() {
+  const navigate = useNavigate();
+  const links = [
+    { label: 'Body Analysis', icon: ScanLine,  route: '/analyzer' },
+    { label: 'Progress',      icon: BarChart2, route: '/progress' },
+    { label: 'Workouts',      icon: Dumbbell,  route: '/workouts' },
+    { label: 'Exercise Lib',  icon: BookOpen,  route: '/exercises' },
+  ];
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <div className="dashboard-hero">
-          <p className="dashboard-eyebrow">Gainlytics Dashboard</p>
-          <h1 className="dashboard-page-title">Home</h1>
-          <p className="dashboard-page-subtitle">
-            Welcome back! Your body analysis, goals, and tools in one place.
-          </p>
+    <div className="quick-links">
+      {links.map(({ label, icon: Icon, route }) => (
+        <button key={route} className="quick-links__item" onClick={() => navigate(route)}>
+          <Icon size={20} className="quick-links__icon" />
+          <span>{label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ============================================================
+   STREAK BADGE
+   ============================================================ */
+function StreakBadge({ streak }) {
+  return (
+    <motion.div
+      className="streak-badge"
+      animate={{ scale: [1, 1.05, 1] }}
+      transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+    >
+      <Flame size={14} />
+      {streak}-day streak
+    </motion.div>
+  );
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+export default function Dashboard() {
+  const hour     = new Date().getHours();
+  const today    = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  // Placeholder values — wire to Supabase once new DB is set up
+  const caloriesLogged = 1840;
+  const proteinLogged  = 132;
+  const streak         = 7;
+
+  return (
+    <div className="dashboard-v2">
+      {/* Greeting header */}
+      <div className="dashboard-v2__header">
+        <div>
+          <h1 className="dashboard-v2__greeting">{greeting}</h1>
+          <p className="dashboard-v2__date">{today}</p>
         </div>
-        {/* Checklist on the right side of the hero */}
-        <OnboardingChecklist />
+        <StreakBadge streak={streak} />
       </div>
 
-      {/* Main dashboard grid of cards */}
-      <div className="dashboard-grid">
-        {/* Row 1: Calendar + Your Plan (both tall, primary) */}
-        <Card title="Consistency Calendar">
+      {/* Bento grid */}
+      <div className="bento-grid">
+        <BentoCard title="Consistency Calendar" span="wide" index={0}>
           <ConsistencyCalendar />
-        </Card>
+        </BentoCard>
 
-        <Card title="Your Plan" cta={{ href: '/goalplanner', label: 'Open' }}>
-          {/* Compact version of the Goal Planner on the dashboard */}
-          <GoalPlanner compact />
-        </Card>
+        <BentoCard title="Getting Started" index={1}>
+          <OnboardingChecklist />
+        </BentoCard>
 
-        {/* Row 2: smaller Body Analysis + Calculators */}
-        <Card
-          title="Body Analysis"
-          cta={{ href: '/analyzer', label: 'Start Analysis' }}
-        >
-          <p>
-            Upload a photo (JPG/PNG) or enter measurements to estimate your body
-            type and body fat % with the AI Analyzer.
-          </p>
-        </Card>
+        <BentoCard title="Today's Calories" index={2}>
+          <StatCard label="Calories" value={caloriesLogged} unit=" kcal" color="var(--accent-light)" max={2500} />
+        </BentoCard>
 
-        <Card title="Calculators" cta={{ href: '/calculators', label: 'Open' }}>
-          <ul>
-            <li>Calorie (TDEE) &amp; Protein</li>
-            <li>1RM Estimator</li>
-            <li>Deficit Time Calculator</li>
-          </ul>
-        </Card>
+        <BentoCard title="Today's Protein" index={3}>
+          <StatCard label="Protein" value={proteinLogged} unit="g" color="var(--accent-light)" max={180} />
+        </BentoCard>
 
-        {/* Row 3: progress + smaller cards */}
-        <Card title="Progress" cta={{ href: '/progress', label: 'View' }}>
-          <p>
-            See charts for weight, body fat %, and measurements over time from
-            your logged data.
-          </p>
-        </Card>
-
-        <div className="dashboard-subgrid">
-          <Card
-            title="Exercise Library"
-            cta={{ href: '/exercises', label: 'Browse' }}
-          >
-            <p>Filter by muscle group and learn form cues for each exercise.</p>
-          </Card>
-
-          <Card
-            title="Workouts"
-            cta={{ href: '/workouts', label: 'Log Workout' }}
-          >
-            <p>Track sets, reps, weight, RPE, and notes for every session.</p>
-          </Card>
-        </div>
-
+        <BentoCard title="Quick Access" index={4}>
+          <QuickLinks />
+        </BentoCard>
       </div>
     </div>
   );

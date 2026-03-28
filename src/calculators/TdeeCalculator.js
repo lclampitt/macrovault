@@ -78,48 +78,52 @@ function DeficitTimeCalculator() {
     <div className="deficit-calculator">
       <h1>Deficit Time Calculator</h1>
 
-      {/* INPUT SECTION – collects all user-specific data for TDEE estimation */}
+      {/* INPUT SECTION */}
       <div className="inputs">
         <div>
-          <label>Units:</label>
-          <button onClick={() => setUnit('imperial')} className={unit === 'imperial' ? 'active' : ''}>Imperial</button>
-          <button onClick={() => setUnit('metric')} className={unit === 'metric' ? 'active' : ''}>Metric</button>
+          <label>Units</label>
+          <div className="btn-group">
+            <button onClick={() => setUnit('imperial')} className={unit === 'imperial' ? 'active' : ''}>Imperial</button>
+            <button onClick={() => setUnit('metric')} className={unit === 'metric' ? 'active' : ''}>Metric</button>
+          </div>
         </div>
 
         <div>
-          <label>Gender:</label>
-          <button onClick={() => setGender('male')} className={gender === 'male' ? 'active' : ''}>Male</button>
-          <button onClick={() => setGender('female')} className={gender === 'female' ? 'active' : ''}>Female</button>
+          <label>Gender</label>
+          <div className="btn-group">
+            <button onClick={() => setGender('male')} className={gender === 'male' ? 'active' : ''}>Male</button>
+            <button onClick={() => setGender('female')} className={gender === 'female' ? 'active' : ''}>Female</button>
+          </div>
         </div>
 
         <div>
-          <label>Weight ({unit === 'imperial' ? 'lbs' : 'kg'}):</label>
+          <label>Weight ({unit === 'imperial' ? 'lbs' : 'kg'})</label>
           <input type="number" value={weight} onChange={e => setWeight(+e.target.value)} />
         </div>
 
         <div>
-          <label>Body Fat %:</label>
+          <label>Body Fat % — {bodyFat}%</label>
           <input type="range" min="5" max="60" value={bodyFat} onChange={e => setBodyFat(+e.target.value)} />
-          <span>{bodyFat}%</span>
         </div>
 
         <div>
-          <label>Workout Hours/Week:</label>
+          <label>Workout Hours/Week</label>
           <input type="number" value={workoutHours} onChange={e => setWorkoutHours(+e.target.value)} />
         </div>
 
         <div>
-          <label>Steps/Day:</label>
+          <label>Steps/Day</label>
           <input type="number" value={steps} onChange={e => setSteps(+e.target.value)} />
         </div>
 
         <div>
-          <label>Age Range:</label>
-          <button onClick={() => setAgeRange('under60')} className={ageRange === 'under60' ? 'active' : ''}>Under 60</button>
-          <button onClick={() => setAgeRange('60plus')} className={ageRange === '60plus' ? 'active' : ''}>61+</button>
+          <label>Age Range</label>
+          <div className="btn-group">
+            <button onClick={() => setAgeRange('under60')} className={ageRange === 'under60' ? 'active' : ''}>Under 60</button>
+            <button onClick={() => setAgeRange('60plus')} className={ageRange === '60plus' ? 'active' : ''}>61+</button>
+          </div>
         </div>
 
-        {/* Triggers the calculation and populates the results section */}
         <button onClick={calculate} className="calculate-button">Calculate</button>
       </div>
 
@@ -157,7 +161,7 @@ function DeficitTimeCalculator() {
 
           {/* Deficit table – what to eat for slow/moderate/fast fat loss */}
           <div className="section-header">
-            <h3>❌ Calories for Deficit</h3>
+            <h3>Calories for Deficit</h3>
           </div>
 
           <table className="tdee-table">
@@ -177,7 +181,7 @@ function DeficitTimeCalculator() {
 
           {/* Surplus table – different bulk strategies */}
           <div className="section-header">
-            <h3>💪 Calories to Gain</h3>
+            <h3>Calories to Gain</h3>
           </div>
 
           <table className="tdee-table">
@@ -197,7 +201,7 @@ function DeficitTimeCalculator() {
 
           {/* Recomposition table – hover around maintenance */}
           <div className="section-header">
-            <h3>⚖️ Recomposition</h3>
+            <h3>Recomposition</h3>
           </div>
 
           <table className="tdee-table">
@@ -218,16 +222,16 @@ function DeficitTimeCalculator() {
 
       {/* ABOUT SECTION – plain-language explanation for users / graders */}
       <div className="tdee-info-section">
-        <h2>💡 About This Calculator</h2>
+        <h2>About This Calculator</h2>
         <p>
           This calculator estimates your <strong>Total Daily Energy Expenditure (TDEE)</strong> — 
           the number of calories you burn daily based on your lean body mass and activity level.
         </p>
         <p>Use it to determine how much to eat for your goal:</p>
         <ul>
-          <li>🔻 Lose <strong>1–2 lbs per week</strong> with a calorie deficit</li>
-          <li>⚖️ Maintain your current weight</li>
-          <li>💪 Gain muscle with a <strong>lean bulk</strong> calorie surplus</li>
+          <li>Lose <strong>1–2 lbs per week</strong> with a calorie deficit</li>
+          <li>Maintain your current weight</li>
+          <li>Gain muscle with a <strong>lean bulk</strong> calorie surplus</li>
         </ul>
       </div>
     </div>

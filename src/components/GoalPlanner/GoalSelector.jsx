@@ -13,9 +13,10 @@ const GoalSelector = ({ goal, setGoal }) => {
           <button
             key={option}
             onClick={() => setGoal(option)}
-            className={`py-2 px-4 rounded border ${
-              goal === option ? 'bg-blue-600 text-white' : 'bg-gray-200'
-            }`}
+            style={goal === option
+              ? { background: 'var(--accent)', color: '#fff', border: '1px solid var(--accent-dark)', borderRadius: '6px', padding: '8px 16px' }
+              : { background: 'var(--bg-surface-2)', color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '6px', padding: '8px 16px' }
+            }
           >
             {option}
           </button>

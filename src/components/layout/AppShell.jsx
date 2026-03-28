@@ -1,0 +1,57 @@
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import Sidebar from './Sidebar';
+import './AppShell.css';
+
+/* Map routes to page titles and optional quick-action buttons */
+const PAGE_META = {
+  '/':            { title: 'Home' },
+  '/analyzer':   { title: 'AI Analyzer' },
+  '/calculators':{ title: 'Calculators' },
+  '/goalplanner':{ title: 'Goal Planner' },
+  '/workouts':   { title: 'Workouts' },
+  '/progress':   { title: 'Progress' },
+};
+
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+  exit:    { opacity: 0, y: -10, transition: { duration: 0.15 } },
+};
+
+export default function AppShell({ session, onLogout, isPro, children }) {
+  const location = useLocation();
+  const meta = PAGE_META[location.pathname] ?? { title: 'Gainlytics' };
+
+  return (
+    <div className="app-shell">
+      <Sidebar session={session} onLogout={onLogout} isPro={isPro} />
+
+      <div className="app-shell__main">
+        {/* Top bar */}
+        <div className="app-shell__topbar">
+          <h1 className="app-shell__page-title">{meta.title}</h1>
+          {meta.action && (
+            <button className="app-shell__action-btn">{meta.action}</button>
+          )}
+        </div>
+
+        {/* Page content with animation */}
+        <div className="app-shell__content">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}

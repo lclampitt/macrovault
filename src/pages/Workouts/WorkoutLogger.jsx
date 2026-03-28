@@ -1,6 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabaseClient';
 import '../../styles/WorkoutLogger.css';
+
+/* Infer a muscle group tag from the workout name */
+function inferMuscleGroup(name = '') {
+  const n = name.toLowerCase();
+  if (n.includes('push') || n.includes('chest') || n.includes('shoulder') || n.includes('tricep')) return 'Upper body';
+  if (n.includes('pull') || n.includes('back') || n.includes('bicep') || n.includes('row')) return 'Upper body';
+  if (n.includes('leg') || n.includes('squat') || n.includes('lower') || n.includes('glute') || n.includes('hamstring')) return 'Lower body';
+  if (n.includes('full') || n.includes('total')) return 'Full body';
+  if (n.includes('core') || n.includes('abs')) return 'Core';
+  if (n.includes('cardio') || n.includes('run') || n.includes('bike')) return 'Cardio';
+  return 'General';
+}
+
+/* Format date string: "2025-12-12" → "Dec 12, 2025" */
+function formatDate(dateStr = '') {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+};
 
 export default function WorkoutLogger() {
   // Form state for creating/editing a workout
@@ -15,6 +39,7 @@ export default function WorkoutLogger() {
   // History and UI state
   const [workoutHistory, setWorkoutHistory] = useState([]);
   const [expanded, setExpanded] = useState({});
+  const [formOpen, setFormOpen] = useState(false);
 
   // Scroll to top when opening the logger
   useEffect(() => {
@@ -26,7 +51,7 @@ export default function WorkoutLogger() {
     async function fetchUser() {
       const { data, error } = await supabase.auth.getUser();
       if (error || !data?.user) {
-        setMessage('⚠️ Please log in to save or view workouts.');
+        setMessage('Please log in to save or view workouts.');
         return;
       }
       setUserId(data.user.id);
@@ -85,11 +110,11 @@ export default function WorkoutLogger() {
   // Save new workout or update an existing one in Supabase
   const saveWorkout = async () => {
     if (!workoutName.trim() || exercises.length === 0) {
-      setMessage('⚠️ Please enter a workout name and add at least one exercise.');
+      setMessage('Please enter a workout name and add at least one exercise.');
       return;
     }
     if (!userId) {
-      setMessage('⚠️ Please log in first.');
+      setMessage('Please log in first.');
       return;
     }
 
@@ -109,22 +134,23 @@ export default function WorkoutLogger() {
         .update(workoutData)
         .eq('id', editingWorkoutId));
       if (!error) {
-        setMessage('✅ Workout updated successfully!');
+        setMessage('Workout updated successfully!');
         setEditingWorkoutId(null);
       }
     } else {
       // Otherwise insert a new workout
       ({ error } = await supabase.from('workouts').insert([workoutData]));
-      if (!error) setMessage('✅ Workout saved successfully!');
+      if (!error) setMessage('Workout saved successfully!');
     }
 
     if (error) {
       console.error('Save error:', error);
-      setMessage(`❌ Error saving workout: ${error.message}`);
+      setMessage(`Error saving workout: ${error.message}`);
     } else {
       // Reset form and refresh history
       setWorkoutName('');
       setExercises([]);
+      setFormOpen(false);
       fetchWorkouts();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -136,6 +162,7 @@ export default function WorkoutLogger() {
     setWorkoutName(workout.workout_name);
     setExercises(workout.exercises || []);
     setEditingWorkoutId(workout.id);
+    setFormOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setMessage('✏️ Editing workout...');
   };
@@ -146,161 +173,205 @@ export default function WorkoutLogger() {
   };
 
   return (
-    <div className="workout-logger">
-      <h1 className="workout-title">Workout Logger</h1>
-      <p className="workout-subtext">
-        Track sets, reps, and weight for your training sessions.
-      </p>
+    <div className="wl">
 
-      {/* Top form: date + workout name */}
-      <div className="workout-header">
-        <div>
-          <label>Date:</label>
-          <input
-            type="date"
-            value={workoutDate}
-            onChange={(e) => setWorkoutDate(e.target.value)}
-          />
+      {/* ── LOG SECTION ── */}
+      <motion.div
+        className="wl-log-card"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+      >
+        {/* Header row: title + expand toggle */}
+        <div className="wl-log-header">
+          <p className="wl-section-title">Log a workout</p>
+          <motion.button
+            className="btn btn-primary wl-toggle-btn"
+            onClick={() => setFormOpen((o) => !o)}
+            whileTap={{ scale: 0.97 }}
+          >
+            {formOpen ? 'Cancel' : '+ New workout'}
+          </motion.button>
         </div>
-        <div>
-          <label>Workout Name:</label>
-          <input
-            type="text"
-            value={workoutName}
-            onChange={(e) => setWorkoutName(e.target.value)}
-            placeholder="e.g. Push Day, Lower Body, Full Body"
-          />
-        </div>
-      </div>
 
-      {/* Add exercise input */}
-      <div className="exercise-adder">
-        <input
-          type="text"
-          value={newExercise}
-          onChange={(e) => setNewExercise(e.target.value)}
-          placeholder="Add an exercise..."
-        />
-        <button onClick={addExercise}>Add</button>
-      </div>
-
-      {/* Exercise blocks with dynamic sets table */}
-      {exercises.map((ex, i) => (
-        <div key={i} className="exercise-block">
-          <div className="exercise-header">
-            <h3>{ex.name}</h3>
-            <button className="trash-btn" onClick={() => deleteExercise(i)}>Trash</button>
-          </div>
-
-          <table className="sets-table">
-            <thead>
-              <tr>
-                <th>Set</th>
-                <th>Weight (lbs)</th>
-                <th>Reps</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ex.sets.map((set, j) => (
-                <tr key={j}>
-                  <td>{j + 1}</td>
-                  <td>
+        {/* Collapsible form */}
+        <AnimatePresence initial={false}>
+          {formOpen && (
+            <motion.div
+              key="log-form"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              style={{ overflow: 'hidden' }}
+            >
+              <div className="wl-form-inner">
+                {/* Date + Name row */}
+                <div className="wl-top-row">
+                  <div className="wl-field">
+                    <label className="wl-label">Date</label>
                     <input
-                      type="number"
-                      value={set.weight}
-                      onChange={(e) => handleSetChange(i, j, 'weight', e.target.value)}
+                      type="date"
+                      className="input"
+                      value={workoutDate}
+                      onChange={(e) => setWorkoutDate(e.target.value)}
                     />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={set.reps}
-                      onChange={(e) => handleSetChange(i, j, 'reps', e.target.value)}
-                    />
-                  </td>
-                  <td>
+                  </div>
+                  <div className="wl-field wl-field--grow">
+                    <label className="wl-label">Workout name</label>
                     <input
                       type="text"
-                      value={set.notes}
-                      onChange={(e) => handleSetChange(i, j, 'notes', e.target.value)}
+                      className="input"
+                      value={workoutName}
+                      onChange={(e) => setWorkoutName(e.target.value)}
+                      placeholder="e.g. Push Day, Lower Body, Full Body"
                     />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
 
-          <button className="add-set-btn" onClick={() => addSet(i)}>+ Add Set</button>
-        </div>
-      ))}
+                {/* Add exercise row */}
+                <div className="wl-adder">
+                  <input
+                    type="text"
+                    className="input"
+                    value={newExercise}
+                    onChange={(e) => setNewExercise(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && addExercise()}
+                    placeholder="Add an exercise…"
+                  />
+                  <motion.button className="btn btn-primary" onClick={addExercise} whileTap={{ scale: 0.97 }}>
+                    Add
+                  </motion.button>
+                </div>
 
-      {/* Save / update message */}
-      {message && <p className="workout-message">{message}</p>}
+                {/* Exercise blocks */}
+                {exercises.map((ex, i) => (
+                  <motion.div
+                    key={i}
+                    className="wl-exercise-block"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="wl-exercise-header">
+                      <span className="wl-exercise-name">{ex.name}</span>
+                      <motion.button
+                        className="btn btn-destructive"
+                        onClick={() => deleteExercise(i)}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        Remove
+                      </motion.button>
+                    </div>
 
-      <button className="save-btn" onClick={saveWorkout}>
-        {editingWorkoutId ? 'Update Workout' : 'Save Workout'}
-      </button>
+                    <table className="wl-sets-table">
+                      <thead>
+                        <tr>
+                          <th>Set</th>
+                          <th>Weight (lbs)</th>
+                          <th>Reps</th>
+                          <th>Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ex.sets.map((set, j) => (
+                          <tr key={j}>
+                            <td className="wl-set-num">{j + 1}</td>
+                            <td><input type="number" className="input wl-set-input" value={set.weight} onChange={(e) => handleSetChange(i, j, 'weight', e.target.value)} /></td>
+                            <td><input type="number" className="input wl-set-input" value={set.reps}   onChange={(e) => handleSetChange(i, j, 'reps',   e.target.value)} /></td>
+                            <td><input type="text"   className="input wl-set-input" value={set.notes}  onChange={(e) => handleSetChange(i, j, 'notes',  e.target.value)} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
 
-      {/* History section */}
-      <h2 className="history-title">Workout History</h2>
+                    <motion.button className="btn btn-primary wl-add-set" onClick={() => addSet(i)} whileTap={{ scale: 0.97 }}>
+                      + Add Set
+                    </motion.button>
+                  </motion.div>
+                ))}
+
+                {/* Feedback message */}
+                {message && <p className="wl-message">{message}</p>}
+
+                {/* Save button — right aligned */}
+                <div className="wl-save-row">
+                  <motion.button className="btn btn-primary" onClick={saveWorkout} whileTap={{ scale: 0.97 }}>
+                    {editingWorkoutId ? 'Update Workout' : 'Save Workout'}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* ── HISTORY SECTION ── */}
+      <p className="wl-history-title">Workout history</p>
+
       {workoutHistory.length === 0 && (
-        <p style={{ color: '#999', textAlign: 'center' }}>No workouts logged yet.</p>
+        <p className="wl-empty">No workouts logged yet.</p>
       )}
 
-      {workoutHistory.map((workout) => (
-        <div key={workout.id} className="history-card">
-          <div className="history-header" onClick={() => toggleExpand(workout.id)}>
-            <span>
-              📅 {workout.workout_date} — <strong>{workout.workout_name}</strong>
-            </span>
-            <div>
-              {/* Edit button inside the history card */}
-              <button
-                className="edit-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  editWorkout(workout);
-                }}
+      <div className="wl-history-list">
+        {workoutHistory.map((workout, idx) => (
+          <motion.div
+            key={workout.id}
+            className="wl-history-row"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: idx * 0.04, ease: 'easeOut' }}
+            whileHover={{ scale: 1.01 }}
+            onClick={() => toggleExpand(workout.id)}
+          >
+            <div className="wl-history-row__left">
+              <span className="wl-history-name">{workout.workout_name}</span>
+              <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
+            </div>
+            <div className="wl-history-row__right">
+              <span className="wl-muscle-tag">{inferMuscleGroup(workout.workout_name)}</span>
+              <motion.button
+                className="btn btn-primary wl-btn-sm"
+                onClick={(e) => { e.stopPropagation(); editWorkout(workout); }}
+                whileTap={{ scale: 0.97 }}
               >
                 Edit
-              </button>
-              <span>{expanded[workout.id] ? '▲' : '▼'}</span>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
+        ))}
+      </div>
 
-          {/* Expandable workout details */}
-          {expanded[workout.id] && (
-            <div className="history-body">
+      {/* Expandable exercise detail */}
+      {workoutHistory.map((workout) =>
+        expanded[workout.id] ? (
+          <AnimatePresence key={workout.id}>
+            <motion.div
+              className="wl-exercise-detail"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+            >
               {workout.exercises?.map((ex, idx) => (
                 <div key={idx} className="history-exercise">
                   <h4>{ex.name}</h4>
                   <table>
-                    <thead>
-                      <tr>
-                        <th>Set</th>
-                        <th>Weight</th>
-                        <th>Reps</th>
-                        <th>Notes</th>
-                      </tr>
-                    </thead>
+                    <thead><tr><th>Set</th><th>Weight</th><th>Reps</th><th>Notes</th></tr></thead>
                     <tbody>
                       {ex.sets.map((set, j) => (
                         <tr key={j}>
-                          <td>{j + 1}</td>
-                          <td>{set.weight}</td>
-                          <td>{set.reps}</td>
-                          <td>{set.notes}</td>
+                          <td>{j + 1}</td><td>{set.weight}</td><td>{set.reps}</td><td>{set.notes}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ))}
-            </div>
-          )}
-        </div>
-      ))}
+            </motion.div>
+          </AnimatePresence>
+        ) : null
+      )}
     </div>
   );
 }

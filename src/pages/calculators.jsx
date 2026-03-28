@@ -1,6 +1,9 @@
 // src/pages/CalculatorsPage.jsx
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/CalculatorsPage.css';
+import UpgradeModal from '../components/ui/UpgradeModal';
+import ProBadge from '../components/ui/ProBadge';
 
 // Config array to render each calculator card
 const calculators = [
@@ -30,7 +33,28 @@ const calculators = [
   },
 ];
 
-function CalculatorsPage() {
+function CalculatorsGate() {
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  return (
+    <div className="calculators-container">
+      <div className="pro-gate">
+        <div className="pro-gate__header">
+          <ProBadge size="md" />
+          <h2>Fitness Calculators</h2>
+          <p>TDEE, Protein, and 1RM calculators are Pro features. Upgrade to access all tools.</p>
+        </div>
+        <button className="pro-gate__cta" onClick={() => setShowUpgrade(true)}>
+          Upgrade to Pro — $4.99/mo
+        </button>
+      </div>
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
+    </div>
+  );
+}
+
+function CalculatorsPage({ isPro }) {
+  if (!isPro) return <CalculatorsGate />;
+
   return (
     <div className="calculators-container">
       <h1 className="calculators-title">Fitness Calculators</h1>

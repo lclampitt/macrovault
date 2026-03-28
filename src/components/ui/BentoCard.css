@@ -1,0 +1,50 @@
+.bento-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bento-card--wide {
+  grid-column: span 2;
+}
+
+.bento-card--tall {
+  grid-row: span 2;
+}
+
+.bento-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 0;
+}
+
+.bento-card__title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bento-card__action {
+  font-size: 12px;
+  color: var(--accent-light);
+  padding: 3px 10px;
+  border: 1px solid var(--accent-dark);
+  border-radius: 20px;
+  transition: background var(--transition-fast);
+}
+
+.bento-card__action:hover {
+  background: var(--accent-muted);
+}
+
+.bento-card__body {
+  padding: 14px 18px 18px;
+  flex: 1;
+}

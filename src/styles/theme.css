@@ -1,0 +1,201 @@
+/* Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* ============================================================
+   GAINLYTICS V2 — GLOBAL THEME & CSS VARIABLES
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --bg-base:       #0f1117;
+  --bg-surface:    #161b27;
+  --bg-surface-2:  #1a2032;
+  --bg-hover:      #1e2640;
+
+  /* Borders */
+  --border:        #1e2536;
+  --border-light:  #252d42;
+
+  /* Accent — cyan/teal */
+  --accent:        #1D9E75;
+  --accent-light:  #5DCAA5;
+  --accent-dark:   #0F6E56;
+  --accent-muted:  rgba(29, 158, 117, 0.12);
+  --accent-glow:   rgba(29, 158, 117, 0.25);
+
+  /* Text */
+  --text-primary:   #e8eaf0;
+  --text-secondary: #8892a4;
+  --text-muted:     #4f5a6e;
+
+  /* Status */
+  --success:  #1D9E75;
+  --warning:  #f59e0b;
+  --error:    #ef4444;
+
+  /* Pro badge */
+  --pro-bg:   rgba(29, 158, 117, 0.15);
+  --pro-text: #5DCAA5;
+
+  /* Sidebar */
+  --sidebar-width:          220px;
+  --sidebar-collapsed-width: 64px;
+
+  /* Radius & shadows */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.25);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-med:  0.25s ease;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   GLOBAL BUTTON SYSTEM
+   ============================================================ */
+
+/* Base — all buttons get this */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform 0.1s ease;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Primary */
+.btn-primary {
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0a2a1e;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Destructive */
+.btn-destructive {
+  background: rgba(192, 57, 43, 0.12);
+  border-color: rgba(192, 57, 43, 0.35);
+  color: #e05c4a;
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background: rgba(192, 57, 43, 0.22);
+  border-color: rgba(192, 57, 43, 0.6);
+  color: #ff6b55;
+}
+
+.btn-destructive:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   GLOBAL INPUT SYSTEM
+   ============================================================ */
+
+.input {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+a {
+  color: var(--accent-light);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-light);
+  opacity: 0.85;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

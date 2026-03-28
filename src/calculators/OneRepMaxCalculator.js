@@ -93,16 +93,16 @@ function OneRepMaxCalculator() {
 
       {/* ABOUT SECTION – explains purpose and how to use this calculator in programs */}
       <div className="tdee-info-section">
-        <h2>💡 About This Calculator</h2>
+        <h2>About This Calculator</h2>
         <p>
           This tool estimates your <strong>One-Rep Max (1RM)</strong> — the maximum weight you can lift
           for one repetition for a given exercise.
         </p>
         <p>Use it to guide strength training and progressive overload:</p>
         <ul>
-          <li>🏋️‍♂️ Determine <strong>training weights</strong> for 70–90% of your 1RM</li>
-          <li>📈 Track <strong>strength progress</strong> over time</li>
-          <li>🔁 Compare lifts and plan <strong>periodized programs</strong></li>
+          <li>Determine <strong>training weights</strong> for 70–90% of your 1RM</li>
+          <li>Track <strong>strength progress</strong> over time</li>
+          <li>Compare lifts and plan <strong>periodized programs</strong></li>
         </ul>
       </div>
     </div>

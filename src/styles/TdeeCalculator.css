@@ -1,260 +1,336 @@
-/* ===== PAGE WRAPPER ===== */
+/* ============================================================
+   TDEE CALCULATOR V2 — matches design system
+   ============================================================ */
+
 .deficit-calculator {
-  max-width: 1100px;      /* keeps it from spanning the whole screen */
-  margin: 0 auto;         /* center on the page */
-  padding: 40px 20px 60px; /* top / sides / bottom padding */
-  color: #e7f5ff;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Title spacing */
 .deficit-calculator h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 24px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.3px;
 }
 
-/* ===== BUTTON GROUPS (Units, Gender, Age Range) ===== */
+/* ── Input card ─────────────────────────────────────────────── */
+.inputs {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.inputs div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputs label,
+.inputs div label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+  display: block;
+  margin: 0;
+}
+
+/* Toggle button groups */
+.inputs div:has(button) {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputs .btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .inputs button {
-  padding: 8px 14px;
-  margin: 4px 6px 0 0;
-  border: 1px solid #333;
-  border-radius: 8px;
-  background: #1a1b2e;
-  color: #fff;
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: inherit;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .inputs button.active,
 .inputs button:hover {
-  border-color: #00cfff;
-  color: #00cfff;
-  background-color: #0e0f1a;
+  border-color: var(--accent);
+  color: var(--accent-light);
+  background: rgba(29, 158, 117, 0.08);
 }
 
-.inputs div {
-  margin-top: 1rem;
-}
-
-.inputs label {
-  font-weight: 600;
-  margin-bottom: 6px;
-  display: inline-block;
-}
-
-/* ===== RANGE SLIDER (Body Fat %) ===== */
+/* Range slider */
 .inputs input[type='range'] {
   width: 100%;
-  margin-top: 6px;
-  accent-color: #00cfff;
+  accent-color: var(--accent);
+  margin-top: 2px;
 }
 
-/* ===== NUMBER INPUTS ===== */
+/* Number inputs */
 .inputs input[type='number'] {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  background: #111223;
-  color: #fff;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .inputs input[type='number']:focus {
-  border-color: #00cfff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(29, 158, 117, 0.2);
   outline: none;
 }
 
-/* Better spacing between label text and button groups */
-.inputs div label {
-  display: block;
-  margin-bottom: 6px;
-}
-
-.inputs div button {
-  margin-top: 4px; /* slight gap below the label */
-}
-
-.inputs div {
-  margin-top: 1.2rem; /* space between each input section */
-}
-
-.tdee-info-section {
-  background-color: #1a1a2e;
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin-top: 2rem;
-  border: 1px solid #2e2e40;
-  text-align: left;
+/* Calculate button */
+.calculate-button {
+  align-self: flex-start;
+  padding: 10px 22px;
+  background: var(--accent);
   color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
-.tdee-info-section h2 {
-  color: #00cfff;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-  font-weight: 700;
+.calculate-button:hover {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
 }
 
-.tdee-info-section p {
-  color: #ddd;
-  margin-bottom: 0.75rem;
-  line-height: 1.6;
+/* ── Stats grid ─────────────────────────────────────────────── */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.tdee-info-section ul {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 0.5rem;
-}
-
-.tdee-info-section li {
-  color: #b5b5b5;
-  margin-bottom: 0.4rem;
-  font-size: 0.95rem;
-}
-
-/* --- Stats Layout --- */
 .stats-title {
-  text-align: center;
-  font-size: 1.6rem;
-  color: #00cfff;
-  margin-bottom: 1.5rem;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
 }
 
 .stats-grid {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
 }
 
 .stat-card {
-  background: #181b24;
-  border: 1px solid #2e2e40;
-  padding: 1.2rem 1.5rem;
-  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
   text-align: center;
-  flex: 1 1 200px;
-  max-width: 250px;
-  color: #f5f5f5;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
-  transition: all 0.2s ease-in-out;
+  transition: border-color var(--transition-fast);
 }
 
 .stat-card:hover {
-  transform: translateY(-3px);
-  border-color: #00cfff;
+  border-color: var(--accent);
 }
 
 .stat-card h3 {
-  font-size: 1rem;
-  margin-bottom: 0.4rem;
-  color: #00cfff;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .stat-card p {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0;
 }
 
 .stat-card.highlight {
-  background: rgba(0, 204, 255, 0.1);
-  border-color: #00cfff;
+  border-color: var(--accent);
+  background: rgba(29, 158, 117, 0.06);
 }
 
-/* --- Section Headers --- */
+.stat-card.highlight p {
+  color: var(--accent-light);
+}
+
+/* ── Section headers ────────────────────────────────────────── */
 .section-header {
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  text-align: center;
+  margin: 0;
 }
 
 .section-header h3 {
-  color: #00cfff;
-  font-size: 1.2rem;
+  font-size: 13px;
   font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
 }
 
-/* --- Tables --- */
+/* ── Tables ─────────────────────────────────────────────────── */
 .tdee-table {
   width: 100%;
   border-collapse: collapse;
-  background: #12141c;
-  border-radius: 12px;
+  font-size: 13px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 2rem;
 }
 
 .tdee-table th {
-  background: #1f2230;
-  color: #00cfff;
-  padding: 10px;
-  text-align: center;
-  font-weight: 600;
+  background: var(--bg-base);
+  color: var(--text-muted);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .tdee-table td {
-  text-align: center;
-  padding: 12px;
-  color: #e0e0e0;
-  border-top: 1px solid #2a2d3c;
+  text-align: left;
+  padding: 11px 14px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
 }
 
-.tdee-table tr:hover {
-  background: rgba(0, 204, 255, 0.05);
+.tdee-table td:last-child {
+  color: var(--accent-light);
+  font-weight: 500;
 }
 
-/* --- Tooltip Info Icons --- */
+.tdee-table tr:hover td {
+  background: rgba(29, 158, 117, 0.04);
+}
+
+/* ── Tooltip info icons ─────────────────────────────────────── */
 .info-icon {
-  display: inline-block;
-  margin-left: 6px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  background: rgba(29, 158, 117, 0.12);
+  border: 1px solid var(--accent-dark);
+  color: var(--accent-light);
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  line-height: 18px;
-  text-align: center;
+  width: 16px;
+  height: 16px;
+  font-size: 11px;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background var(--transition-fast);
+  vertical-align: middle;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .info-icon:hover {
-  background: #00cfff;
-  color: #000;
+  background: rgba(29, 158, 117, 0.25);
 }
 
-/* Tooltip Text */
 .info-icon::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: 130%;
   left: 50%;
   transform: translateX(-50%);
-  background: #1e1f25;
-  color: #fff;
+  background: var(--bg-base);
+  color: var(--text-secondary);
   padding: 8px 10px;
-  font-size: 0.8rem;
-  border-radius: 8px;
+  font-size: 12px;
+  border-radius: var(--radius-md);
   width: 220px;
   text-align: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  border: 1px solid #00cfff33;
-  box-shadow: 0 0 8px rgba(0, 204, 255, 0.2);
+  transition: opacity var(--transition-fast);
+  border: 1px solid var(--border);
   z-index: 10;
+  font-weight: 400;
 }
 
 .info-icon:hover::after {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, -5px);
+}
+
+/* ── About section ──────────────────────────────────────────── */
+.tdee-info-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+}
+
+.tdee-info-section h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-light);
+  margin: 0 0 10px;
+}
+
+.tdee-info-section p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.tdee-info-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tdee-info-section li {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding-left: 14px;
+  position: relative;
+}
+
+.tdee-info-section li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }

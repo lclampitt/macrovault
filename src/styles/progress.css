@@ -1,274 +1,181 @@
-/* === Layout === */
-.progress-page {
-  max-width: 950px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 3rem;
-  color: #e8f1ff;
-}
+/* ============================================================
+   PROGRESS V2
+   ============================================================ */
 
-.progress-title {
-  margin-top: 0;
-  margin-bottom: 1.2rem;
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(90deg, #00cfff, #00a4ff);
-  -webkit-background-clip: text;
-  color: transparent;
-}
-
-/* Alerts */
-.progress-alert {
-  margin-bottom: 0.75rem;
-  padding: 0.6rem 0.9rem;
-  border-radius: 10px;
-  font-size: 0.9rem;
-}
-
-.progress-alert--error {
-  background: rgba(255, 77, 94, 0.12);
-  border: 1px solid rgba(255, 118, 133, 0.7);
-  color: #ffd4db;
-  box-shadow: 0 0 18px rgba(255, 77, 94, 0.25);
-}
-
-.progress-alert--success {
-  background: rgba(0, 255, 153, 0.08);
-  border: 1px solid rgba(0, 255, 153, 0.7);
-  color: #c5ffe6;
-  box-shadow: 0 0 18px rgba(0, 255, 153, 0.25);
-}
-
-/* === Reusable card styling === */
-.progress-card {
-  margin-bottom: 1.4rem;
-  padding: 1.4rem 1.25rem;
-
-  border-radius: 20px;
-  border: 1px solid rgba(0, 207, 255, 0.25);
-
-  /* lighter gradient */
-  background: radial-gradient(
-      circle at top left,
-      #1d2538 0,
-      #151a2a 48%,
-      #0d101a 100%
-    );
-
-  box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.6),
-    0 0 24px rgba(0, 207, 255, 0.05);
-}
-
-.progress-card--chart {
-  padding: 1.2rem 1.1rem 1.4rem;
-  /* slightly brighter for the chart block */
-  background: radial-gradient(
-      circle at top left,
-      #222b3f 0,
-      #161b2b 55%,
-      #101420 100%
-    );
-}
-
-/* Section titles */
-.progress-section-title {
-  margin-top: 0;
-  margin-bottom: 0.8rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #00cfff;
-}
-
-/* === Add Entry form === */
-.progress-form {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.9rem;
-}
-
-.progress-field {
+.pg {
+  max-width: 100%;
   display: flex;
   flex-direction: column;
+  gap: 24px;
 }
 
-.progress-label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-size: 0.85rem;
-  color: #b7c3d9;
+.pg-muted { color: var(--text-muted); font-size: 13px; }
+
+/* Alerts */
+.pg-alert {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+.pg-alert--error   { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+.pg-alert--success { background: rgba(29,158,117,0.08); border: 1px solid rgba(29,158,117,0.25); color: var(--accent-light); }
+
+/* ── STAT CHIPS ─────────────────────────── */
+.pg-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
-.progress-input {
-  padding: 0.55rem 0.75rem;
-  border-radius: 9px;
-  border: 1px solid #343b54;
-  background-color: #15192a;
-  color: #e8f1ff;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease,
-    background-color 0.15s ease;
-}
-
-.progress-input::placeholder {
-  color: #6c7690;
-}
-
-.progress-input:focus {
-  border-color: #00cfff;
-  box-shadow: 0 0 0 1px rgba(0, 207, 255, 0.45);
-  background-color: #171d32;
-}
-
-.progress-save-wrapper {
+.pg-chip {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pg-chip__value {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.pg-chip__label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── CHART ─────────────────────────────── */
+.pg-chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+/* ── ADD ENTRY FORM ─────────────────────── */
+.pg-form-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pg-section-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+
+.pg-form-row {
+  display: flex;
+  gap: 12px;
   align-items: flex-end;
-  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
-.progress-save-btn {
-  padding: 0.6rem 1.1rem;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, #00cfff, #00ffbf);
-  color: #050711;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+.pg-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 120px;
 }
 
-.progress-save-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 0 20px rgba(0, 207, 255, 0.7);
-  filter: brightness(1.05);
+.pg-form-field--btn {
+  flex: 0;
+  min-width: auto;
 }
 
-.progress-save-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.78;
+.pg-form-label {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
-.progress-tip {
-  margin-top: 0.55rem;
-  font-size: 0.82rem;
-  color: #9faac4;
+.pg-tip {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
-/* === History table === */
-.progress-card--table-header {
-  padding-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(45, 55, 82, 0.85);
-  margin-bottom: 0.2rem;
+/* ── HISTORY TABLE ─────────────────────── */
+.pg-table-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.progress-table-wrapper {
-  overflow-x: auto;
-}
-
-.progress-table {
+.pg-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 13px;
+  table-layout: fixed;
 }
 
-.progress-th,
-.progress-td {
-  padding: 0.65rem 0.8rem;
+.pg-table th:nth-child(1),
+.pg-table td:nth-child(1) { width: 30%; }
+.pg-table th:nth-child(2),
+.pg-table td:nth-child(2) { width: 25%; }
+.pg-table th:nth-child(3),
+.pg-table td:nth-child(3) { width: 25%; }
+.pg-table th:nth-child(4),
+.pg-table td:nth-child(4) { width: 20%; text-align: right; }
+
+.pg-table th {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
   text-align: left;
+  padding: 0 10px 8px;
+  border-bottom: 1px solid var(--border);
 }
 
-.progress-th {
-  font-weight: 600;
-  background: #181e30;
-  color: #a4afc5;
+.pg-row td {
+  padding: 10px 10px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
 }
 
-.progress-row {
-  border-top: 1px solid #283047;
+.pg-row:last-child td {
+  border-bottom: none;
 }
 
-.progress-td {
-  color: #e1e7f5;
+.pg-row--alt {
+  background: var(--bg-surface-2);
 }
 
-/* Delete button */
-.progress-delete-btn {
-  border-radius: 999px;
-  border: 1px solid #4e5670;
-  background: #232842;
-  color: #ff9da3;
-  padding: 0.32rem 0.85rem;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease,
-    box-shadow 0.18s ease, transform 0.18s ease;
+.pg-del-btn {
+  font-size: 12px;
+  padding: 4px 10px;
 }
 
-.progress-delete-btn:hover:not(:disabled) {
-  background: #ff6b6b;
-  color: #050711;
-  border-color: #ffb0b0;
-  box-shadow: 0 0 18px rgba(255, 107, 107, 0.6);
-  transform: translateY(-1px);
-}
-
-.progress-delete-btn:disabled {
-  opacity: 0.75;
-  cursor: not-allowed;
-}
-
-/* Guest state (not logged in) */
-.progress-guest {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem;
-  color: #e8f1ff;
-}
-.progress-guest p {
-  color: #a3aec6;
-}
-
-/* Responsive tweaks */
-@media (max-width: 768px) {
-  .progress-page {
-    padding: 2.2rem 1.1rem 2.5rem;
-  }
-
-  .progress-form {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 520px) {
-  .progress-form {
-    grid-template-columns: 1fr;
-  }
-
-  .progress-save-wrapper {
-    justify-content: flex-start;
-  }
-}
-
-/* ===== Recharts tooltip theming for Progress chart ===== */
+/* Recharts tooltip */
 .recharts-default-tooltip {
-  background-color: #101420 !important;
-  border-radius: 10px !important;
-  border: 1px solid rgba(148, 163, 184, 0.7) !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  background-color: #0f1117 !important;
+  border-radius: 8px !important;
+  border: 1px solid #1e2536 !important;
   padding: 8px 10px !important;
 }
+.recharts-tooltip-label { font-size: 11px; color: #8892a4 !important; margin-bottom: 4px; }
+.recharts-tooltip-item  { font-size: 12px; color: #e8eaf0 !important; }
 
-/* Date label at the top of the tooltip */
-.recharts-tooltip-label {
-  margin-bottom: 4px;
-  font-size: 0.8rem;
-  color: #9ca3af !important;
+/* Responsive */
+@media (max-width: 700px) {
+  .pg-chips { grid-template-columns: 1fr 1fr; }
 }
-
-/* Individual value rows */
-.recharts-tooltip-item {
-  font-size: 0.85rem;
-  color: #e5edf7 !important; /* or #00cfff if you want it cyan */
+@media (max-width: 480px) {
+  .pg-form-row { flex-direction: column; }
+  .pg-form-field { min-width: 0; width: 100%; }
 }
-

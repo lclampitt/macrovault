@@ -1,7 +1,42 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { supabase } from '../supabaseClient';
 import ProgressCharts from '../components/ProgressCharts';
 import '../styles/progress.css';
+
+/* Count-up hook */
+function useCountUp(target, duration = 700) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (!target || target === 0) { setVal(0); return; }
+    let start = 0;
+    const step = target / (duration / 16);
+    const t = setInterval(() => {
+      start += step;
+      if (start >= target) { setVal(target); clearInterval(t); }
+      else setVal(start);
+    }, 16);
+    return () => clearInterval(t);
+  }, [target, duration]);
+  return val;
+}
+
+/* Stat chip with count-up */
+function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive }) {
+  const num = useCountUp(Math.abs(value ?? 0));
+  const display = value == null ? '—' : `${positive === false ? '-' : positive ? '+' : ''}${num.toFixed(decimals)}${suffix}`;
+  return (
+    <motion.div
+      className="pg-chip"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.06, ease: 'easeOut' }}
+    >
+      <span className="pg-chip__value">{display}</span>
+      <span className="pg-chip__label">{label}</span>
+    </motion.div>
+  );
+}
 
 export default function ProgressPage() {
   const [session, setSession] = useState(null);
@@ -112,7 +147,7 @@ export default function ProgressPage() {
         data,
         ...prev.filter((r) => r.id !== tempId && r.date !== data.date),
       ]);
-      setMsg('✅ Progress saved.');
+      setMsg('Progress saved.');
       setWeightLbs('');
       setBfPct('');
     }
@@ -135,145 +170,134 @@ export default function ProgressPage() {
       setError(error.message);
       setRows(prev);
     } else {
-      setMsg('🗑️ Deleted.');
+      setMsg('Deleted.');
     }
     setDeletingId(null);
   }
 
   if (loading) {
-    return (
-      <div className="progress-page">
-        <h2 className="progress-title">Progress</h2>
-        <p style={{ color: '#9aa0a6' }}>Loading...</p>
-      </div>
-    );
+    return <div className="pg"><p className="pg-muted">Loading…</p></div>;
+  }
+  if (!session) {
+    return <div className="pg"><p className="pg-muted">Please log in to view and track your progress.</p></div>;
   }
 
-  // If not logged in, show a friendly guest message
-  if (!session) {
-    return (
-      <div className="progress-guest">
-        <h2 className="progress-title">Progress</h2>
-        <p>Please log in to view and track your progress.</p>
-      </div>
-    );
-  }
+  /* Derive stat chip values from rows */
+  const sorted = [...rows].sort((a, b) => a.date.localeCompare(b.date));
+  const latest  = sorted[sorted.length - 1];
+  const first   = sorted[0];
+  const currentWeight = latest?.weight_kg ?? null;
+  const currentBf     = latest?.body_fat_pct ?? null;
+  const weightChange  = (first && latest && first.weight_kg != null && latest.weight_kg != null)
+    ? Number((latest.weight_kg - first.weight_kg).toFixed(1)) : null;
+  const bfChange      = (first && latest && first.body_fat_pct != null && latest.body_fat_pct != null)
+    ? Number((latest.body_fat_pct - first.body_fat_pct).toFixed(1)) : null;
 
   return (
-    <div className="progress-page">
-      <h2 className="progress-title">Progress</h2>
+    <div className="pg">
 
-      {/* Alerts for error/success */}
-      {error && (
-        <div className="progress-alert progress-alert--error">❌ {error}</div>
-      )}
-      {msg && (
-        <div className="progress-alert progress-alert--success">{msg}</div>
-      )}
+      {/* Alerts */}
+      {error && <div className="pg-alert pg-alert--error">{error}</div>}
+      {msg   && <div className="pg-alert pg-alert--success">{msg}</div>}
 
-      {/* Chart card */}
-      <div className="progress-card progress-card--chart">
-        <ProgressCharts rows={rows} />
+      {/* Stat chips */}
+      <div className="pg-chips">
+        <StatChip label="Current weight" value={currentWeight} suffix=" lbs" decimals={1} index={0} />
+        <StatChip label="Body fat %" value={currentBf} suffix="%" decimals={1} index={1} />
+        <StatChip label="Weight change" value={weightChange} suffix=" lbs" decimals={1} index={2}
+          positive={weightChange != null ? weightChange <= 0 : undefined} />
+        <StatChip label="BF% change" value={bfChange} suffix="%" decimals={1} index={3}
+          positive={bfChange != null ? bfChange <= 0 : undefined} />
       </div>
 
-      {/* Add Entry card */}
-      <div className="progress-card">
-        <h3 className="progress-section-title">Add Entry</h3>
-        <form className="progress-form" onSubmit={handleAdd}>
-          <div className="progress-field">
-            <label className="progress-label">Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="progress-input"
-            />
+      {/* Chart */}
+      <motion.div
+        className="pg-chart-card"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1, ease: 'easeOut' }}
+      >
+        <ProgressCharts rows={rows} />
+      </motion.div>
+
+      {/* Add entry form */}
+      <motion.div
+        className="pg-form-card"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.16, ease: 'easeOut' }}
+      >
+        <p className="pg-section-title">Add entry</p>
+        <form className="pg-form-row" onSubmit={handleAdd}>
+          <div className="pg-form-field">
+            <label className="pg-form-label">Date</label>
+            <input type="date" className="input" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
-          <div className="progress-field">
-            <label className="progress-label">Weight (lbs)</label>
-            <input
-              type="number"
-              step="0.1"
-              value={weightLbs}
-              onChange={(e) => setWeightLbs(e.target.value)}
-              placeholder="e.g. 180"
-              className="progress-input"
-            />
+          <div className="pg-form-field">
+            <label className="pg-form-label">Weight (lbs)</label>
+            <input type="number" step="0.1" className="input" placeholder="e.g. 180" value={weightLbs} onChange={(e) => setWeightLbs(e.target.value)} />
           </div>
-          <div className="progress-field">
-            <label className="progress-label">Body Fat %</label>
-            <input
-              type="number"
-              step="0.1"
-              value={bfPct}
-              onChange={(e) => setBfPct(e.target.value)}
-              placeholder="e.g. 16.8"
-              className="progress-input"
-            />
+          <div className="pg-form-field">
+            <label className="pg-form-label">Body Fat %</label>
+            <input type="number" step="0.1" className="input" placeholder="e.g. 16.8" value={bfPct} onChange={(e) => setBfPct(e.target.value)} />
           </div>
-          <div className="progress-save-wrapper">
-            <button
-              type="submit"
-              disabled={saving}
-              className="progress-save-btn"
-            >
+          <div className="pg-form-field pg-form-field--btn">
+            <motion.button type="submit" className="btn btn-primary" disabled={saving} whileTap={{ scale: 0.97 }}>
               {saving ? 'Saving…' : 'Save'}
-            </button>
+            </motion.button>
           </div>
         </form>
-        <p className="progress-tip">
-          Tip: you can fill just weight, just BF%, or both. Entries are unique per
-          date—new saves will overwrite that day.
-        </p>
-      </div>
+        <p className="pg-tip">Entries are unique per date — saves will overwrite that day.</p>
+      </motion.div>
 
-      {/* History table card */}
-      <div className="progress-card">
-        <div className="progress-card--table-header">
-          <span className="progress-section-title">History</span>
-        </div>
-
+      {/* History table */}
+      <motion.div
+        className="pg-table-card"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.22, ease: 'easeOut' }}
+      >
+        <p className="pg-section-title">History</p>
         {rows.length === 0 ? (
-          <div style={{ paddingTop: '0.7rem', color: '#9aa0a6' }}>
-            No entries yet.
-          </div>
+          <p className="pg-muted">No entries yet.</p>
         ) : (
-          <div className="progress-table-wrapper">
-            <table className="progress-table">
-              <thead>
-                <tr>
-                  <th className="progress-th">Date</th>
-                  <th className="progress-th">Weight (lbs)</th>
-                  <th className="progress-th">Body Fat %</th>
-                  <th className="progress-th" />
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.id} className="progress-row">
-                    <td className="progress-td">{r.date}</td>
-                    <td className="progress-td">
-                      {r.weight_kg ?? '—'}
-                    </td>
-                    <td className="progress-td">
-                      {r.body_fat_pct ?? '—'}
-                    </td>
-                    <td className="progress-td" style={{ textAlign: 'right' }}>
-                      <button
-                        onClick={() => handleDelete(r.id)}
-                        disabled={deletingId === r.id}
-                        className="progress-delete-btn"
-                      >
-                        {deletingId === r.id ? 'Deleting…' : 'Delete'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <table className="pg-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Weight (lbs)</th>
+                <th>Body Fat %</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => (
+                <motion.tr
+                  key={r.id}
+                  className={`pg-row ${idx % 2 === 0 ? 'pg-row--alt' : ''}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: idx * 0.03 }}
+                >
+                  <td>{r.date}</td>
+                  <td>{r.weight_kg ?? '—'}</td>
+                  <td>{r.body_fat_pct ?? '—'}</td>
+                  <td>
+                    <motion.button
+                      className="btn btn-destructive pg-del-btn"
+                      onClick={() => handleDelete(r.id)}
+                      disabled={deletingId === r.id}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      {deletingId === r.id ? 'Deleting…' : 'Delete'}
+                    </motion.button>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

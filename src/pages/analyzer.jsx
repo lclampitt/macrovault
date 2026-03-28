@@ -1,10 +1,36 @@
 import React, { useState } from 'react';
 import '../styles/analyzer.css';
+import UpgradeModal from '../components/ui/UpgradeModal';
+import ProBadge from '../components/ui/ProBadge';
 
 // Use env var in production, fall back to hosted backend URL
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
-export default function Analyzer() {
+function AnalyzerGate({ onUpgrade }) {
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  return (
+    <div className="analyzer-container">
+      <div className="pro-gate">
+        <div className="pro-gate__header">
+          <ProBadge size="md" />
+          <h2>AI Body Analyzer</h2>
+          <p>The AI Body Analyzer is a Pro feature. Upgrade to unlock instant body fat estimates using measurements or photos.</p>
+        </div>
+        <button className="pro-gate__cta" onClick={() => setShowUpgrade(true)}>
+          Upgrade to Pro — $4.99/mo
+        </button>
+      </div>
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
+    </div>
+  );
+}
+
+export default function Analyzer({ isPro }) {
+  if (!isPro) return <AnalyzerGate />;
+  return <AnalyzerContent />;
+}
+
+function AnalyzerContent() {
   // Which mode is active: "measurements" or "photo"
   const [mode, setMode] = useState('measurements');
 
