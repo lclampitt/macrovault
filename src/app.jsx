@@ -14,7 +14,8 @@ import ProgressPage from './pages/progress';
 import AuthPage     from './pages/auth';
 import Contact      from './pages/Contact';
 import About        from './pages/About';
-import BillingPage  from './pages/billing';
+import BillingPage   from './pages/billing';
+import SettingsPage  from './pages/settings';
 
 // Features
 import GoalPlanner from './components/GoalPlanner/goalplanner';
@@ -33,6 +34,9 @@ import WorkoutLogger from './pages/Workouts/WorkoutLogger';
 
 // Upgrade context
 import { UpgradeProvider } from './context/UpgradeContext';
+
+// Toast
+import { Toaster } from 'sonner';
 
 // Onboarding
 import OnboardingWizard from './components/ui/OnboardingWizard';
@@ -123,6 +127,18 @@ function App() {
 
   return (
     <UpgradeProvider>
+    <Toaster
+      position="bottom-right"
+      toastOptions={{
+        style: {
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-light)',
+          color: 'var(--text-primary)',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '13px',
+        },
+      }}
+    />
     {/* Onboarding wizard — shown to newly signed-up users */}
     {session && !onboardingDone && !loading && (
       <OnboardingWizard
@@ -157,6 +173,7 @@ function App() {
       <Route path="/progress"            element={protect(<ProgressPage />)} />
       <Route path="/workouts"            element={protect(<WorkoutLogger />)} />
       <Route path="/billing"             element={protect(<BillingPage />)} />
+      <Route path="/settings"            element={protect(<SettingsPage />)} />
       <Route path="/exercises"           element={protect(<ExerciseLibrary />)} />
       <Route path="/exercises/:id"       element={protect(<ExerciseDetails />)} />
     </Routes>

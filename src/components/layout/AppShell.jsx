@@ -15,6 +15,7 @@ const PAGE_META = {
   '/progress':    { title: 'Progress' },
   '/billing':     { title: 'Billing' },
   '/exercises':   { title: 'Exercise Library' },
+  '/settings':    { title: 'Settings' },
 };
 
 const pageVariants = {

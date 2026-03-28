@@ -14,6 +14,7 @@ import {
   User,
   Crown,
   Lock,
+  Settings,
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -104,6 +105,32 @@ export default function Sidebar({ session, onLogout, isPro, usage }) {
 
       {/* Spacer */}
       <div className="sidebar__spacer" />
+
+      {/* Settings — pinned above user section */}
+      <div style={{ padding: '0 8px 4px' }}>
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
+          }
+          title={collapsed ? 'Settings' : undefined}
+        >
+          <Settings size={18} className="sidebar__nav-icon" />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                className="sidebar__nav-label"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+              >
+                Settings
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </NavLink>
+      </div>
 
       {/* User section */}
       <div className="sidebar__user">
