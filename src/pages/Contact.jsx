@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Send, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import '../styles/contact.css';
 
 const FORMSPREE_URL = 'https://formspree.io/f/xreopzjn';
 
 export default function Contact() {
+  const navigate = useNavigate();
   const [form, setForm]     = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState('idle'); // idle | sending | success | error
   const [errorMsg, setErrorMsg] = useState('');
@@ -65,6 +67,12 @@ export default function Contact() {
                 onClick={() => { setStatus('idle'); setForm({ name: '', email: '', message: '' }); }}
               >
                 Send another
+              </button>
+              <button
+                className="ct-btn ct-btn--ghost"
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft size={15} /> Back to home
               </button>
             </motion.div>
           ) : (

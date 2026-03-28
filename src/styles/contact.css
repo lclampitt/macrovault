@@ -141,6 +141,17 @@
   cursor: default;
 }
 
+.ct-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.ct-btn--ghost:hover {
+  background: var(--bg-surface-raised, rgba(255,255,255,0.04));
+  color: var(--text-primary);
+}
+
 /* Success state */
 .ct-success {
   display: flex;
