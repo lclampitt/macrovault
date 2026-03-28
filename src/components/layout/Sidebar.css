@@ -7,7 +7,9 @@
   height: 100vh;
   position: sticky;
   top: 0;
-  background: var(--bg-surface);
+  background: rgba(22, 27, 39, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -65,26 +67,26 @@
   align-items: center;
   gap: 10px;
   padding: 9px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   color: var(--text-secondary);
   text-decoration: none;
   white-space: nowrap;
   overflow: hidden;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
   position: relative;
-  border-left: 2px solid transparent;
+  border: 1px solid transparent;
 }
 
 .sidebar__nav-item:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
-  transform: scale(1.03);
+  border-color: var(--border);
 }
 
 .sidebar__nav-item--active {
   background: var(--accent-muted);
   color: var(--accent-light);
-  border-left-color: var(--accent);
+  border-color: rgba(29, 158, 117, 0.25);
 }
 
 .sidebar__nav-icon {

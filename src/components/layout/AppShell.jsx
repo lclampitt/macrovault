@@ -7,12 +7,14 @@ import './AppShell.css';
 
 /* Map routes to page titles and optional quick-action buttons */
 const PAGE_META = {
-  '/':            { title: 'Home' },
-  '/analyzer':   { title: 'AI Analyzer' },
-  '/calculators':{ title: 'Calculators' },
-  '/goalplanner':{ title: 'Goal Planner' },
-  '/workouts':   { title: 'Workouts' },
-  '/progress':   { title: 'Progress' },
+  '/home':        { title: 'Home' },
+  '/analyzer':    { title: 'AI Analyzer' },
+  '/calculators': { title: 'Calculators' },
+  '/goalplanner': { title: 'Goal Planner' },
+  '/workouts':    { title: 'Workouts' },
+  '/progress':    { title: 'Progress' },
+  '/billing':     { title: 'Billing' },
+  '/exercises':   { title: 'Exercise Library' },
 };
 
 const pageVariants = {
@@ -34,7 +36,9 @@ export default function AppShell({ session, onLogout, isPro, children }) {
       <div className="app-shell__main">
         {/* Top bar */}
         <div className="app-shell__topbar">
-          <h1 className="app-shell__page-title">{meta.title}</h1>
+          <div className="app-shell__topbar-left">
+            <h1 className="app-shell__page-title">{meta.title}</h1>
+          </div>
           {meta.action && (
             <button className="app-shell__action-btn">{meta.action}</button>
           )}

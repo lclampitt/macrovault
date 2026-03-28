@@ -14,6 +14,34 @@
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
+  position: relative;
+}
+
+/* Grid dot background — same pattern as landing/auth */
+.app-shell__main::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(29, 158, 117, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 158, 117, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle radial glow in top-center of content */
+.app-shell__main::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: calc(var(--sidebar-width) + 50%);
+  transform: translateX(-50%);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(29, 158, 117, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Top bar */
@@ -21,18 +49,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 28px;
+  padding: 0 28px;
+  height: 60px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg-surface);
+  background: rgba(15, 17, 23, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
+.app-shell__topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .app-shell__page-title {
-  font-size: 17px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Teal accent dot before page title */
+.app-shell__page-title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-right: 10px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
 }
 
 .app-shell__action-btn {
@@ -49,21 +101,28 @@
   background: var(--accent-dark);
 }
 
-/* Scrollable content */
+/* Scrollable content — sits above grid */
 .app-shell__content {
   flex: 1;
   overflow-y: auto;
-  padding: 28px;
+  padding: 32px 28px;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
   .app-shell__content {
     padding: 16px;
-    padding-top: 64px; /* space for mobile toggle */
+    padding-top: 64px;
   }
 
   .app-shell__topbar {
-    padding: 12px 16px;
-    padding-left: 60px; /* space for hamburger */
+    padding: 0 16px;
+    padding-left: 60px;
+  }
+
+  /* Glow doesn't account for sidebar on mobile */
+  .app-shell__main::after {
+    left: 50%;
   }
 }
