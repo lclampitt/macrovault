@@ -113,23 +113,28 @@
   z-index: 1;
 }
 
+/* ============================================================
+   MOBILE — below 768px
+   ============================================================ */
 @media (max-width: 768px) {
-  .app-shell__content {
-    padding: 16px;
-    padding-top: 64px;
-  }
-
+  /* Hide the desktop page-title topbar — replaced by mob-topbar in Sidebar */
   .app-shell__topbar {
-    padding: 0 16px;
-    padding-left: 60px;
+    display: none;
   }
 
-  /* Grid and glow start at screen edge on mobile (no sidebar) */
+  /* Grid and glow span full width (no sidebar offset) */
   .app-shell__main::before {
     left: 0;
   }
 
   .app-shell__main::after {
     left: 50%;
+  }
+
+  /* Content: top pad for mob-topbar (56px) + spacing; bottom pad for bottom nav (64px) */
+  .app-shell__content {
+    padding: 16px;
+    padding-top: 72px;
+    padding-bottom: 80px;
   }
 }

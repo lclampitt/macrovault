@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
@@ -27,15 +27,25 @@ const NAV_ITEMS = [
   { to: '/progress',   label: 'Progress',    icon: BarChart2   },
 ];
 
+const BOTTOM_NAV_ITEMS = [
+  { to: '/home',     icon: Home      },
+  { to: '/analyzer', icon: ScanLine  },
+  { to: '/workouts', icon: Dumbbell  },
+  { to: '/progress', icon: BarChart2 },
+  { to: '/settings', icon: Settings  },
+];
+
 export default function Sidebar({ session, onLogout, isPro, usage }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const navigate = useNavigate();
 
   const userEmail = session?.user?.email ?? '';
   const displayName = userEmail.split('@')[0] || 'User';
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   const handleLogout = async () => {
+    setSheetOpen(false);
     await onLogout();
     navigate('/auth');
   };
@@ -196,39 +206,99 @@ export default function Sidebar({ session, onLogout, isPro, usage }) {
 
   return (
     <>
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — hidden on mobile via CSS */}
       <div className="sidebar-desktop">
         <SidebarContent />
       </div>
 
-      {/* Mobile hamburger */}
-      <button
-        className="sidebar-mobile-toggle"
-        onClick={() => setMobileOpen(true)}
-        aria-label="Open menu"
-      >
-        <span /><span /><span />
-      </button>
+      {/* ── Mobile top bar ── */}
+      <div className="mob-topbar">
+        <Link to="/home" className="mob-topbar__logo">
+          <div className="mob-topbar__logo-icon">G</div>
+          <span className="mob-topbar__logo-name">Gainlytics</span>
+        </Link>
+        <button
+          className="mob-topbar__avatar"
+          onClick={() => setSheetOpen(true)}
+          aria-label="Open user menu"
+        >
+          {initials}
+        </button>
+      </div>
 
-      {/* Mobile drawer */}
+      {/* ── Mobile bottom nav ── */}
+      <nav className="mob-bottom-nav">
+        {BOTTOM_NAV_ITEMS.map(({ to, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `mob-bottom-nav__item${isActive ? ' mob-bottom-nav__item--active' : ''}`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                {isActive && <span className="mob-bottom-nav__dot" />}
+                <Icon size={22} />
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* ── Mobile user slide-up sheet ── */}
       <AnimatePresence>
-        {mobileOpen && (
+        {sheetOpen && (
           <>
             <motion.div
-              className="sidebar-overlay"
+              className="mob-sheet-overlay"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setMobileOpen(false)}
+              onClick={() => setSheetOpen(false)}
             />
             <motion.div
-              className="sidebar-mobile-drawer"
-              initial={{ x: -240 }}
-              animate={{ x: 0 }}
-              exit={{ x: -240 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="mob-sheet"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              <SidebarContent />
+              <div className="mob-sheet__handle" />
+
+              <div className="mob-sheet__user">
+                <div className="mob-sheet__avatar-circle">{initials}</div>
+                <div className="mob-sheet__user-info">
+                  <div className="mob-sheet__name">{displayName}</div>
+                  <div className="mob-sheet__email">{userEmail}</div>
+                </div>
+                {isPro ? (
+                  <span className="sidebar__pro-badge" style={{ marginLeft: 'auto', flexShrink: 0 }}>
+                    <Crown size={10} /> Pro
+                  </span>
+                ) : (
+                  <span className="sidebar__free-badge" style={{ marginLeft: 'auto' }}>Free</span>
+                )}
+              </div>
+
+              <div className="mob-sheet__divider" />
+
+              <Link
+                to="/settings"
+                className="mob-sheet__item"
+                onClick={() => setSheetOpen(false)}
+              >
+                <Settings size={18} />
+                Settings
+              </Link>
+
+              <button
+                className="mob-sheet__item mob-sheet__item--danger"
+                onClick={handleLogout}
+              >
+                <LogOut size={18} />
+                Sign out
+              </button>
             </motion.div>
           </>
         )}
