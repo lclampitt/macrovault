@@ -22,14 +22,19 @@ import stripe
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from datetime import datetime
-from posthog import Posthog
+try:
+    from posthog import Posthog as _Posthog
+    _posthog_available = True
+except ImportError:
+    _Posthog = None
+    _posthog_available = False
 
 load_dotenv()
 
 # PostHog client
 _posthog_key = os.environ.get("POSTHOG_KEY", "")
 _posthog_host = os.environ.get("POSTHOG_HOST", "https://us.i.posthog.com")
-posthog_client: Posthog | None = Posthog(_posthog_key, host=_posthog_host) if _posthog_key else None
+posthog_client = _Posthog(_posthog_key, host=_posthog_host) if (_posthog_available and _posthog_key) else None
 
 # Stripe config
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
