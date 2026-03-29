@@ -96,7 +96,11 @@ function Navbar() {
     >
       {/* Logo */}
       <Link to="/" className="lp-nav__logo">
-        <div className="lp-nav__logo-icon">G</div>
+        <div className="lp-nav__logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M6 20V10M12 20V4M18 20v-6" />
+          </svg>
+        </div>
         <span className="lp-nav__logo-name">Gainlytics</span>
       </Link>
 
@@ -350,7 +354,11 @@ function Footer() {
         <div className="lp-footer__top">
           <div className="lp-footer__brand">
             <Link to="/" className="lp-footer__logo">
-              <div className="lp-footer__logo-icon">G</div>
+              <div className="lp-footer__logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                  <path d="M6 20V10M12 20V4M18 20v-6" />
+                </svg>
+              </div>
               <span className="lp-footer__logo-name">Gainlytics</span>
             </Link>
             <p className="lp-footer__tagline">
