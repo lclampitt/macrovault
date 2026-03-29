@@ -23,8 +23,7 @@ import SettingsPage  from './pages/settings';
 import GoalPlanner from './components/GoalPlanner/goalplanner';
 
 // Calculators
-import TdeeCalculator      from './calculators/TdeeCalculator';
-import ProteinCalculator   from './calculators/ProteinCalculator';
+import MacroCalculator     from './calculators/MacroCalculator';
 import OneRepMaxCalculator from './calculators/OneRepMaxCalculator';
 
 // Exercises
@@ -174,8 +173,7 @@ function App() {
       <Route path="/home"                element={protect(<Dashboard />)} />
       <Route path="/analyzer"            element={protect(<Analyzer isPro={isPro} />)} />
       <Route path="/calculators"         element={protect(<Calculators isPro={isPro} />)} />
-      <Route path="/calculators/tdee"    element={protect(<TdeeCalculator />)} />
-      <Route path="/calculators/protein" element={protect(<ProteinCalculator />)} />
+      <Route path="/calculators/macros"   element={protect(<MacroCalculator />)} />
       <Route path="/calculators/1rm"     element={protect(<OneRepMaxCalculator />)} />
       <Route path="/goalplanner"         element={protect(<GoalPlanner isPro={isPro} />)} />
       <Route path="/progress"            element={protect(<ProgressPage isPro={isPro} />)} />
