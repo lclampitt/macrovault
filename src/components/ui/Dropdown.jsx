@@ -114,7 +114,7 @@ export default function Dropdown({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            background: 'transparent',
+            background: 'var(--bg-base)',
             border: `1px solid ${isOpen ? '#1D9E75' : '#1e2536'}`,
             borderRadius: isOpen ? '8px 8px 0 0' : '8px',
             padding: '8px 12px',
