@@ -5,13 +5,13 @@ import Dropdown from '../components/ui/Dropdown';
 function ProteinCalculator() {
   // Core input state
   const [weight, setWeight] = useState('');
-  const [ageRange, setAgeRange] = useState('<34');
+  const [ageRange, setAgeRange] = useState('18-39');
   const [bodyFat, setBodyFat] = useState('');
   const [workoutHours, setWorkoutHours] = useState('0-1');
   const [isPlantBased, setIsPlantBased] = useState('No');
   const [gender, setGender] = useState('Male');
 
-  // Calculated grams per day (min / max / optimal)
+  // Calculated grams per day (min / max / optimal) + adjustment notes
   const [results, setResults] = useState(null);
 
   // Main protein estimation logic
@@ -28,17 +28,47 @@ function ProteinCalculator() {
     let max = leanMass * 1.0;
     let optimal = leanMass * 0.88;
 
-    // Adjust optimal target for higher training volume
-    if (workoutHours === '4-6') optimal *= 1.1;
-    if (workoutHours === '7+') optimal *= 1.2;
+    // Training multiplier — applied to all three values
+    let trainingMult = 1.0;
+    if (workoutHours === '4-6') trainingMult = 1.1;
+    if (workoutHours === '7+')  trainingMult = 1.2;
 
-    // Plant-based diets often benefit from slightly higher protein for quality
-    if (isPlantBased === 'Yes') optimal *= 1.1;
+    // Plant-based diets benefit from slightly higher protein for amino acid quality
+    const plantMult = isPlantBased === 'Yes' ? 1.1 : 1.0;
+    const combinedTrainingMult = trainingMult * plantMult;
+
+    min     *= combinedTrainingMult;
+    optimal *= combinedTrainingMult;
+    max     *= combinedTrainingMult;
+
+    // Age multiplier — accounts for anabolic resistance and sarcopenia risk
+    // Applied after training multipliers
+    const ageMults = { '18-39': 1.0, '40-49': 1.08, '50-59': 1.15, '60+': 1.20 };
+    const ageMult = ageMults[ageRange] ?? 1.0;
+
+    min     *= ageMult;
+    optimal *= ageMult;
+    max     *= ageMult;
+
+    // Build adjustment notes for display
+    const notes = [];
+    if (ageMult > 1.0) {
+      notes.push(`Age adjustment applied (+${Math.round((ageMult - 1) * 100)}%)`);
+    }
+    if (trainingMult > 1.0) {
+      notes.push(`Training adjustment applied (+${Math.round((trainingMult - 1) * 100)}%)`);
+    }
+    if (gender === 'Female') {
+      notes.push(
+        'Women may benefit from slightly higher protein intake during menstrual phases or pregnancy. These values are for general fitness.'
+      );
+    }
 
     setResults({
-      min: Math.round(min),
-      max: Math.round(max),
-      optimal: Math.round(optimal),
+      min:     Math.round(min * 10) / 10,
+      max:     Math.round(max * 10) / 10,
+      optimal: Math.round(optimal * 10) / 10,
+      notes,
     });
   };
 
@@ -65,9 +95,10 @@ function ProteinCalculator() {
         value={ageRange}
         onChange={setAgeRange}
         options={[
-          { label: '<34',   value: '<34' },
-          { label: '35–60', value: '35-60' },
-          { label: '61+',   value: '61+' },
+          { label: '18–39', value: '18-39' },
+          { label: '40–49', value: '40-49' },
+          { label: '50–59', value: '50-59' },
+          { label: '60+',   value: '60+' },
         ]}
       />
 
@@ -106,6 +137,13 @@ function ProteinCalculator() {
           <p><strong>Minimum:</strong> {results.min} g/day</p>
           <p><strong>Maximum:</strong> {results.max} g/day</p>
           <p><strong>Optimal:</strong> {results.optimal} g/day</p>
+          {results.notes.length > 0 && (
+            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {results.notes.map((note, i) => (
+                <p key={i} style={{ fontSize: 11, color: '#888', margin: 0 }}>{note}</p>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
