@@ -29,12 +29,12 @@
 /* Radial glow centered behind the card */
 .auth-glow {
   position: fixed;
-  top: 30%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(ellipse at center, rgba(29,158,117,0.1) 0%, transparent 70%);
+  width: 900px;
+  height: 600px;
+  background: radial-gradient(ellipse at center, rgba(29,158,117,0.14) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
