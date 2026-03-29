@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import '../styles/analyzer.css';
-import ProBadge from '../components/ui/ProBadge';
 import posthog from '../lib/posthog';
 import { supabase } from '../supabaseClient';
 import { useUpgrade } from '../context/UpgradeContext';
@@ -8,26 +7,7 @@ import { useUpgrade } from '../context/UpgradeContext';
 // Use env var in production, fall back to hosted backend URL
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
-function AnalyzerGate() {
-  const { triggerUpgrade } = useUpgrade();
-  return (
-    <div className="analyzer-container">
-      <div className="pro-gate">
-        <div className="pro-gate__header">
-          <ProBadge size="md" />
-          <h2>AI Body Analyzer</h2>
-          <p>The AI Body Analyzer is a Pro feature. Upgrade to unlock instant body fat estimates using measurements or photos.</p>
-        </div>
-        <button className="pro-gate__cta" onClick={() => triggerUpgrade('analyzer')}>
-          Upgrade to Pro — $4.99/mo
-        </button>
-      </div>
-    </div>
-  );
-}
-
-export default function Analyzer({ isPro }) {
-  if (!isPro) return <AnalyzerGate />;
+export default function Analyzer() {
   return <AnalyzerContent />;
 }
 
@@ -98,8 +78,8 @@ function AnalyzerContent() {
 
 
     /* ============ FUNCTIONAL REQUIREMENT: FR-5 ============ */
-    /* Gender is mapped to numeric for the ML model: male=1, female=0. */
-    const genderNumeric = gender === 'male' ? 1 : 0;
+    /* Gender is mapped to numeric for the ML model: male=0, female=1. */
+    const genderNumeric = gender === 'male' ? 0 : 1;
 
     // Convert imperial inputs to metric for backend model
     const totalInches = hFtNum * 12 + hInNum;
@@ -115,13 +95,13 @@ function AnalyzerContent() {
 
     const payload = {
       gender: genderNumeric,
+      age: Number(age),
       height_cm,
       weight_kg,
       waist_cm,
       hip_cm,
       neck_cm,
       user_id: userId,
-      // age is collected for UX but not used by the current model
     };
 
     setLoadingMeasure(true);
@@ -465,11 +445,12 @@ function AnalyzerContent() {
           <div className="about-calculator">
             <h3>How these estimates work</h3>
             <p>
-              The measurement-based analyzer uses a machine learning model trained
-              on a real dataset of body measurements and body fat %. The photo
-              analyzer is experimental and blends simple silhouette features with
-              the same model. Use the results as practical guidance for training and
-              nutrition, not as a medical diagnosis.
+              The measurement-based analyzer uses a Random Forest model trained on
+              the NHANES 2017-2018 dataset — a nationally representative sample of
+              thousands of U.S. adults of both sexes, with DXA-measured body fat as
+              the ground truth. The photo analyzer is experimental and uses a
+              separate rule-based silhouette estimator. Use the results as practical
+              guidance for training and nutrition, not as a medical diagnosis.
             </p>
           </div>
         </>

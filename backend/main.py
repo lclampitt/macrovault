@@ -73,7 +73,7 @@ app.add_middleware(
 # -------------------------------------------------
 # Build an absolute path to the saved RandomForest model
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "bodyfat_model.joblib")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "bodyfat_model.pkl")
 bodyfat_model = None
 
 # Try to load the model at startup so each request can reuse it
@@ -115,16 +115,21 @@ class MeasurementRequest(BaseModel):
     Measurement-based analysis request.
 
     Frontend collects imperial units and converts to:
-      gender: 0=female, 1=male
-      height_cm, weight_kg, waist_cm, hip_cm, neck_cm
+      gender: 0=male, 1=female
+      age: years
+      height_cm, weight_kg, waist_cm, hip_cm
+
+    neck_cm is accepted but not used by the model — BMXNECK was discontinued
+    in NHANES after 2013-2014 so it is absent from the training data.
     """
-    gender: int          # 0=female, 1=male
+    gender: int          # 0=male, 1=female
+    age: float
     height_cm: float
     weight_kg: float
     waist_cm: float
     hip_cm: float
-    neck_cm: float
-    user_id: Optional[str] = None  # Used for usage tracking
+    neck_cm: Optional[float] = None  # accepted for API compatibility, not used in model
+    user_id: Optional[str] = None    # used for usage tracking
 
 
 # -------------------------------------------------
@@ -458,30 +463,25 @@ async def analyze_measurements(data: MeasurementRequest):
     3. Calls the RandomForest model for prediction.
     4. Interprets the bodyfat % into a plan.
     """
-    # Enforce monthly usage limit for free users
-    if data.user_id and not can_use_analyzer(data.user_id):
-        raise HTTPException(
-            status_code=403,
-            detail={"error": "limit_reached", "feature": "analyzer"},
-        )
-
     if bodyfat_model is None:
         # If the model hasn't been trained / loaded yet, fail fast
         raise HTTPException(
             status_code=500,
-            detail="Bodyfat model is not loaded. Train it with train_bodyfat.py.",
+            detail="Bodyfat model is not loaded. Run scripts/prepare_nhanes.py then train_bodyfat.py.",
         )
 
-    # Convert the Pydantic object to a 2D numpy array for scikit-learn
+    # Convert the Pydantic object to a 2D numpy array for scikit-learn.
+    # Feature order must match training: [gender, age, height_cm, weight_kg,
+    #                                      waist_cm, hip_cm]
     features = np.array(
         [
             [
                 data.gender,
+                data.age,
                 data.height_cm,
                 data.weight_kg,
                 data.waist_cm,
                 data.hip_cm,
-                data.neck_cm,
             ]
         ],
         dtype=float,
@@ -502,13 +502,6 @@ async def analyze_measurements(data: MeasurementRequest):
     bodyfat = max(4.0, min(45.0, bodyfat))
 
     category, goal, cals, notes = interpretation_and_plan(bodyfat)
-
-    # Increment usage counter after a successful analysis
-    if data.user_id:
-        try:
-            increment_analyzer_use(data.user_id)
-        except Exception:
-            pass  # Never fail the request because of a tracking error
 
     # Track analysis event
     if posthog_client:
@@ -555,13 +548,6 @@ async def analyze_image(file: UploadFile = File(...), user_id: Optional[str] = F
     This is intentionally separate from the dataset-trained model so we
     can clearly state its limitations in the writeup.
     """
-    # Enforce monthly usage limit for free users
-    if user_id and not can_use_analyzer(user_id):
-        raise HTTPException(
-            status_code=403,
-            detail={"error": "limit_reached", "feature": "analyzer"},
-        )
-
     if file.content_type not in ("image/jpeg", "image/png", "image/jpg"):
         raise HTTPException(
             status_code=400, detail="Please upload a JPG or PNG image."
@@ -578,13 +564,6 @@ async def analyze_image(file: UploadFile = File(...), user_id: Optional[str] = F
     # 3) Clamp + interpret results into a plan
     bodyfat = max(4.0, min(45.0, bodyfat))
     category, goal, cals, notes = interpretation_and_plan(bodyfat)
-
-    # Increment usage counter after a successful analysis
-    if user_id:
-        try:
-            increment_analyzer_use(user_id)
-        except Exception:
-            pass
 
     # Track analysis event
     if posthog_client:

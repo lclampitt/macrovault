@@ -1,0 +1,25 @@
+{
+  "trained_on": "NHANES 2017-2018",
+  "n_samples": 2420,
+  "n_male": 1166,
+  "n_female": 1254,
+  "features": [
+    "gender",
+    "age",
+    "height_cm",
+    "weight_kg",
+    "waist_cm",
+    "hip_cm"
+  ],
+  "gender_encoding": {
+    "0": "male",
+    "1": "female"
+  },
+  "overall_mae": 2.666,
+  "overall_r2": 0.833,
+  "male_mae": 2.563,
+  "male_r2": 0.738,
+  "female_mae": 2.761,
+  "female_r2": 0.71,
+  "trained_at": "2026-03-29T19:43:20.501616+00:00"
+}
