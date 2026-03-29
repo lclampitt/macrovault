@@ -29,13 +29,13 @@ const stagger = {
 const FEATURES = [
   {
     icon: ScanLine,
-    title: 'AI Body Analyzer',
-    desc: 'Upload a photo and get an AI-powered body composition breakdown in seconds.',
+    title: 'Measurements',
+    desc: 'Enter your measurements to estimate body fat % and get personalized calorie targets.',
   },
   {
     icon: Target,
     title: 'Goal Planner',
-    desc: 'Set weight, strength, and body goals — then track your path to hitting them.',
+    desc: 'Set weight, strength, and body goals then track your path to hitting them.',
   },
   {
     icon: Dumbbell,
@@ -68,7 +68,7 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   'Everything in Free',
-  'AI Body Analyzer (unlimited)',
+  'Unlimited measurements',
   'Unlimited workout logs',
   'Advanced progress charts',
   'Priority support',
