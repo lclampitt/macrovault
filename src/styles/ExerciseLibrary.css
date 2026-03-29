@@ -189,7 +189,7 @@
 }
 .el-skeleton-card__img {
   height: 130px;
-  background: #161b27;
+  background: #0e1624;
   animation: el-pulse 1.4s ease-in-out infinite;
 }
 @keyframes el-pulse {
@@ -302,7 +302,7 @@
   color: var(--accent-light);
 }
 .el-tag--gray {
-  background: #1e2536;
+  background: #1a2538;
   color: var(--text-secondary);
 }
 
@@ -767,7 +767,7 @@
   transform: translate(-50%, -50%);
   width: 90%;
   max-width: 360px;
-  background: #1e2536;
+  background: #1a2538;
   border: 1px solid #1D9E75;
   border-radius: 12px;
   padding: 22px 20px 18px;
@@ -799,8 +799,8 @@
 }
 .el-naming-pill {
   padding: 5px 14px;
-  background: #161b27;
-  border: 1px solid #1e2536;
+  background: #0e1624;
+  border: 1px solid #1a2538;
   border-radius: 99px;
   color: var(--text-secondary);
   font-size: 12px;

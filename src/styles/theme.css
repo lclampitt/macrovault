@@ -7,14 +7,14 @@
 
 :root {
   /* Backgrounds */
-  --bg-base:       #0f1117;
-  --bg-surface:    #161b27;
-  --bg-surface-2:  #1a2032;
-  --bg-hover:      #1e2640;
+  --bg-base:       #080c14;
+  --bg-surface:    #0e1624;
+  --bg-surface-2:  #131e30;
+  --bg-hover:      #192540;
 
   /* Borders */
-  --border:        #1e2536;
-  --border-light:  #252d42;
+  --border:        #1a2538;
+  --border-light:  #20304a;
 
   /* Accent — cyan/teal */
   --accent:        #1D9E75;

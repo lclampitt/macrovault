@@ -117,7 +117,7 @@ export default function Dropdown({
             justifyContent: 'space-between',
             alignItems: 'center',
             background: 'var(--bg-base)',
-            border: `1px solid ${isOpen ? '#1D9E75' : '#1e2536'}`,
+            border: `1px solid ${isOpen ? '#1D9E75' : '#1a2538'}`,
             borderRadius: isOpen ? '8px 8px 0 0' : '8px',
             padding: '8px 12px',
             cursor: 'pointer',
@@ -131,7 +131,7 @@ export default function Dropdown({
             if (!isOpen) e.currentTarget.style.borderColor = '#1D9E75';
           }}
           onMouseLeave={(e) => {
-            if (!isOpen) e.currentTarget.style.borderColor = '#1e2536';
+            if (!isOpen) e.currentTarget.style.borderColor = '#1a2538';
           }}
         >
           <span>{displayLabel ?? placeholder}</span>
@@ -162,7 +162,7 @@ export default function Dropdown({
                 left: 0,
                 right: 0,
                 zIndex: 50,
-                background: '#161b27',
+                background: '#0e1624',
                 border: '1px solid #1D9E75',
                 borderTop: 'none',
                 borderRadius: '0 0 8px 8px',

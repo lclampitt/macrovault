@@ -65,7 +65,7 @@ function SectionLabel({ text }) {
 
 function ResultChip({ value, label, source }) {
   return (
-    <div style={{ background: '#0f1117', border: '1px solid #1e2536', borderRadius: 8, padding: '10px 14px' }}>
+    <div style={{ background: '#080c14', border: '1px solid #1a2538', borderRadius: 8, padding: '10px 14px' }}>
       <div style={{ fontSize: 18, fontWeight: 500, color: '#1D9E75', lineHeight: 1 }}>{value ?? '—'}</div>
       <div style={{ fontSize: 10, color: '#555', marginTop: 3 }}>{label}</div>
       <div style={{ fontSize: 9, color: '#2a3548', marginTop: 2 }}>{source}</div>
@@ -125,7 +125,7 @@ function CalculatorsPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, delay: 0.25 }}
-          style={{ background: '#161b27', border: '1px solid #1e2536', borderRadius: 10, padding: '16px 20px' }}
+          style={{ background: '#0e1624', border: '1px solid #1a2538', borderRadius: 10, padding: '16px 20px' }}
         >
           {hasAnyResults ? (
             <>
@@ -167,7 +167,7 @@ function CalculatorsPage() {
       {/* ── Section 2: How these work ── */}
       <div>
         <SectionLabel text="How These Work" />
-        <div style={{ background: '#161b27', border: '1px solid #1e2536', borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ background: '#0e1624', border: '1px solid #1a2538', borderRadius: 10, overflow: 'hidden' }}>
           {howRows.map((row, i) => (
             <motion.div
               key={row.title}
@@ -176,7 +176,7 @@ function CalculatorsPage() {
               transition={{ duration: 0.25, delay: 0.32 + i * 0.06 }}
               style={{
                 display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 16px',
-                borderBottom: i < howRows.length - 1 ? '1px solid #1e2536' : 'none',
+                borderBottom: i < howRows.length - 1 ? '1px solid #1a2538' : 'none',
               }}
             >
               <div style={{
@@ -205,7 +205,7 @@ function CalculatorsPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, delay: 0.5 + i * 0.06 }}
-              style={{ background: '#161b27', border: '1px solid #1e2536', borderRadius: 8, padding: '12px 14px' }}
+              style={{ background: '#0e1624', border: '1px solid #1a2538', borderRadius: 8, padding: '12px 14px' }}
             >
               <div style={{ fontSize: 11, fontWeight: 500, color: '#5DCAA5', marginBottom: 4 }}>{tip.title}</div>
               <div style={{ fontSize: 10, color: '#555', lineHeight: 1.5 }}>{tip.body}</div>

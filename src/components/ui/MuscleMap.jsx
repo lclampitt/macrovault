@@ -126,7 +126,7 @@ const MuscleMap = memo(function MuscleMap({ targetMuscle, secondaryMuscles = [],
       <rect width="120" height="110" fill="#0a0d13" />
 
       {/* Divider */}
-      <line x1="60" y1="4" x2="60" y2="106" stroke="#1e2536" strokeWidth="0.6" />
+      <line x1="60" y1="4" x2="60" y2="106" stroke="#1a2538" strokeWidth="0.6" />
 
       {/* ═══════════ FRONT FIGURE (center x=30) ═══════════ */}
 

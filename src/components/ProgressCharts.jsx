@@ -44,7 +44,7 @@ export default function ProgressCharts({ rows = [] }) {
     const bf     = payload.find((p) => p.dataKey === 'body_fat_pct');
     return (
       <div style={{
-        background: '#0f1117', border: '1px solid #1e2536',
+        background: '#080c14', border: '1px solid #1a2538',
         borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#e8eaf0',
       }}>
         <div style={{ marginBottom: 4, color: '#8892a4' }}>{label}</div>
@@ -65,7 +65,7 @@ export default function ProgressCharts({ rows = [] }) {
             </linearGradient>
           </defs>
 
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e2536" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a2538" />
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#8892a4' }} />
           <YAxis yAxisId="left"  tick={{ fontSize: 11, fill: '#8892a4' }} />
           <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#8892a4' }} />

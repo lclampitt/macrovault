@@ -32,7 +32,7 @@ const DIET_OPTS = [
 // ── Shared styles ──────────────────────────────────────────────────────────────
 
 const inputStyle = {
-  background: '#0f1117', border: '1px solid #1e2536', borderRadius: 8,
+  background: '#080c14', border: '1px solid #1a2538', borderRadius: 8,
   padding: '10px 12px', fontSize: 13, color: '#fff', fontFamily: 'inherit',
   outline: 'none', width: '100%', boxSizing: 'border-box',
 };
@@ -43,7 +43,7 @@ const tealBtn = {
 };
 
 const outlineBtn = {
-  background: 'transparent', color: '#5DCAA5', border: '1px solid #1e2536',
+  background: 'transparent', color: '#5DCAA5', border: '1px solid #1a2538',
   borderRadius: 8, padding: '10px 20px', fontSize: 13,
   fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
 };
@@ -58,7 +58,7 @@ function UnitPills({ value, onChange, opts }) {
           background: '#0a2a1e', border: '1px solid #1D9E75', color: '#5DCAA5',
           borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit',
         } : {
-          background: 'transparent', border: '1px solid #1e2536', color: '#666',
+          background: 'transparent', border: '1px solid #1a2538', color: '#666',
           borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit',
         }}>
           {o.label}
@@ -144,7 +144,7 @@ function ResultsView({ results, goal, onReset, onSave, onCopy }) {
       style={{ maxWidth: 560, margin: '0 auto' }}
     >
       <div style={{
-        background: '#161b27', border: '1px solid #1D9E75', borderRadius: 12,
+        background: '#0e1624', border: '1px solid #1D9E75', borderRadius: 12,
         padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 24,
       }}>
         {/* Header */}
@@ -179,7 +179,7 @@ function ResultsView({ results, goal, onReset, onSave, onCopy }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: m.delay / 1000 }}
-              style={{ background: '#0f1117', borderRadius: 8, padding: '14px 16px' }}
+              style={{ background: '#080c14', borderRadius: 8, padding: '14px 16px' }}
             >
               <div style={{ fontSize: 11, color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.label}</div>
               <div style={{ fontSize: 22, fontWeight: 500, color: m.color, lineHeight: 1.2, marginTop: 4 }}>
@@ -226,7 +226,7 @@ function ResultsView({ results, goal, onReset, onSave, onCopy }) {
               { label: 'Carbs',    value: `${Math.round(carbG / 3)}g` },
               { label: 'Fat',      value: `${Math.round(fatG / 3)}g` },
             ].map(m => (
-              <div key={m.label} style={{ background: '#0f1117', borderRadius: 6, padding: '8px 10px' }}>
+              <div key={m.label} style={{ background: '#080c14', borderRadius: 6, padding: '8px 10px' }}>
                 <div style={{ fontSize: 10, color: '#555', marginBottom: 3 }}>{m.label}</div>
                 <div style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>{m.value}</div>
               </div>
@@ -352,8 +352,8 @@ export default function MacroCalculator() {
                   animate={{ scale: sex === val ? 1.02 : 1 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   style={{
-                    background: sex === val ? '#0a2a1e' : '#0f1117',
-                    border: `1px solid ${sex === val ? '#1D9E75' : '#1e2536'}`,
+                    background: sex === val ? '#0a2a1e' : '#080c14',
+                    border: `1px solid ${sex === val ? '#1D9E75' : '#1a2538'}`,
                     borderRadius: 10, padding: 20, cursor: 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, fontFamily: 'inherit',
                   }}
@@ -413,7 +413,7 @@ export default function MacroCalculator() {
               </button>
               {showBfInfo && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-                  style={{ marginTop: 10, background: '#0f1117', border: '1px solid #1e2536', borderRadius: 8, padding: '12px 14px' }}>
+                  style={{ marginTop: 10, background: '#080c14', border: '1px solid #1a2538', borderRadius: 8, padding: '12px 14px' }}>
                   <p style={{ fontSize: 11, color: '#666', lineHeight: 1.6, margin: 0 }}>
                     The Navy method estimates body fat from waist, neck, and hip measurements.
                     Or use the AI Body Analyzer for a photo-based estimate. If you skip, we'll use a
@@ -465,8 +465,8 @@ export default function MacroCalculator() {
                     animate={{ scale: sel ? 1.02 : 1 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                     style={{
-                      background: sel ? '#0a2a1e' : '#0f1117',
-                      border: `1px solid ${sel ? '#1D9E75' : '#1e2536'}`,
+                      background: sel ? '#0a2a1e' : '#080c14',
+                      border: `1px solid ${sel ? '#1D9E75' : '#1a2538'}`,
                       borderRadius: 10, padding: '16px 12px', cursor: 'pointer',
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, fontFamily: 'inherit',
                     }}>
@@ -491,7 +491,7 @@ export default function MacroCalculator() {
                 return (
                   <button key={val} onClick={() => setDiet(val)} style={{
                     background: sel ? '#0a2a1e' : 'transparent',
-                    border: `1px solid ${sel ? '#1D9E75' : '#1e2536'}`,
+                    border: `1px solid ${sel ? '#1D9E75' : '#1a2538'}`,
                     color: sel ? '#5DCAA5' : '#666', borderRadius: 99,
                     padding: '7px 16px', fontSize: 13, cursor: 'pointer',
                     fontFamily: 'inherit', transition: 'all 0.15s ease',
@@ -516,7 +516,7 @@ export default function MacroCalculator() {
     <div style={{ maxWidth: 560, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
       {/* Progress bar */}
       <div>
-        <div style={{ height: 3, background: '#1e2536', borderRadius: 99, overflow: 'hidden' }}>
+        <div style={{ height: 3, background: '#1a2538', borderRadius: 99, overflow: 'hidden' }}>
           <motion.div
             style={{ height: '100%', background: '#1D9E75', borderRadius: 99 }}
             animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
@@ -538,7 +538,7 @@ export default function MacroCalculator() {
           animate="center"
           exit="exit"
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          style={{ background: '#161b27', border: '1px solid #1e2536', borderRadius: 12, padding: '28px 32px' }}
+          style={{ background: '#0e1624', border: '1px solid #1a2538', borderRadius: 12, padding: '28px 32px' }}
         >
           {renderStep()}
           {error && <div style={{ color: '#f87171', fontSize: 12, marginTop: 10 }}>{error}</div>}

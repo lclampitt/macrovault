@@ -26,8 +26,8 @@ export default function CalculatorCard({ title, subtitle, description, icon: Ico
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: '#161b27',
-        border: `1px solid ${hovered ? '#1D9E75' : '#1e2536'}`,
+        background: '#0e1624',
+        border: `1px solid ${hovered ? '#1D9E75' : '#1a2538'}`,
         borderRadius: 12,
         padding: '18px 20px',
         cursor: 'pointer',
@@ -75,7 +75,7 @@ export default function CalculatorCard({ title, subtitle, description, icon: Ico
 
       {/* ── Open button ── */}
       <div style={{
-        border: `1px solid ${hovered ? '#1D9E75' : '#1e2536'}`,
+        border: `1px solid ${hovered ? '#1D9E75' : '#1a2538'}`,
         borderRadius: 6,
         padding: '6px 0',
         fontSize: 11,

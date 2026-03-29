@@ -38,7 +38,7 @@ function difficultyStyle(d) {
   if (d === 'beginner')     return { bg: '#1a2e0d', text: '#97C459' };
   if (d === 'intermediate') return { bg: '#2e1a06', text: '#EF9F27' };
   if (d === 'advanced')     return { bg: '#2e0d0d', text: '#F09595' };
-  return { bg: '#1e2536', text: '#aab' };
+  return { bg: '#1a2538', text: '#aab' };
 }
 
 /* ── Dropdown ─────────────────────────────────────────────── */
