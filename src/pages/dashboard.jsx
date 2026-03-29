@@ -372,56 +372,6 @@ function DailyChecklist({ userId }) {
   );
 }
 
-/* ============================================================
-   STAT CARD (count-up animation)
-   ============================================================ */
-function StatCard({ value, unit, color, goal, isOver, logLabel, onLog }) {
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const step = Math.max(1, Math.ceil(value / 50));
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= value) { setDisplay(value); clearInterval(timer); }
-      else setDisplay(start);
-    }, 16);
-    return () => clearInterval(timer);
-  }, [value]);
-
-  const hasGoal  = goal != null && goal > 0;
-  // bar shows fraction remaining (full = nothing logged yet, empty = all consumed)
-  const fillPct  = hasGoal ? Math.min((value / goal) * 100, 100) : 0;
-  const barColor = isOver ? '#EF9F27' : color;
-
-  return (
-    <div className="stat-card">
-      <p className="stat-card__value" style={{ color: isOver ? '#EF9F27' : color }}>
-        {display.toLocaleString()}
-        <span className="stat-card__unit">{unit}</span>
-      </p>
-      {hasGoal ? (
-        <>
-          <div className="stat-card__bar-track">
-            <div className="stat-card__bar-fill" style={{ background: barColor, width: `${fillPct}%` }} />
-          </div>
-          {isOver && <p className="stat-card__over-goal">Over goal</p>}
-        </>
-      ) : (
-        <p className="stat-card__no-goal">Set a goal to track progress</p>
-      )}
-      {onLog && (
-        <motion.button
-          className="stat-card__log-btn"
-          onClick={onLog}
-          whileTap={{ scale: 0.97 }}
-        >
-          {logLabel}
-        </motion.button>
-      )}
-    </div>
-  );
-}
 
 /* ============================================================
    QUICK LINKS
@@ -446,37 +396,6 @@ function QuickLinks() {
   );
 }
 
-/* ============================================================
-   LOCKED NUTRITION CARD
-   ============================================================ */
-function LockedNutritionCard({ onUpgrade }) {
-  return (
-    <div style={{ position: 'relative' }}>
-      <div style={{ filter: 'blur(5px)', userSelect: 'none', pointerEvents: 'none', opacity: 0.35 }}>
-        <p style={{ fontSize: 32, fontWeight: 500, color: 'var(--accent-light)', margin: 0 }}>—</p>
-        <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, margin: '12px 0' }} />
-        <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>Set a goal to track</p>
-      </div>
-      <div style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-        background: 'rgba(10,12,20,0.55)', borderRadius: 8,
-      }}>
-        <Lock size={16} style={{ color: '#5DCAA5' }} />
-        <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Pro feature</span>
-        <button
-          onClick={onUpgrade}
-          style={{
-            fontSize: 11, color: 'var(--accent-light)', background: 'transparent',
-            border: '1px solid var(--accent-dark)', borderRadius: 6, padding: '4px 12px', cursor: 'pointer',
-          }}
-        >
-          Upgrade
-        </button>
-      </div>
-    </div>
-  );
-}
 
 /* ============================================================
    STREAK BADGE
