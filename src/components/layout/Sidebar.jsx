@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../../supabaseClient';
 import {
   Home,
   ScanLine,
@@ -8,6 +9,7 @@ import {
   Target,
   Dumbbell,
   BarChart2,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -19,20 +21,21 @@ import {
 import './Sidebar.css';
 
 const NAV_ITEMS = [
-  { to: '/home',        label: 'Home',        icon: Home       },
-  { to: '/analyzer',   label: 'Analyzer',    icon: ScanLine,  pro: true },
-  { to: '/calculators',label: 'Calculators', icon: Calculator, pro: true },
-  { to: '/goalplanner',label: 'Goal Planner',icon: Target      },
-  { to: '/workouts',   label: 'Workouts',    icon: Dumbbell    },
-  { to: '/progress',   label: 'Progress',    icon: BarChart2   },
+  { to: '/home',        label: 'Home',         icon: Home       },
+  { to: '/analyzer',   label: 'Analyzer',     icon: ScanLine   },
+  { to: '/calculators',label: 'Calculators',  icon: Calculator  },
+  { to: '/goalplanner',label: 'Goal Planner', icon: Target,     locked: true },
+  { to: '/workouts',   label: 'Workouts',     icon: Dumbbell    },
+  { to: '/exercises',  label: 'Exercise Library', icon: BookOpen },
+  { to: '/progress',   label: 'Progress',     icon: BarChart2,  locked: true },
 ];
 
 const BOTTOM_NAV_ITEMS = [
-  { to: '/home',     icon: Home      },
-  { to: '/analyzer', icon: ScanLine  },
-  { to: '/workouts', icon: Dumbbell  },
-  { to: '/progress', icon: BarChart2 },
-  { to: '/settings', icon: Settings  },
+  { to: '/home',      icon: Home      },
+  { to: '/analyzer',  icon: ScanLine  },
+  { to: '/workouts',  icon: Dumbbell  },
+  { to: '/exercises', icon: BookOpen  },
+  { to: '/settings',  icon: Settings  },
 ];
 
 export default function Sidebar({ session, onLogout, isPro, usage }) {
@@ -41,7 +44,29 @@ export default function Sidebar({ session, onLogout, isPro, usage }) {
   const navigate = useNavigate();
 
   const userEmail = session?.user?.email ?? '';
-  const displayName = userEmail.split('@')[0] || 'User';
+  const emailFallback = userEmail.split('@')[0] || 'User';
+  const [displayName, setDisplayName] = useState(emailFallback);
+
+  useEffect(() => {
+    const uid = session?.user?.id;
+    if (!uid) return;
+
+    supabase.from('profiles').select('display_name').eq('id', uid).maybeSingle()
+      .then(({ data }) => {
+        setDisplayName(data?.display_name?.trim() || emailFallback);
+      });
+
+    const channel = supabase.channel(`sidebar_profile_${uid}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${uid}` }, (payload) => {
+        const name = payload.new?.display_name?.trim();
+        if (name) setDisplayName(name);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id]);
+
   const initials = displayName.slice(0, 2).toUpperCase();
 
   const handleLogout = async () => {
@@ -54,7 +79,11 @@ export default function Sidebar({ session, onLogout, isPro, usage }) {
     <div className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>
       {/* Logo */}
       <div className="sidebar__logo">
-        <div className="sidebar__logo-icon">G</div>
+        <div className="sidebar__logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+            <path d="M6 20V10M12 20V4M18 20v-6" />
+          </svg>
+        </div>
         <AnimatePresence>
           {!collapsed && (
             <motion.span
@@ -72,44 +101,34 @@ export default function Sidebar({ session, onLogout, isPro, usage }) {
 
       {/* Nav */}
       <nav className="sidebar__nav">
-        {NAV_ITEMS.map(({ to, label, icon: Icon, pro }) => (
-          <React.Fragment key={to}>
-            <NavLink
-              to={to}
-              end={to === '/'}
-              className={({ isActive }) =>
-                `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
-              }
-              title={collapsed ? label : undefined}
-            >
-              <Icon size={18} className="sidebar__nav-icon" />
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.span
-                    className="sidebar__nav-label"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    {label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-              {!isPro && pro && !collapsed && (
-                <span className="sidebar__pro-dot" title="Pro feature" />
+        {NAV_ITEMS.map(({ to, label, icon: Icon, locked }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className={({ isActive }) =>
+              `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
+            }
+            title={collapsed ? label : undefined}
+          >
+            <Icon size={18} className="sidebar__nav-icon" />
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  className="sidebar__nav-label"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  {label}
+                </motion.span>
               )}
-            </NavLink>
-            {/* Usage hint below Analyzer for free users */}
-            {to === '/analyzer' && !isPro && !collapsed && usage && (
-              <div className={`sidebar__usage-hint${usage.analyzerUsed >= usage.analyzerLimit ? ' sidebar__usage-hint--locked' : ''}`}>
-                {usage.analyzerUsed >= usage.analyzerLimit && (
-                  <Lock size={10} className="sidebar__usage-lock" />
-                )}
-                {usage.analyzerUsed} / {usage.analyzerLimit} analyses used
-              </div>
+            </AnimatePresence>
+            {!isPro && locked && !collapsed && (
+              <Lock size={12} style={{ color: '#666', flexShrink: 0, marginLeft: 'auto' }} title="Pro feature" />
             )}
-          </React.Fragment>
+          </NavLink>
         ))}
       </nav>
 
@@ -214,7 +233,11 @@ export default function Sidebar({ session, onLogout, isPro, usage }) {
       {/* ── Mobile top bar ── */}
       <div className="mob-topbar">
         <Link to="/home" className="mob-topbar__logo">
-          <div className="mob-topbar__logo-icon">G</div>
+          <div className="mob-topbar__logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+              <path d="M6 20V10M12 20V4M18 20v-6" />
+            </svg>
+          </div>
           <span className="mob-topbar__logo-name">Gainlytics</span>
         </Link>
         <button

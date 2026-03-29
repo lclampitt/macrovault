@@ -1,0 +1,2908 @@
+[
+  {
+    "id": "barbell-bench-press",
+    "name": "Barbell Bench Press",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["triceps", "front deltoids"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Lie flat on a bench with your feet flat on the floor.",
+      "Grip the bar slightly wider than shoulder-width with an overhand grip.",
+      "Unrack the bar and hold it directly above your chest with arms fully extended.",
+      "Lower the bar slowly to your mid-chest, keeping elbows at about 45 degrees.",
+      "Press the bar back up to full extension, exhaling as you push."
+    ],
+    "formCues": [
+      "Keep your feet flat on the floor throughout",
+      "Maintain a slight arch in your lower back",
+      "Squeeze your shoulder blades together before unracking",
+      "Keep your wrists straight and directly above your elbows"
+    ],
+    "commonMistakes": [
+      "Flaring elbows out to 90 degrees",
+      "Bouncing the bar off your chest",
+      "Lifting your hips off the bench",
+      "Not retracting the shoulder blades"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12-15, moderate weight",
+      "bulking": "4x6-8, heavy weight",
+      "maintenance": "3x10, moderate weight"
+    }
+  },
+  {
+    "id": "dumbbell-bench-press",
+    "name": "Dumbbell Bench Press",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["triceps", "front deltoids"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit on the edge of a bench holding a dumbbell on each knee.",
+      "Lie back, bringing the dumbbells to chest height with palms facing forward.",
+      "Press the dumbbells up until your arms are fully extended.",
+      "Lower them slowly back to the starting position."
+    ],
+    "formCues": [
+      "Keep your elbows at 45-75 degrees from your torso",
+      "Allow a full stretch at the bottom for greater range of motion",
+      "Press the dumbbells slightly inward at the top"
+    ],
+    "commonMistakes": [
+      "Letting dumbbells drift too far apart",
+      "Using momentum instead of controlled movement",
+      "Going too heavy before mastering the movement"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12-15, light-moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x10, moderate weight"
+    }
+  },
+  {
+    "id": "incline-barbell-press",
+    "name": "Incline Barbell Press",
+    "bodyPart": "chest",
+    "targetMuscle": "upper pectoralis",
+    "secondaryMuscles": ["front deltoids", "triceps"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Set an adjustable bench to 30-45 degrees incline.",
+      "Grip the bar slightly wider than shoulder-width.",
+      "Lower the bar to your upper chest near the clavicle.",
+      "Press back up to full extension."
+    ],
+    "formCues": [
+      "Keep the angle between 30-45 degrees to target upper chest",
+      "Pull the bar down rather than just letting it fall",
+      "Keep shoulder blades pinched throughout"
+    ],
+    "commonMistakes": [
+      "Setting the bench too steep (turns it into a shoulder press)",
+      "Letting the bar drift too far down the chest",
+      "Arching excessively off the bench"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, moderate weight",
+      "bulking": "4x6-8, heavy weight",
+      "maintenance": "3x10, moderate weight"
+    }
+  },
+  {
+    "id": "dumbbell-flye",
+    "name": "Dumbbell Flye",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["front deltoids"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Lie flat on a bench holding dumbbells above your chest, palms facing each other.",
+      "With a slight bend in your elbows, lower the dumbbells in a wide arc.",
+      "Lower until you feel a stretch across your chest.",
+      "Bring the dumbbells back up in the same arc, squeezing your chest at the top."
+    ],
+    "formCues": [
+      "Maintain a fixed, slight elbow bend throughout",
+      "Think of hugging a large tree",
+      "Control the descent — 3 seconds down"
+    ],
+    "commonMistakes": [
+      "Bending the elbows too much (turns into a press)",
+      "Going too heavy and losing control",
+      "Not feeling the stretch at the bottom"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light weight",
+      "bulking": "3x10-12, moderate weight",
+      "maintenance": "3x12, light-moderate weight"
+    }
+  },
+  {
+    "id": "cable-crossover",
+    "name": "Cable Crossover",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["front deltoids"],
+    "equipment": "cable",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Set cables to the highest position on both sides of a cable station.",
+      "Stand in the center, grab both handles, and step forward slightly.",
+      "With a slight elbow bend, bring your hands down and together in front of your hips.",
+      "Slowly return to the starting position with arms extended."
+    ],
+    "formCues": [
+      "Keep a slight forward lean throughout",
+      "Squeeze the chest hard at the point of crossover",
+      "Control the return — don't let the weight pull you back"
+    ],
+    "commonMistakes": [
+      "Standing too upright",
+      "Bending the elbows too much",
+      "Using momentum to swing the weight"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, light weight",
+      "bulking": "3x12, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "push-up",
+    "name": "Push-Up",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["triceps", "front deltoids", "core"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Start in a high plank with hands slightly wider than shoulder-width.",
+      "Keep your body in a straight line from head to heels.",
+      "Lower your chest to the floor by bending your elbows.",
+      "Push back up to full arm extension."
+    ],
+    "formCues": [
+      "Don't let your hips sag or pike up",
+      "Keep your core braced throughout",
+      "Look slightly ahead, not straight down"
+    ],
+    "commonMistakes": [
+      "Letting hips drop or rise",
+      "Flaring elbows to 90 degrees",
+      "Not going through full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15-20",
+      "bulking": "3x10-15 (add weight vest for resistance)",
+      "maintenance": "3x15"
+    }
+  },
+  {
+    "id": "decline-bench-press",
+    "name": "Decline Bench Press",
+    "bodyPart": "chest",
+    "targetMuscle": "lower pectoralis",
+    "secondaryMuscles": ["triceps", "front deltoids"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Set the bench to a 15-30 degree decline and secure your feet.",
+      "Grip the bar slightly wider than shoulder-width.",
+      "Lower the bar to your lower chest.",
+      "Press back up to full extension."
+    ],
+    "formCues": [
+      "Keep the decline mild — 15-30 degrees is enough",
+      "Maintain shoulder blade retraction throughout",
+      "The bar should touch your lower chest/sternum area"
+    ],
+    "commonMistakes": [
+      "Excessive decline angle",
+      "Losing shoulder blade retraction at the bottom",
+      "Bouncing the bar off the chest"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, moderate weight",
+      "bulking": "4x6-8, heavy weight",
+      "maintenance": "3x10, moderate weight"
+    }
+  },
+  {
+    "id": "machine-chest-press",
+    "name": "Machine Chest Press",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["triceps", "front deltoids"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Adjust the seat so the handles are at chest height.",
+      "Grip the handles with palms facing forward.",
+      "Press the handles forward until arms are nearly fully extended.",
+      "Slowly return to the starting position."
+    ],
+    "formCues": [
+      "Keep your back flat against the pad",
+      "Don't fully lock out elbows to maintain tension",
+      "Control the eccentric (return) portion"
+    ],
+    "commonMistakes": [
+      "Seat height too high or low",
+      "Arching back off the pad",
+      "Moving too fast on the return"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "chest-dip",
+    "name": "Chest Dip",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["triceps", "front deltoids"],
+    "equipment": "bodyweight",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Grip parallel bars and support your body at arm's length.",
+      "Lean forward at about 30 degrees to shift focus to chest.",
+      "Lower yourself by bending your elbows until you feel a chest stretch.",
+      "Push back up to the starting position."
+    ],
+    "formCues": [
+      "Lean forward to emphasize chest over triceps",
+      "Keep elbows slightly flared, not tucked tight",
+      "Full range of motion for maximum chest activation"
+    ],
+    "commonMistakes": [
+      "Staying too upright (works triceps instead)",
+      "Not going deep enough",
+      "Swinging or using momentum"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12-15 (bodyweight)",
+      "bulking": "4x8-10 (add weight belt if needed)",
+      "maintenance": "3x10-12"
+    }
+  },
+  {
+    "id": "pec-deck",
+    "name": "Pec Deck Machine",
+    "bodyPart": "chest",
+    "targetMuscle": "pectoralis major",
+    "secondaryMuscles": ["front deltoids"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit in the machine with your back flat against the pad.",
+      "Place your forearms on the pads with elbows at 90 degrees.",
+      "Bring the pads together in front of your chest, squeezing the pecs.",
+      "Slowly return to the starting position for a full stretch."
+    ],
+    "formCues": [
+      "Keep your chest up and shoulders down",
+      "Pause and squeeze at full contraction",
+      "Let the pads go back far enough to feel a stretch"
+    ],
+    "commonMistakes": [
+      "Allowing shoulders to roll forward",
+      "Not getting a full range of motion",
+      "Going too heavy and losing form"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, light-moderate weight",
+      "bulking": "3x12, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "deadlift",
+    "name": "Deadlift",
+    "bodyPart": "back",
+    "targetMuscle": "erector spinae",
+    "secondaryMuscles": ["glutes", "hamstrings", "lats", "traps"],
+    "equipment": "barbell",
+    "difficulty": "advanced",
+    "instructions": [
+      "Stand with feet hip-width apart, bar over mid-foot.",
+      "Hinge at the hips and grip the bar just outside your legs.",
+      "Brace your core, chest up, and drive the floor away with your feet.",
+      "Keep the bar close to your body as you stand up fully.",
+      "Hinge back down to lower the bar under control."
+    ],
+    "formCues": [
+      "Push the floor away — don't think of pulling the bar up",
+      "Keep bar in contact with your shins throughout the lift",
+      "Lock out hips and knees simultaneously at the top",
+      "Take a big breath and brace hard before each rep"
+    ],
+    "commonMistakes": [
+      "Rounding the lower back",
+      "Bar drifting away from the body",
+      "Jerking the weight off the floor",
+      "Looking up too aggressively"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x6-8, moderate weight",
+      "bulking": "4x3-5, heavy weight",
+      "maintenance": "3x5, moderate-heavy weight"
+    }
+  },
+  {
+    "id": "barbell-row",
+    "name": "Barbell Row",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["rhomboids", "rear deltoids", "biceps", "traps"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Stand with feet shoulder-width apart, hinge forward about 45 degrees.",
+      "Grip the bar with an overhand grip, slightly wider than shoulder-width.",
+      "Pull the bar toward your lower chest/upper abdomen.",
+      "Squeeze your shoulder blades together at the top.",
+      "Lower the bar under control."
+    ],
+    "formCues": [
+      "Keep your back flat and parallel to the floor",
+      "Drive your elbows back, not your hands up",
+      "Initiate the pull by retracting your shoulder blades"
+    ],
+    "commonMistakes": [
+      "Using momentum and heaving the weight up",
+      "Standing too upright",
+      "Not squeezing at the top"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, moderate weight",
+      "bulking": "4x6-8, heavy weight",
+      "maintenance": "3x10, moderate weight"
+    }
+  },
+  {
+    "id": "pull-up",
+    "name": "Pull-Up",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["biceps", "rear deltoids", "rhomboids"],
+    "equipment": "bodyweight",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Hang from a bar with an overhand grip, hands slightly wider than shoulders.",
+      "Engage your core and depress your shoulder blades.",
+      "Pull yourself up until your chin clears the bar.",
+      "Lower yourself slowly to a full hang."
+    ],
+    "formCues": [
+      "Think about pulling your elbows toward your hips",
+      "Avoid kipping or swinging",
+      "Full dead hang at the bottom for complete range of motion"
+    ],
+    "commonMistakes": [
+      "Using momentum to kip",
+      "Not going to full extension at the bottom",
+      "Shrugging the shoulders up"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x max reps",
+      "bulking": "4x6-8 (add weight if needed)",
+      "maintenance": "3x8-10"
+    }
+  },
+  {
+    "id": "lat-pulldown",
+    "name": "Lat Pulldown",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["biceps", "rear deltoids"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit at the pulldown station and secure your thighs under the pads.",
+      "Grip the bar wider than shoulder-width with an overhand grip.",
+      "Lean back slightly and pull the bar down to your upper chest.",
+      "Squeeze your lats at the bottom, then slowly return the bar up."
+    ],
+    "formCues": [
+      "Pull your elbows down and back, not just the bar down",
+      "Slight lean back is fine — don't go past 30 degrees",
+      "Think about putting your shoulder blades in your back pockets"
+    ],
+    "commonMistakes": [
+      "Pulling the bar behind the neck",
+      "Using too much momentum",
+      "Letting the weight stack crash on each rep"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x12-15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x10-12, moderate weight"
+    }
+  },
+  {
+    "id": "seated-cable-row",
+    "name": "Seated Cable Row",
+    "bodyPart": "back",
+    "targetMuscle": "rhomboids",
+    "secondaryMuscles": ["lats", "rear deltoids", "biceps", "traps"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit at the cable row station with feet on the platform, knees slightly bent.",
+      "Grip the handle and sit tall with your back straight.",
+      "Pull the handle toward your lower abdomen, keeping elbows close to your body.",
+      "Squeeze your shoulder blades together at full contraction.",
+      "Slowly extend your arms back to the starting position."
+    ],
+    "formCues": [
+      "Maintain an upright torso — don't lean back excessively",
+      "Drive elbows behind your body, not flared out",
+      "Pause and hold the contraction for 1 second"
+    ],
+    "commonMistakes": [
+      "Rocking back and forth with the torso",
+      "Letting shoulders roll forward on the return",
+      "Pulling to the chest instead of abdomen"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "dumbbell-row",
+    "name": "Single-Arm Dumbbell Row",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["rhomboids", "biceps", "rear deltoids"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Place one knee and hand on a bench for support.",
+      "Hold a dumbbell in the opposite hand, arm hanging straight down.",
+      "Pull the dumbbell up toward your hip, keeping your elbow close to your body.",
+      "Lower the dumbbell back to the starting position."
+    ],
+    "formCues": [
+      "Keep your back flat and parallel to the floor",
+      "Drive your elbow toward the ceiling, not your hand toward your chest",
+      "Rotate your torso slightly at the top for full lat contraction"
+    ],
+    "commonMistakes": [
+      "Rotating the torso too much (using body momentum)",
+      "Pulling the dumbbell toward the chest instead of the hip",
+      "Rushing the eccentric portion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12 each side",
+      "bulking": "4x8-10 each side",
+      "maintenance": "3x10 each side"
+    }
+  },
+  {
+    "id": "t-bar-row",
+    "name": "T-Bar Row",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["rhomboids", "traps", "biceps"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Stand over the T-bar with feet straddling the bar.",
+      "Hinge forward to about 45 degrees and grip the handles.",
+      "Pull the bar toward your chest, keeping elbows close.",
+      "Lower the bar under control."
+    ],
+    "formCues": [
+      "Keep your chest up and back flat",
+      "Don't jerk the weight — smooth, controlled pull",
+      "Squeeze shoulder blades together at the top"
+    ],
+    "commonMistakes": [
+      "Rounding the lower back",
+      "Using too much body momentum",
+      "Not achieving full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, moderate weight",
+      "bulking": "4x6-8, heavy weight",
+      "maintenance": "3x10, moderate weight"
+    }
+  },
+  {
+    "id": "face-pull",
+    "name": "Face Pull",
+    "bodyPart": "back",
+    "targetMuscle": "rear deltoids",
+    "secondaryMuscles": ["rhomboids", "traps", "rotator cuff"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to upper chest height with a rope attachment.",
+      "Grip the rope with both hands and step back.",
+      "Pull the rope toward your face, flaring elbows out to the sides.",
+      "Finish with hands beside your ears and elbows pointing out.",
+      "Slowly return to the starting position."
+    ],
+    "formCues": [
+      "Pull toward your nose or forehead, not your chin",
+      "Elbows should be higher than your hands at the finish",
+      "Keep your chest up and don't lean back excessively"
+    ],
+    "commonMistakes": [
+      "Pulling toward the chin (becomes a rear delt row)",
+      "Using too much weight",
+      "Allowing the elbows to drop below shoulder height"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, light weight",
+      "bulking": "3x15, light-moderate weight",
+      "maintenance": "3x15, light weight"
+    }
+  },
+  {
+    "id": "hyperextension",
+    "name": "Back Extension",
+    "bodyPart": "back",
+    "targetMuscle": "erector spinae",
+    "secondaryMuscles": ["glutes", "hamstrings"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Position yourself on the hyperextension bench with hips at the top pad.",
+      "Cross your arms over your chest or place hands behind your head.",
+      "Lower your torso until you feel a stretch in the hamstrings.",
+      "Raise your torso back up until your body is in a straight line."
+    ],
+    "formCues": [
+      "Do not hyperextend beyond a neutral spine at the top",
+      "Squeeze your glutes at the top of the movement",
+      "Control the descent — don't just fall forward"
+    ],
+    "commonMistakes": [
+      "Hyperextending the lumbar spine at the top",
+      "Using momentum to swing up",
+      "Rounding the back excessively at the bottom"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15-20",
+      "bulking": "3x10-12 (hold a plate for resistance)",
+      "maintenance": "3x12-15"
+    }
+  },
+  {
+    "id": "good-morning",
+    "name": "Good Morning",
+    "bodyPart": "back",
+    "targetMuscle": "erector spinae",
+    "secondaryMuscles": ["hamstrings", "glutes"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Place a barbell across your upper traps, feet shoulder-width apart.",
+      "With a slight knee bend, hinge forward at the hips.",
+      "Lower your torso until nearly parallel to the floor.",
+      "Drive your hips forward to return to standing."
+    ],
+    "formCues": [
+      "Keep your back flat throughout — this is not a back-rounding exercise",
+      "Push your hips backward as you hinge, not your chest forward",
+      "Keep the bar in contact with your traps throughout"
+    ],
+    "commonMistakes": [
+      "Rounding the lower back",
+      "Bending the knees too much (turns into a squat)",
+      "Using too much weight for this movement"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, light weight",
+      "bulking": "4x8, moderate weight",
+      "maintenance": "3x10, light-moderate weight"
+    }
+  },
+  {
+    "id": "chest-supported-row",
+    "name": "Chest-Supported Row",
+    "bodyPart": "back",
+    "targetMuscle": "rhomboids",
+    "secondaryMuscles": ["lats", "rear deltoids", "biceps"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set an incline bench to 30-45 degrees and lie chest-down on it.",
+      "Hold a dumbbell in each hand hanging below the bench.",
+      "Row the dumbbells up toward your hips, squeezing your shoulder blades.",
+      "Lower under control."
+    ],
+    "formCues": [
+      "Let your chest rest on the pad to eliminate cheating",
+      "Drive elbows back and up, not just up",
+      "Full stretch at the bottom for each rep"
+    ],
+    "commonMistakes": [
+      "Lifting your chest off the pad",
+      "Shrugging the shoulders up instead of retracting them",
+      "Not getting a full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x10, moderate-heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "cable-pullover",
+    "name": "Cable Pullover",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["chest", "triceps"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to the highest position with a rope or bar attachment.",
+      "Stand facing the machine and grip the attachment with both hands.",
+      "With arms mostly straight, pull the attachment down toward your thighs.",
+      "Return under control to the starting position."
+    ],
+    "formCues": [
+      "Keep a slight bend in the elbows throughout",
+      "Feel the stretch in your lats at the top",
+      "Squeeze the lats hard at the bottom position"
+    ],
+    "commonMistakes": [
+      "Bending the elbows too much",
+      "Using too much weight and losing form",
+      "Not maintaining consistent back position"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light-moderate weight",
+      "bulking": "3x12, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "shrug",
+    "name": "Barbell Shrug",
+    "bodyPart": "back",
+    "targetMuscle": "trapezius",
+    "secondaryMuscles": ["upper traps", "levator scapulae"],
+    "equipment": "barbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding a barbell in front of you with an overhand grip.",
+      "With arms straight, shrug your shoulders straight up toward your ears.",
+      "Hold at the top for 1-2 seconds.",
+      "Lower your shoulders back down under control."
+    ],
+    "formCues": [
+      "Lift straight up — don't roll the shoulders",
+      "Hold the contraction at the top",
+      "Keep your arms straight throughout"
+    ],
+    "commonMistakes": [
+      "Rolling the shoulders (increases injury risk)",
+      "Using too much weight with poor range of motion",
+      "Bending the elbows"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "inverted-row",
+    "name": "Inverted Row",
+    "bodyPart": "back",
+    "targetMuscle": "rhomboids",
+    "secondaryMuscles": ["lats", "biceps", "rear deltoids"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a bar at about waist height in a squat rack.",
+      "Lie under the bar and grip it with an overhand grip.",
+      "Hang below the bar with your body in a straight line.",
+      "Pull your chest up to the bar, squeezing shoulder blades together.",
+      "Lower back down under control."
+    ],
+    "formCues": [
+      "Keep your body rigid like a plank",
+      "Pull to the chest, not the neck",
+      "Make it harder by lowering the bar or elevating your feet"
+    ],
+    "commonMistakes": [
+      "Letting the hips sag",
+      "Using momentum to swing up",
+      "Not achieving a full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15",
+      "bulking": "4x10 (add weight vest or lower bar for difficulty)",
+      "maintenance": "3x12"
+    }
+  },
+  {
+    "id": "overhead-press",
+    "name": "Overhead Press",
+    "bodyPart": "shoulders",
+    "targetMuscle": "deltoids",
+    "secondaryMuscles": ["triceps", "upper traps", "core"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Stand with feet shoulder-width apart and grip the bar at shoulder height.",
+      "Brace your core and press the bar straight up overhead.",
+      "Push your head through as the bar passes your face.",
+      "Lock out overhead with arms fully extended.",
+      "Lower the bar back to shoulder height under control."
+    ],
+    "formCues": [
+      "Keep your core tight and glutes squeezed to prevent lower back arch",
+      "The bar should travel in a straight vertical line",
+      "Push your head through the 'window' at the top"
+    ],
+    "commonMistakes": [
+      "Excessive lower back arch",
+      "Bar path drifting forward",
+      "Pressing in front of the face instead of behind it"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, moderate weight",
+      "bulking": "4x5-6, heavy weight",
+      "maintenance": "3x8, moderate weight"
+    }
+  },
+  {
+    "id": "dumbbell-lateral-raise",
+    "name": "Dumbbell Lateral Raise",
+    "bodyPart": "shoulders",
+    "targetMuscle": "lateral deltoids",
+    "secondaryMuscles": ["front deltoids", "traps"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding dumbbells at your sides with palms facing your body.",
+      "With a slight elbow bend, raise your arms out to the sides.",
+      "Lift until your arms are parallel to the floor.",
+      "Lower slowly back to the starting position."
+    ],
+    "formCues": [
+      "Lead with your pinkies (internally rotate slightly) to target lateral head",
+      "Control the lowering — 3 seconds down",
+      "Don't shrug your traps up as you raise"
+    ],
+    "commonMistakes": [
+      "Swinging the weight up with momentum",
+      "Going too heavy and losing control",
+      "Raising arms above shoulder height unnecessarily"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, light weight",
+      "bulking": "4x12, moderate weight",
+      "maintenance": "3x12-15, light-moderate weight"
+    }
+  },
+  {
+    "id": "arnold-press",
+    "name": "Arnold Press",
+    "bodyPart": "shoulders",
+    "targetMuscle": "deltoids",
+    "secondaryMuscles": ["triceps", "upper traps"],
+    "equipment": "dumbbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Sit on a bench with dumbbells at shoulder height, palms facing you.",
+      "As you press up, rotate your palms outward (facing away at the top).",
+      "Fully extend your arms overhead.",
+      "Reverse the rotation as you lower back to the starting position."
+    ],
+    "formCues": [
+      "The rotation should be smooth and continuous throughout the press",
+      "Keep your core braced and don't arch your back",
+      "Control the eccentric — take 3 seconds to lower"
+    ],
+    "commonMistakes": [
+      "Rushing the rotation",
+      "Excessive back arch",
+      "Using too much weight which limits the rotation"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, moderate weight",
+      "bulking": "4x8-10, moderate-heavy weight",
+      "maintenance": "3x10, moderate weight"
+    }
+  },
+  {
+    "id": "front-raise",
+    "name": "Dumbbell Front Raise",
+    "bodyPart": "shoulders",
+    "targetMuscle": "front deltoids",
+    "secondaryMuscles": ["upper chest", "traps"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding dumbbells in front of your thighs, palms facing your body.",
+      "With a slight elbow bend, raise one or both dumbbells in front of you.",
+      "Lift to shoulder height (or slightly above).",
+      "Lower slowly back to the starting position."
+    ],
+    "formCues": [
+      "Don't lean back as you raise the weight",
+      "Control the movement — no swinging",
+      "Palms can face down or toward each other"
+    ],
+    "commonMistakes": [
+      "Swinging the torso back",
+      "Going too heavy",
+      "Raising way above shoulder height"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light weight",
+      "bulking": "3x12, moderate weight",
+      "maintenance": "3x12, light-moderate weight"
+    }
+  },
+  {
+    "id": "reverse-flye",
+    "name": "Reverse Dumbbell Flye",
+    "bodyPart": "shoulders",
+    "targetMuscle": "rear deltoids",
+    "secondaryMuscles": ["rhomboids", "traps"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Hinge forward at the hips until your torso is nearly parallel to the floor.",
+      "Hold dumbbells below your chest with palms facing each other.",
+      "With a slight elbow bend, raise the dumbbells out to the sides.",
+      "Squeeze your rear delts and rhomboids at the top.",
+      "Lower under control."
+    ],
+    "formCues": [
+      "Lead with your elbows, not your hands",
+      "Keep your back flat throughout",
+      "The movement is similar to spreading wings"
+    ],
+    "commonMistakes": [
+      "Rounding the back",
+      "Using momentum to swing the weight up",
+      "Going too heavy"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, light weight",
+      "bulking": "3x12, moderate weight",
+      "maintenance": "3x15, light weight"
+    }
+  },
+  {
+    "id": "upright-row",
+    "name": "Upright Row",
+    "bodyPart": "shoulders",
+    "targetMuscle": "lateral deltoids",
+    "secondaryMuscles": ["traps", "biceps"],
+    "equipment": "barbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding a barbell with an overhand grip, hands about 8-12 inches apart.",
+      "Pull the bar straight up toward your chin, leading with your elbows.",
+      "Raise until the bar is at upper chest/chin height.",
+      "Lower the bar back down under control."
+    ],
+    "formCues": [
+      "Keep the bar close to your body throughout",
+      "Elbows should always be above your hands",
+      "Don't use momentum — slow and controlled"
+    ],
+    "commonMistakes": [
+      "Using too narrow a grip (increases impingement risk)",
+      "Pulling the bar too high above the chin",
+      "Letting the bar drift away from the body"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "cable-lateral-raise",
+    "name": "Cable Lateral Raise",
+    "bodyPart": "shoulders",
+    "targetMuscle": "lateral deltoids",
+    "secondaryMuscles": ["front deltoids", "traps"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to the lowest position and attach a single handle.",
+      "Stand sideways to the machine and grab the handle with your far hand.",
+      "Raise your arm out to the side to shoulder height.",
+      "Slowly lower back down."
+    ],
+    "formCues": [
+      "Constant tension from the cable throughout the movement",
+      "Slight forward lean to better target the lateral head",
+      "Don't shrug your shoulder at the top"
+    ],
+    "commonMistakes": [
+      "Standing too close to the machine",
+      "Shrugging at the top",
+      "Bending the elbow too much"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15 each side",
+      "bulking": "3x12 each side",
+      "maintenance": "3x12-15 each side"
+    }
+  },
+  {
+    "id": "machine-shoulder-press",
+    "name": "Machine Shoulder Press",
+    "bodyPart": "shoulders",
+    "targetMuscle": "deltoids",
+    "secondaryMuscles": ["triceps", "upper traps"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Adjust the seat so handles are at shoulder level.",
+      "Grip the handles and press upward until arms are extended.",
+      "Lower back to shoulder level under control."
+    ],
+    "formCues": [
+      "Keep your back flat against the pad",
+      "Don't fully lock out your elbows",
+      "Exhale as you press up"
+    ],
+    "commonMistakes": [
+      "Arching away from the back pad",
+      "Using too much weight and losing posture",
+      "Going too fast on the eccentric"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x10-12, moderate weight"
+    }
+  },
+  {
+    "id": "barbell-curl",
+    "name": "Barbell Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "biceps brachii",
+    "secondaryMuscles": ["brachialis", "forearms"],
+    "equipment": "barbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding a barbell with an underhand grip, hands shoulder-width apart.",
+      "Keeping your elbows pinned at your sides, curl the bar up to shoulder height.",
+      "Squeeze your biceps at the top.",
+      "Slowly lower the bar back to the starting position."
+    ],
+    "formCues": [
+      "Keep your upper arms completely still",
+      "Don't swing your hips or lean back",
+      "Take 2-3 seconds to lower the weight"
+    ],
+    "commonMistakes": [
+      "Swinging the body to lift the weight",
+      "Letting elbows drift forward",
+      "Not achieving full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x10-12, moderate weight"
+    }
+  },
+  {
+    "id": "dumbbell-curl",
+    "name": "Dumbbell Bicep Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "biceps brachii",
+    "secondaryMuscles": ["brachialis", "forearms"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding dumbbells at your sides, palms facing forward.",
+      "Keeping your elbows stationary, curl both dumbbells up toward your shoulders.",
+      "Squeeze your biceps at the top.",
+      "Lower slowly back to full extension."
+    ],
+    "formCues": [
+      "Supinate (rotate) your wrists as you curl for peak contraction",
+      "Keep your elbows stationary at your sides",
+      "Full extension at the bottom for complete stretch"
+    ],
+    "commonMistakes": [
+      "Swinging the arms using momentum",
+      "Not supinating the wrist",
+      "Partial range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15 each arm",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "hammer-curl",
+    "name": "Hammer Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "brachialis",
+    "secondaryMuscles": ["biceps brachii", "forearms"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding dumbbells at your sides, palms facing each other (neutral grip).",
+      "Curl the dumbbells upward without rotating your wrists.",
+      "Squeeze at the top.",
+      "Lower back down slowly."
+    ],
+    "formCues": [
+      "Keep palms facing each other throughout the movement",
+      "Elbows stay fixed at your sides",
+      "This hits the brachialis and brachioradialis more than a regular curl"
+    ],
+    "commonMistakes": [
+      "Rotating the wrist (turning it into a regular curl)",
+      "Using momentum to swing the weight",
+      "Going too heavy"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12"
+    }
+  },
+  {
+    "id": "tricep-pushdown",
+    "name": "Tricep Pushdown",
+    "bodyPart": "arms",
+    "targetMuscle": "triceps brachii",
+    "secondaryMuscles": ["forearms"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to the highest position with a straight bar or rope attachment.",
+      "Grip the bar with an overhand grip, elbows tucked at your sides.",
+      "Push the bar down until your arms are fully extended.",
+      "Slowly return to the starting position."
+    ],
+    "formCues": [
+      "Keep your elbows stationary and pinned to your sides",
+      "Fully extend the arms at the bottom for peak contraction",
+      "Don't lean forward excessively"
+    ],
+    "commonMistakes": [
+      "Letting elbows flare out or drift forward",
+      "Using body weight to push down",
+      "Not fully extending arms"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, moderate weight",
+      "bulking": "4x10-12, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "skull-crusher",
+    "name": "Skull Crusher",
+    "bodyPart": "arms",
+    "targetMuscle": "triceps brachii",
+    "secondaryMuscles": [],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Lie on a bench holding an EZ-bar or straight bar with arms extended above your chest.",
+      "Keeping your upper arms perpendicular to the floor, bend your elbows.",
+      "Lower the bar toward your forehead.",
+      "Extend your arms back to the starting position."
+    ],
+    "formCues": [
+      "Upper arms remain fixed — only the forearms move",
+      "Keep your elbows shoulder-width apart, don't let them flare",
+      "Control the descent — this is a vulnerable position"
+    ],
+    "commonMistakes": [
+      "Elbows flaring out widely",
+      "Moving the upper arms instead of just the forearms",
+      "Dropping the weight too fast"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light-moderate weight",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "tricep-dip",
+    "name": "Tricep Dip",
+    "bodyPart": "arms",
+    "targetMuscle": "triceps brachii",
+    "secondaryMuscles": ["chest", "front deltoids"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Place your hands on a bench behind you, feet on the floor.",
+      "Lower your hips toward the floor by bending your elbows.",
+      "Keep your back close to the bench.",
+      "Push back up to the starting position."
+    ],
+    "formCues": [
+      "Keep your hips close to the bench to target triceps",
+      "Don't shrug your shoulders up",
+      "Keep elbows pointing straight back, not out"
+    ],
+    "commonMistakes": [
+      "Hips drifting too far from the bench",
+      "Shoulders shrugging up",
+      "Elbows flaring out"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15-20",
+      "bulking": "4x10-15 (add weight for resistance)",
+      "maintenance": "3x12-15"
+    }
+  },
+  {
+    "id": "overhead-tricep-extension",
+    "name": "Overhead Tricep Extension",
+    "bodyPart": "arms",
+    "targetMuscle": "triceps brachii",
+    "secondaryMuscles": [],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Hold a dumbbell with both hands and raise it overhead.",
+      "Keeping your upper arms beside your head, bend your elbows.",
+      "Lower the dumbbell behind your head until you feel a stretch.",
+      "Extend your arms back to the starting position."
+    ],
+    "formCues": [
+      "Keep your elbows pointing toward the ceiling",
+      "Don't let the elbows flare out to the sides",
+      "Get a full stretch at the bottom for the long head"
+    ],
+    "commonMistakes": [
+      "Letting elbows flare outward",
+      "Moving the upper arms during the exercise",
+      "Using too much weight"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light-moderate weight",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "preacher-curl",
+    "name": "Preacher Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "biceps brachii",
+    "secondaryMuscles": ["brachialis"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit at the preacher bench and place your upper arms on the pad.",
+      "Grip the bar with an underhand grip.",
+      "Curl the bar upward, stopping just before vertical.",
+      "Lower slowly under control."
+    ],
+    "formCues": [
+      "Keep your upper arms pressed firmly against the pad",
+      "Don't fully lock out at the bottom — keep tension on the biceps",
+      "Control the eccentric portion"
+    ],
+    "commonMistakes": [
+      "Letting arms slip off the pad",
+      "Locking out at the bottom (hyperextension risk)",
+      "Using momentum"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light-moderate weight",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "squat",
+    "name": "Barbell Back Squat",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings", "core", "adductors"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Place the barbell on your upper traps and stand with feet shoulder-width apart.",
+      "Brace your core and take a deep breath.",
+      "Push your knees out and descend by sitting back and down.",
+      "Lower until your thighs are at least parallel to the floor.",
+      "Drive through your heels to return to standing."
+    ],
+    "formCues": [
+      "Knees should track over your toes throughout",
+      "Keep your chest up and torso as upright as possible",
+      "Push the floor away — don't think of standing up"
+    ],
+    "commonMistakes": [
+      "Knees caving inward",
+      "Heels rising off the floor",
+      "Not reaching parallel depth",
+      "Excessive forward lean"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12, moderate weight",
+      "bulking": "5x5, heavy weight",
+      "maintenance": "4x8, moderate-heavy weight"
+    }
+  },
+  {
+    "id": "front-squat",
+    "name": "Front Squat",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "core", "upper back"],
+    "equipment": "barbell",
+    "difficulty": "advanced",
+    "instructions": [
+      "Rest the barbell on your front deltoids, elbows high and forward.",
+      "Stand with feet shoulder-width apart.",
+      "Descend by sitting straight down, keeping a very upright torso.",
+      "Lower until thighs are parallel or below.",
+      "Drive through your heels to stand."
+    ],
+    "formCues": [
+      "Keep elbows up — if they drop, the bar will fall",
+      "Much more upright torso than a back squat",
+      "Knees should travel forward over toes more than in back squat"
+    ],
+    "commonMistakes": [
+      "Elbows dropping and bar rolling forward",
+      "Excessive forward lean",
+      "Not enough ankle mobility"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x10, moderate weight",
+      "bulking": "4x5-6, heavy weight",
+      "maintenance": "3x8, moderate weight"
+    }
+  },
+  {
+    "id": "goblet-squat",
+    "name": "Goblet Squat",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "core", "adductors"],
+    "equipment": "kettlebell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Hold a kettlebell vertically at your chest with both hands.",
+      "Stand with feet slightly wider than shoulder-width, toes turned out.",
+      "Sit down between your heels, keeping your chest up.",
+      "Drive through your heels to return to standing."
+    ],
+    "formCues": [
+      "Use your elbows to push your knees out at the bottom",
+      "Keep the kettlebell close to your chest throughout",
+      "A great teaching tool for squat mechanics"
+    ],
+    "commonMistakes": [
+      "Letting knees cave inward",
+      "Losing upright torso position",
+      "Not achieving full depth"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x10, heavy kettlebell",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "leg-press",
+    "name": "Leg Press",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit in the leg press machine with your back flat against the pad.",
+      "Place your feet shoulder-width apart on the platform.",
+      "Release the safety handles and lower the platform toward your chest.",
+      "Press the platform back up until your legs are nearly fully extended.",
+      "Re-engage safety handles before exiting."
+    ],
+    "formCues": [
+      "Don't lock your knees out at the top",
+      "Keep your lower back pressed against the pad throughout",
+      "Foot position changes emphasis: high feet = more glutes/hamstrings, low feet = more quads"
+    ],
+    "commonMistakes": [
+      "Going too heavy and having knees cave",
+      "Letting lower back round off the pad",
+      "Partial range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "lunge",
+    "name": "Barbell Lunge",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings", "core"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Place the barbell across your upper traps.",
+      "Step forward with one leg and lower your back knee toward the floor.",
+      "Keep your front knee tracking over your toes.",
+      "Push through your front heel to return to standing.",
+      "Repeat on the other side."
+    ],
+    "formCues": [
+      "Keep your torso upright throughout",
+      "Front knee should not go past your toes",
+      "Back knee hovers just above the floor"
+    ],
+    "commonMistakes": [
+      "Leaning too far forward",
+      "Front knee caving inward",
+      "Taking too short a step"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12 each leg",
+      "bulking": "4x8 each leg",
+      "maintenance": "3x10 each leg"
+    }
+  },
+  {
+    "id": "romanian-deadlift",
+    "name": "Romanian Deadlift",
+    "bodyPart": "legs",
+    "targetMuscle": "hamstrings",
+    "secondaryMuscles": ["glutes", "erector spinae", "adductors"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Stand holding a barbell with an overhand grip, feet hip-width apart.",
+      "With a slight knee bend, hinge forward by pushing your hips back.",
+      "Lower the bar along your legs until you feel a deep hamstring stretch.",
+      "Drive your hips forward to return to standing."
+    ],
+    "formCues": [
+      "Push your hips back — don't just bend over",
+      "Keep the bar close to your legs throughout",
+      "Maintain a neutral spine — no rounding"
+    ],
+    "commonMistakes": [
+      "Rounding the lower back",
+      "Bending the knees too much (turning it into a deadlift)",
+      "Not feeling the hamstring stretch"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x10-12, moderate weight"
+    }
+  },
+  {
+    "id": "leg-curl",
+    "name": "Lying Leg Curl",
+    "bodyPart": "legs",
+    "targetMuscle": "hamstrings",
+    "secondaryMuscles": ["calves"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Lie face down on the leg curl machine with the pad just below your calves.",
+      "Curl your heels toward your glutes.",
+      "Pause at the top, squeezing your hamstrings.",
+      "Lower slowly back to the starting position."
+    ],
+    "formCues": [
+      "Hips stay flat on the pad throughout",
+      "Control the eccentric — 3 seconds down",
+      "Point toes away to increase hamstring activation"
+    ],
+    "commonMistakes": [
+      "Hips rising off the pad",
+      "Using momentum to swing the weight",
+      "Not achieving full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, moderate weight",
+      "bulking": "4x10, moderate-heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "hip-thrust",
+    "name": "Barbell Hip Thrust",
+    "bodyPart": "legs",
+    "targetMuscle": "glutes",
+    "secondaryMuscles": ["hamstrings", "core"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Sit on the floor with your upper back against a bench.",
+      "Roll a barbell over your hips.",
+      "Drive your hips upward by squeezing your glutes.",
+      "Your upper back should pivot on the bench.",
+      "Lower your hips back toward the floor."
+    ],
+    "formCues": [
+      "Chin to chest at the top to prevent back extension",
+      "Drive through your heels, not your toes",
+      "Fully extend hips at the top — get a hard glute squeeze"
+    ],
+    "commonMistakes": [
+      "Looking up (causes lumbar hyperextension)",
+      "Pushing through the toes instead of heels",
+      "Not fully extending at the top"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "glute-bridge",
+    "name": "Glute Bridge",
+    "bodyPart": "legs",
+    "targetMuscle": "glutes",
+    "secondaryMuscles": ["hamstrings", "core"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Lie on your back with knees bent and feet flat on the floor.",
+      "Drive your hips up toward the ceiling by squeezing your glutes.",
+      "Hold at the top for 1-2 seconds.",
+      "Lower your hips back to the floor."
+    ],
+    "formCues": [
+      "Squeeze glutes hard at the top",
+      "Feet should be hip-width apart",
+      "Don't let your back arch excessively"
+    ],
+    "commonMistakes": [
+      "Pushing through the toes instead of heels",
+      "Hamstrings doing the work instead of glutes",
+      "Not fully extending at the top"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20",
+      "bulking": "4x15 (add weight plate on hips)",
+      "maintenance": "3x15-20"
+    }
+  },
+  {
+    "id": "calf-raise",
+    "name": "Standing Calf Raise",
+    "bodyPart": "legs",
+    "targetMuscle": "gastrocnemius",
+    "secondaryMuscles": ["soleus"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand on the edge of a step or calf raise machine, heels hanging off.",
+      "Rise up onto your toes as high as possible.",
+      "Pause at the top.",
+      "Lower your heels below the platform level for a full stretch."
+    ],
+    "formCues": [
+      "Full range of motion — get the heel all the way down",
+      "Pause at the top and squeeze the calf hard",
+      "Straight legs target the gastrocnemius more"
+    ],
+    "commonMistakes": [
+      "Not going through full range of motion",
+      "Bouncing at the bottom",
+      "Going too fast"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20, moderate weight",
+      "bulking": "4x12-15, heavy weight",
+      "maintenance": "3x15-20, moderate weight"
+    }
+  },
+  {
+    "id": "seated-calf-raise",
+    "name": "Seated Calf Raise",
+    "bodyPart": "legs",
+    "targetMuscle": "soleus",
+    "secondaryMuscles": ["gastrocnemius"],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit in the seated calf raise machine with the pad on your lower thighs.",
+      "Rise up onto your toes as high as possible.",
+      "Pause and squeeze at the top.",
+      "Lower your heels to get a full stretch."
+    ],
+    "formCues": [
+      "Bent knees target the soleus (deeper calf muscle)",
+      "Full range of motion is critical",
+      "Slow, controlled reps are more effective than bouncing"
+    ],
+    "commonMistakes": [
+      "Short range of motion",
+      "Bouncing the weight",
+      "Not feeling a stretch at the bottom"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20, moderate weight",
+      "bulking": "4x12, heavy weight",
+      "maintenance": "3x15-20"
+    }
+  },
+  {
+    "id": "leg-extension",
+    "name": "Leg Extension",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": [],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit in the leg extension machine with the pad on your shins.",
+      "Extend your legs until nearly fully straight.",
+      "Pause and squeeze your quads at the top.",
+      "Lower slowly back to the starting position."
+    ],
+    "formCues": [
+      "Pause at the top for peak quad contraction",
+      "Control the eccentric — don't just let the weight fall",
+      "Keep your back against the pad"
+    ],
+    "commonMistakes": [
+      "Swinging the legs up with momentum",
+      "Not fully extending at the top",
+      "Going too heavy"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, moderate weight",
+      "bulking": "4x10-12, moderate-heavy weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "sumo-deadlift",
+    "name": "Sumo Deadlift",
+    "bodyPart": "legs",
+    "targetMuscle": "adductors",
+    "secondaryMuscles": ["glutes", "quadriceps", "hamstrings", "erector spinae"],
+    "equipment": "barbell",
+    "difficulty": "advanced",
+    "instructions": [
+      "Stand with feet much wider than shoulder-width, toes pointed out 45 degrees.",
+      "Grip the bar inside your legs with a double overhand or mixed grip.",
+      "Keep your torso more upright than a conventional deadlift.",
+      "Drive the floor away and stand up fully.",
+      "Lower the bar under control."
+    ],
+    "formCues": [
+      "Push your knees out over your toes throughout",
+      "More upright torso compared to conventional",
+      "Spread the floor apart with your feet as you lift"
+    ],
+    "commonMistakes": [
+      "Knees caving inward",
+      "Not enough hip external rotation",
+      "Hips shooting up before the bar leaves the floor"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x8, moderate weight",
+      "bulking": "4x4-5, heavy weight",
+      "maintenance": "3x6, moderate-heavy weight"
+    }
+  },
+  {
+    "id": "bulgarian-split-squat",
+    "name": "Bulgarian Split Squat",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings", "core"],
+    "equipment": "dumbbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Stand with your back to a bench, holding dumbbells at your sides.",
+      "Place one foot on the bench behind you.",
+      "Lower your back knee toward the floor.",
+      "Drive through your front heel to stand back up."
+    ],
+    "formCues": [
+      "Keep your front foot far enough forward that your knee stays over your toes",
+      "Keep your torso upright",
+      "Control the descent — don't just drop down"
+    ],
+    "commonMistakes": [
+      "Front knee caving inward",
+      "Foot too close to the bench causing knee to go past toes",
+      "Excessive forward lean"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12 each leg",
+      "bulking": "4x8 each leg",
+      "maintenance": "3x10 each leg"
+    }
+  },
+  {
+    "id": "step-up",
+    "name": "Dumbbell Step-Up",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Hold dumbbells at your sides and stand in front of a bench or box.",
+      "Step up with one foot, pressing through the heel to stand fully.",
+      "Bring your other foot up to the bench.",
+      "Step back down with the same leg."
+    ],
+    "formCues": [
+      "Drive through the heel of the leg on the bench",
+      "Don't push off with the back foot",
+      "Keep your torso upright"
+    ],
+    "commonMistakes": [
+      "Pushing off the back foot (reduces stimulus on the working leg)",
+      "Leaning forward excessively",
+      "Using a platform that's too low"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15 each leg",
+      "bulking": "4x10 each leg",
+      "maintenance": "3x12 each leg"
+    }
+  },
+  {
+    "id": "nordic-hamstring-curl",
+    "name": "Nordic Hamstring Curl",
+    "bodyPart": "legs",
+    "targetMuscle": "hamstrings",
+    "secondaryMuscles": ["glutes", "calves"],
+    "equipment": "bodyweight",
+    "difficulty": "advanced",
+    "instructions": [
+      "Kneel on a mat with your ankles anchored under a bar or held by a partner.",
+      "Keep your body straight from knees to head.",
+      "Slowly lower your torso toward the floor by allowing your knees to extend.",
+      "Catch yourself with your hands if needed, then curl back up using your hamstrings."
+    ],
+    "formCues": [
+      "The eccentric (lowering) is where most of the benefit comes from",
+      "Keep your hips extended — don't bend at the hips",
+      "This is extremely difficult — most people need to start with slow eccentrics only"
+    ],
+    "commonMistakes": [
+      "Bending at the hips",
+      "Going too fast and not controlling the descent",
+      "Not having ankles properly anchored"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x5-8 (eccentric focus)",
+      "bulking": "3x5-8",
+      "maintenance": "3x6"
+    }
+  },
+  {
+    "id": "wall-sit",
+    "name": "Wall Sit",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings", "calves"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand with your back against a wall.",
+      "Slide down until your thighs are parallel to the floor.",
+      "Hold this position for the target duration.",
+      "Push through your heels and stand back up."
+    ],
+    "formCues": [
+      "Thighs should be parallel to the floor",
+      "Keep your back flat against the wall",
+      "Don't rest your hands on your knees"
+    ],
+    "commonMistakes": [
+      "Thighs not reaching parallel (too easy)",
+      "Leaning away from the wall",
+      "Resting hands on knees"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x45-60 seconds",
+      "bulking": "3x60 seconds (add weight plate on thighs)",
+      "maintenance": "3x45-60 seconds"
+    }
+  },
+  {
+    "id": "glute-kickback",
+    "name": "Cable Glute Kickback",
+    "bodyPart": "legs",
+    "targetMuscle": "glutes",
+    "secondaryMuscles": ["hamstrings"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Attach an ankle cuff to a low cable.",
+      "Face the machine holding the frame for balance.",
+      "Kick your working leg straight back and up, squeezing your glute.",
+      "Return to the starting position under control."
+    ],
+    "formCues": [
+      "Keep a slight bend in the standing knee",
+      "Don't rotate your hip — kick straight back",
+      "Squeeze the glute hard at the top of the movement"
+    ],
+    "commonMistakes": [
+      "Using too much weight and losing control",
+      "Rotating the hip outward",
+      "Not getting full extension"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15 each side",
+      "bulking": "3x12 each side",
+      "maintenance": "3x15 each side"
+    }
+  },
+  {
+    "id": "adductor-machine",
+    "name": "Adductor Machine",
+    "bodyPart": "legs",
+    "targetMuscle": "adductors",
+    "secondaryMuscles": [],
+    "equipment": "machine",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit in the adductor machine with the pads on the insides of your knees.",
+      "Start with legs spread wide.",
+      "Squeeze your legs together against the resistance.",
+      "Slowly return to the starting position."
+    ],
+    "formCues": [
+      "Keep your back flat against the pad",
+      "Controlled movement — no jerking",
+      "Full range of motion in both directions"
+    ],
+    "commonMistakes": [
+      "Using momentum to bring the legs together",
+      "Not getting a full stretch at the start",
+      "Going too heavy"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "3x12, moderate weight",
+      "maintenance": "3x12-15, moderate weight"
+    }
+  },
+  {
+    "id": "plank",
+    "name": "Plank",
+    "bodyPart": "core",
+    "targetMuscle": "transverse abdominis",
+    "secondaryMuscles": ["rectus abdominis", "obliques", "glutes", "shoulders"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Start in a push-up position and lower onto your forearms.",
+      "Keep your body in a straight line from head to heels.",
+      "Engage your core and glutes.",
+      "Hold for the target duration."
+    ],
+    "formCues": [
+      "Don't let your hips sag or pike up",
+      "Squeeze your glutes and brace your abs like you're about to be punched",
+      "Look at the floor to keep your neck neutral"
+    ],
+    "commonMistakes": [
+      "Hips sagging toward the floor",
+      "Hips piked up too high",
+      "Holding the breath"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x45-60 seconds",
+      "bulking": "3x60 seconds",
+      "maintenance": "3x45-60 seconds"
+    }
+  },
+  {
+    "id": "crunch",
+    "name": "Crunch",
+    "bodyPart": "core",
+    "targetMuscle": "rectus abdominis",
+    "secondaryMuscles": ["obliques"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Lie on your back with knees bent and feet flat on the floor.",
+      "Place your hands behind your head without pulling your neck.",
+      "Curl your shoulders off the floor by contracting your abs.",
+      "Hold the contraction briefly, then lower back down."
+    ],
+    "formCues": [
+      "Focus on curling your ribcage toward your pelvis",
+      "Don't pull on your neck with your hands",
+      "Exhale as you crunch up"
+    ],
+    "commonMistakes": [
+      "Pulling the neck with the hands",
+      "Using hip flexors instead of abs",
+      "Jerking up instead of curling"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20",
+      "bulking": "3x20 (hold a weight plate for resistance)",
+      "maintenance": "3x20"
+    }
+  },
+  {
+    "id": "russian-twist",
+    "name": "Russian Twist",
+    "bodyPart": "core",
+    "targetMuscle": "obliques",
+    "secondaryMuscles": ["rectus abdominis"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit on the floor with knees bent, lean back to about 45 degrees.",
+      "Hold your hands together or hold a weight in front of you.",
+      "Rotate your torso to one side, then the other.",
+      "Each side rotation counts as one rep."
+    ],
+    "formCues": [
+      "The rotation comes from your torso, not your arms",
+      "Keep your feet elevated for more difficulty",
+      "Keep your lower back from rounding"
+    ],
+    "commonMistakes": [
+      "Moving the arms instead of rotating the torso",
+      "Letting the lower back round",
+      "Going through the motion without core engagement"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20 each side",
+      "bulking": "3x15 each side (hold a medicine ball)",
+      "maintenance": "3x20 each side"
+    }
+  },
+  {
+    "id": "hanging-leg-raise",
+    "name": "Hanging Leg Raise",
+    "bodyPart": "core",
+    "targetMuscle": "rectus abdominis",
+    "secondaryMuscles": ["hip flexors", "obliques"],
+    "equipment": "bodyweight",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Hang from a pull-up bar with an overhand grip.",
+      "Engage your core and raise your legs straight up to 90 degrees.",
+      "Hold briefly at the top.",
+      "Lower your legs slowly without swinging."
+    ],
+    "formCues": [
+      "No swinging — control the movement completely",
+      "Posterior pelvic tilt at the top for more ab activation",
+      "Beginners can bend the knees to make it easier"
+    ],
+    "commonMistakes": [
+      "Swinging the body for momentum",
+      "Not controlling the eccentric",
+      "Using hip flexors exclusively without involving the abs"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15",
+      "bulking": "3x10-15 (add ankle weights for resistance)",
+      "maintenance": "3x12-15"
+    }
+  },
+  {
+    "id": "ab-wheel-rollout",
+    "name": "Ab Wheel Rollout",
+    "bodyPart": "core",
+    "targetMuscle": "transverse abdominis",
+    "secondaryMuscles": ["rectus abdominis", "lats", "shoulders"],
+    "equipment": "bodyweight",
+    "difficulty": "advanced",
+    "instructions": [
+      "Kneel on a mat holding the ab wheel in front of you.",
+      "Roll the wheel forward, extending your body toward the floor.",
+      "Extend as far as you can while maintaining a neutral spine.",
+      "Pull the wheel back toward your knees using your abs and lats."
+    ],
+    "formCues": [
+      "Don't let your lower back arch — keep it neutral",
+      "Pull the wheel back using your abs, not your hip flexors",
+      "Start with short range of motion and increase gradually"
+    ],
+    "commonMistakes": [
+      "Excessive lower back arch",
+      "Going too far too soon",
+      "Using arm strength instead of core"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x10-12",
+      "bulking": "3x10-15",
+      "maintenance": "3x10"
+    }
+  },
+  {
+    "id": "bicycle-crunch",
+    "name": "Bicycle Crunch",
+    "bodyPart": "core",
+    "targetMuscle": "obliques",
+    "secondaryMuscles": ["rectus abdominis", "hip flexors"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Lie on your back and bring your knees to your chest.",
+      "Place your hands behind your head.",
+      "Extend one leg out while rotating your upper body toward the opposite knee.",
+      "Alternate sides in a pedaling motion."
+    ],
+    "formCues": [
+      "The rotation should come from your torso, not your elbows",
+      "Keep the movement slow and controlled for maximum activation",
+      "Keep the lower back pressed to the floor"
+    ],
+    "commonMistakes": [
+      "Pulling on the neck",
+      "Moving elbows instead of rotating the torso",
+      "Going too fast and losing the mind-muscle connection"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x20 each side",
+      "bulking": "3x20 each side",
+      "maintenance": "3x20 each side"
+    }
+  },
+  {
+    "id": "cable-crunch",
+    "name": "Cable Crunch",
+    "bodyPart": "core",
+    "targetMuscle": "rectus abdominis",
+    "secondaryMuscles": ["obliques"],
+    "equipment": "cable",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Kneel in front of a high cable with a rope attachment.",
+      "Hold the rope at the sides of your head.",
+      "Crunch downward by flexing your spine, bringing your elbows toward your knees.",
+      "Slowly return to the starting position."
+    ],
+    "formCues": [
+      "Hinge at the hips AND flex the spine — it's not just a hip hinge",
+      "Keep your hips stationary throughout",
+      "Really focus on curling the ribcage toward the pelvis"
+    ],
+    "commonMistakes": [
+      "Hinging at the hips only (turning it into a lat pulldown)",
+      "Moving the hips forward and back",
+      "Not getting a full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15, moderate weight",
+      "bulking": "4x12, moderate weight",
+      "maintenance": "3x15, moderate weight"
+    }
+  },
+  {
+    "id": "dead-bug",
+    "name": "Dead Bug",
+    "bodyPart": "core",
+    "targetMuscle": "transverse abdominis",
+    "secondaryMuscles": ["rectus abdominis", "hip flexors"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Lie on your back, arms extended toward the ceiling, knees bent 90 degrees.",
+      "Press your lower back into the floor and maintain that pressure.",
+      "Slowly extend one arm back and the opposite leg out simultaneously.",
+      "Return and repeat on the other side."
+    ],
+    "formCues": [
+      "Lower back must stay pressed to the floor throughout",
+      "Move slowly and deliberately",
+      "Breathe out as you extend the limbs"
+    ],
+    "commonMistakes": [
+      "Lower back arching off the floor",
+      "Moving too fast",
+      "Not fully extending the arm and leg"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x10 each side",
+      "bulking": "3x10 each side",
+      "maintenance": "3x10 each side"
+    }
+  },
+  {
+    "id": "side-plank",
+    "name": "Side Plank",
+    "bodyPart": "core",
+    "targetMuscle": "obliques",
+    "secondaryMuscles": ["transverse abdominis", "glutes", "shoulders"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Lie on your side and prop yourself up on your forearm.",
+      "Stack your feet or stagger them for stability.",
+      "Raise your hips off the floor to form a straight line from head to heels.",
+      "Hold for the target duration."
+    ],
+    "formCues": [
+      "Keep your hips from rotating forward or backward",
+      "Drive your hip up toward the ceiling — don't let it sag",
+      "Keep your neck neutral"
+    ],
+    "commonMistakes": [
+      "Hips sagging toward the floor",
+      "Hips rotating",
+      "Neck out of alignment"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x30-45 seconds each side",
+      "bulking": "3x45 seconds each side",
+      "maintenance": "3x30-45 seconds each side"
+    }
+  },
+  {
+    "id": "burpee",
+    "name": "Burpee",
+    "bodyPart": "full body",
+    "targetMuscle": "full body",
+    "secondaryMuscles": ["chest", "shoulders", "triceps", "core", "quads", "glutes"],
+    "equipment": "bodyweight",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Start standing, then squat down and place hands on the floor.",
+      "Jump your feet back into a push-up position.",
+      "Perform a push-up.",
+      "Jump your feet back toward your hands.",
+      "Explode upward into a jump with arms overhead."
+    ],
+    "formCues": [
+      "Keep your core engaged throughout",
+      "Land softly from the jump to protect your joints",
+      "Set a sustainable pace rather than sprinting and stopping"
+    ],
+    "commonMistakes": [
+      "Skipping the push-up for a scaled version without acknowledging it",
+      "Collapsing the hips during the push-up phase",
+      "Landing heavily from the jump"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x10-15",
+      "bulking": "3x10",
+      "maintenance": "3x10-12"
+    }
+  },
+  {
+    "id": "clean-and-press",
+    "name": "Clean and Press",
+    "bodyPart": "full body",
+    "targetMuscle": "full body",
+    "secondaryMuscles": ["shoulders", "traps", "quads", "core"],
+    "equipment": "barbell",
+    "difficulty": "advanced",
+    "instructions": [
+      "Stand with the bar at mid-shin, grip just outside legs.",
+      "Explosively pull the bar upward, using hip extension and a high pull.",
+      "Drop under the bar and catch it at shoulder height (front rack position).",
+      "From the front rack, press the bar overhead to full extension.",
+      "Lower back to the starting position."
+    ],
+    "formCues": [
+      "The power comes from the hips, not the arms",
+      "Stay on your heels through the pull phase",
+      "A strong front rack position is essential for a safe press"
+    ],
+    "commonMistakes": [
+      "Pulling with the arms too early",
+      "A poor front rack position (bar resting on hands instead of shoulders)",
+      "Not using hip drive"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x6, moderate weight",
+      "bulking": "4x4, heavy weight",
+      "maintenance": "3x5, moderate weight"
+    }
+  },
+  {
+    "id": "kettlebell-swing",
+    "name": "Kettlebell Swing",
+    "bodyPart": "full body",
+    "targetMuscle": "glutes",
+    "secondaryMuscles": ["hamstrings", "core", "shoulders", "back"],
+    "equipment": "kettlebell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Stand with feet shoulder-width apart, kettlebell on the floor in front of you.",
+      "Hinge at the hips and grip the kettlebell.",
+      "Hike the kettlebell back between your legs.",
+      "Drive your hips forward explosively to swing the kettlebell to chest height.",
+      "Let the kettlebell swing back and repeat."
+    ],
+    "formCues": [
+      "This is a hip hinge, not a squat — don't bend the knees excessively",
+      "Power comes entirely from the hip snap",
+      "Your arms are just a guide — don't use them to lift the weight"
+    ],
+    "commonMistakes": [
+      "Squatting instead of hinging",
+      "Using arms to lift the kettlebell",
+      "Rounding the lower back"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x15-20",
+      "bulking": "4x10-12, heavy kettlebell",
+      "maintenance": "3x15"
+    }
+  },
+  {
+    "id": "thruster",
+    "name": "Thruster",
+    "bodyPart": "full body",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "shoulders", "triceps", "core"],
+    "equipment": "barbell",
+    "difficulty": "advanced",
+    "instructions": [
+      "Hold the barbell in a front rack position at shoulder height.",
+      "Squat down until thighs are parallel to the floor.",
+      "Use the momentum from standing up to drive the bar overhead.",
+      "Lock out arms overhead at the top.",
+      "Lower bar back to shoulders and repeat."
+    ],
+    "formCues": [
+      "The transition from squat to press should be seamless",
+      "Drive from the hips to add momentum to the press",
+      "Strong front rack and core brace are essential"
+    ],
+    "commonMistakes": [
+      "Pausing at the top of the squat before pressing",
+      "Pressing independently without using leg drive",
+      "A weak front rack position"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x10, moderate weight",
+      "bulking": "4x6, moderate-heavy weight",
+      "maintenance": "3x8, moderate weight"
+    }
+  },
+  {
+    "id": "farmers-carry",
+    "name": "Farmer's Carry",
+    "bodyPart": "full body",
+    "targetMuscle": "trapezius",
+    "secondaryMuscles": ["forearms", "core", "glutes", "shoulders"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Pick up a heavy dumbbell in each hand.",
+      "Stand tall with your shoulders back and core braced.",
+      "Walk forward for the target distance or time.",
+      "Keep your steps controlled and your posture tall throughout."
+    ],
+    "formCues": [
+      "Don't let the dumbbells cause you to lean to one side",
+      "Keep your shoulders packed down and back",
+      "Short, controlled steps"
+    ],
+    "commonMistakes": [
+      "Leaning to one side",
+      "Shrugging the shoulders up",
+      "Taking too large steps and losing stability"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x40 meters",
+      "bulking": "4x20-30 meters, heavy",
+      "maintenance": "3x30-40 meters"
+    }
+  },
+  {
+    "id": "battle-ropes",
+    "name": "Battle Ropes",
+    "bodyPart": "full body",
+    "targetMuscle": "shoulders",
+    "secondaryMuscles": ["core", "arms", "back", "legs"],
+    "equipment": "bodyweight",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Anchor a thick rope to a fixed point at the base.",
+      "Hold one end in each hand, stand with a slight squat.",
+      "Create alternating waves by raising and lowering your arms.",
+      "Maintain the waves for the target duration."
+    ],
+    "formCues": [
+      "Stay low in your squat throughout for lower body engagement",
+      "The power comes from the whole body, not just the arms",
+      "Keep your core braced and back straight"
+    ],
+    "commonMistakes": [
+      "Standing too upright",
+      "Only using arms without body drive",
+      "Letting the ropes go slack"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "5x30 seconds",
+      "bulking": "3x20 seconds, maximum intensity",
+      "maintenance": "4x30 seconds"
+    }
+  },
+  {
+    "id": "box-jump",
+    "name": "Box Jump",
+    "bodyPart": "full body",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings", "calves"],
+    "equipment": "bodyweight",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Stand facing a sturdy box or platform.",
+      "Bend your knees and swing your arms back.",
+      "Explode upward, swinging arms forward for momentum.",
+      "Land softly on the box with both feet, absorbing the impact through your legs.",
+      "Step down carefully."
+    ],
+    "formCues": [
+      "Land softly — bend knees to absorb the impact",
+      "Full hip extension at the top of the jump",
+      "Step down, don't jump down, to reduce joint stress"
+    ],
+    "commonMistakes": [
+      "Landing hard with straight legs",
+      "Using a box that is too high before mastering the pattern",
+      "Jumping down instead of stepping"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x8",
+      "bulking": "5x5 (maximum height box)",
+      "maintenance": "3x8"
+    }
+  },
+  {
+    "id": "pull-and-press",
+    "name": "Dumbbell Pull and Press",
+    "bodyPart": "full body",
+    "targetMuscle": "full body",
+    "secondaryMuscles": ["lats", "shoulders", "core", "glutes"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding dumbbells, hinge forward and row them to your hips.",
+      "Stand up and curl the dumbbells to your shoulders.",
+      "Press overhead to full extension.",
+      "Reverse the movement to the starting position."
+    ],
+    "formCues": [
+      "Each phase should be deliberate and controlled",
+      "Full extension on the press",
+      "Keep your core engaged throughout"
+    ],
+    "commonMistakes": [
+      "Rushing through the phases",
+      "Using momentum",
+      "Arching the back during the press"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x12",
+      "bulking": "4x10",
+      "maintenance": "3x10"
+    }
+  },
+  {
+    "id": "man-maker",
+    "name": "Man Maker",
+    "bodyPart": "full body",
+    "targetMuscle": "full body",
+    "secondaryMuscles": ["chest", "shoulders", "back", "core", "legs"],
+    "equipment": "dumbbell",
+    "difficulty": "advanced",
+    "instructions": [
+      "Start standing, holding dumbbells.",
+      "Squat down and place dumbbells on floor.",
+      "Jump feet back to push-up position.",
+      "Perform a push-up.",
+      "Row each dumbbell while in plank.",
+      "Jump feet forward and clean dumbbells to shoulders.",
+      "Press overhead."
+    ],
+    "formCues": [
+      "Control each phase — this is a skill movement",
+      "Core stays braced throughout especially during the row",
+      "Maintain neutral spine in the plank position"
+    ],
+    "commonMistakes": [
+      "Rushing and losing form",
+      "Hips rising too high in the plank position",
+      "Not performing a full push-up"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x6",
+      "bulking": "3x5, heavier dumbbells",
+      "maintenance": "3x5-6"
+    }
+  },
+  {
+    "id": "resistance-band-squat",
+    "name": "Resistance Band Squat",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "hamstrings", "abductors"],
+    "equipment": "resistance band",
+    "difficulty": "beginner",
+    "instructions": [
+      "Place a resistance band just above your knees.",
+      "Stand with feet shoulder-width apart.",
+      "Push your knees out against the band resistance as you squat down.",
+      "Drive back up to standing, maintaining outward knee pressure."
+    ],
+    "formCues": [
+      "Actively push knees outward against the band",
+      "This improves glute activation and knee tracking",
+      "Keep your chest up and heels flat"
+    ],
+    "commonMistakes": [
+      "Letting the band collapse the knees inward",
+      "Not maintaining tension against the band",
+      "Using too light a band"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x20",
+      "bulking": "3x15 (use heavier band or hold dumbbells)",
+      "maintenance": "3x15-20"
+    }
+  },
+  {
+    "id": "resistance-band-pull-apart",
+    "name": "Resistance Band Pull-Apart",
+    "bodyPart": "back",
+    "targetMuscle": "rear deltoids",
+    "secondaryMuscles": ["rhomboids", "traps"],
+    "equipment": "resistance band",
+    "difficulty": "beginner",
+    "instructions": [
+      "Hold a resistance band with both hands at shoulder height, arms extended.",
+      "Pull the band apart by moving your hands out to the sides.",
+      "Squeeze your shoulder blades together at full extension.",
+      "Return slowly to the starting position."
+    ],
+    "formCues": [
+      "Keep your arms straight throughout",
+      "Squeeze the rear delts hard at full extension",
+      "Control the return — don't let the band snap back"
+    ],
+    "commonMistakes": [
+      "Bending the elbows",
+      "Not achieving full range of motion",
+      "Going too fast"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20",
+      "bulking": "3x20",
+      "maintenance": "3x15-20"
+    }
+  },
+  {
+    "id": "resistance-band-bicep-curl",
+    "name": "Resistance Band Bicep Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "biceps brachii",
+    "secondaryMuscles": ["forearms"],
+    "equipment": "resistance band",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand on the middle of a resistance band with feet shoulder-width apart.",
+      "Hold an end in each hand at your sides.",
+      "Curl your hands toward your shoulders against the band resistance.",
+      "Lower slowly back down."
+    ],
+    "formCues": [
+      "Keep elbows pinned to your sides",
+      "The resistance increases as you curl — maintain control",
+      "Full extension at the bottom"
+    ],
+    "commonMistakes": [
+      "Elbows drifting forward",
+      "Not controlling the eccentric",
+      "Using a band with too little resistance"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x20",
+      "bulking": "3x15 (double up band for more resistance)",
+      "maintenance": "3x15"
+    }
+  },
+  {
+    "id": "kettlebell-goblet-squat",
+    "name": "Kettlebell Goblet Squat",
+    "bodyPart": "legs",
+    "targetMuscle": "quadriceps",
+    "secondaryMuscles": ["glutes", "core", "adductors"],
+    "equipment": "kettlebell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Hold a kettlebell by the horns at chest height.",
+      "Stand with feet slightly wider than hip-width, toes turned out.",
+      "Sit down between your heels into a deep squat.",
+      "Drive through your heels to stand."
+    ],
+    "formCues": [
+      "Use elbows to push knees outward at the bottom",
+      "Chest stays tall throughout",
+      "Try to achieve full depth"
+    ],
+    "commonMistakes": [
+      "Heels rising off the floor",
+      "Torso collapsing forward",
+      "Knees caving inward"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15",
+      "bulking": "4x10, heavy kettlebell",
+      "maintenance": "3x12"
+    }
+  },
+  {
+    "id": "kettlebell-turkish-getup",
+    "name": "Turkish Get-Up",
+    "bodyPart": "full body",
+    "targetMuscle": "shoulders",
+    "secondaryMuscles": ["core", "glutes", "quads", "triceps"],
+    "equipment": "kettlebell",
+    "difficulty": "advanced",
+    "instructions": [
+      "Lie on the floor with a kettlebell in one hand, pressed toward the ceiling.",
+      "Using a series of controlled movements, rise from lying to standing.",
+      "Keep the kettlebell locked out overhead throughout.",
+      "Reverse the sequence back to the floor."
+    ],
+    "formCues": [
+      "Eyes on the kettlebell at all times",
+      "Move slowly and deliberately — this is a skill movement",
+      "Each position should feel stable before moving to the next"
+    ],
+    "commonMistakes": [
+      "Moving too fast",
+      "Losing the locked-out position overhead",
+      "Looking away from the kettlebell"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x3 each side",
+      "bulking": "3x3 each side, heavier",
+      "maintenance": "3x3 each side"
+    }
+  },
+  {
+    "id": "mountain-climber",
+    "name": "Mountain Climber",
+    "bodyPart": "core",
+    "targetMuscle": "rectus abdominis",
+    "secondaryMuscles": ["hip flexors", "shoulders", "obliques"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Start in a high push-up position with hands under shoulders.",
+      "Drive one knee toward your chest.",
+      "Quickly switch legs in a running motion.",
+      "Continue alternating at a controlled or fast pace."
+    ],
+    "formCues": [
+      "Keep your hips level — don't let them rise",
+      "Brace your core throughout",
+      "Shoulders stay over your hands"
+    ],
+    "commonMistakes": [
+      "Hips rising up",
+      "Not fully driving the knee to the chest",
+      "Arms bending under load"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x30 seconds",
+      "bulking": "3x20 seconds",
+      "maintenance": "3x30 seconds"
+    }
+  },
+  {
+    "id": "dumbbell-Romanian-deadlift",
+    "name": "Dumbbell Romanian Deadlift",
+    "bodyPart": "legs",
+    "targetMuscle": "hamstrings",
+    "secondaryMuscles": ["glutes", "erector spinae"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Stand holding dumbbells in front of your thighs.",
+      "Hinge at the hips, pushing them back.",
+      "Lower dumbbells along the fronts of your legs until you feel a hamstring stretch.",
+      "Drive hips forward to return to standing."
+    ],
+    "formCues": [
+      "Soft knee bend throughout",
+      "Keep dumbbells close to your legs",
+      "Flat back — no rounding"
+    ],
+    "commonMistakes": [
+      "Bending the knees too much",
+      "Rounding the lower back",
+      "Not getting enough hip hinge"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12"
+    }
+  },
+  {
+    "id": "incline-dumbbell-curl",
+    "name": "Incline Dumbbell Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "biceps brachii",
+    "secondaryMuscles": ["brachialis"],
+    "equipment": "dumbbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Set a bench to a 45-60 degree incline and sit back on it.",
+      "Let your arms hang straight down, dumbbells at your sides.",
+      "Curl both dumbbells up, supinating your wrists.",
+      "Lower slowly back to the starting position."
+    ],
+    "formCues": [
+      "The incline increases the range of motion and stretch on the biceps",
+      "Let the arms fully extend at the bottom for maximum stretch",
+      "Don't swing the torso"
+    ],
+    "commonMistakes": [
+      "Swinging the torso to assist the lift",
+      "Partial range of motion",
+      "Going too heavy"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light weight",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "cable-row-single-arm",
+    "name": "Single-Arm Cable Row",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["rhomboids", "biceps", "rear deltoids"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to lower chest height with a single handle attachment.",
+      "Sit or stand sideways and grip the handle.",
+      "Row the handle toward your hip, rotating slightly for a full contraction.",
+      "Return under control."
+    ],
+    "formCues": [
+      "Allow a slight torso rotation to maximize the range of motion",
+      "Drive the elbow behind you, not just your hand toward your hip",
+      "Initiate by retracting the shoulder blade"
+    ],
+    "commonMistakes": [
+      "Not allowing any rotation (limits range of motion)",
+      "Rotating too much and turning it into a cheat row",
+      "Using arm strength instead of pulling with the back"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15 each side",
+      "bulking": "4x10 each side",
+      "maintenance": "3x12 each side"
+    }
+  },
+  {
+    "id": "concentration-curl",
+    "name": "Concentration Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "biceps brachii",
+    "secondaryMuscles": [],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit on a bench, lean forward, and brace your elbow on the inside of your thigh.",
+      "Hold a dumbbell in that hand.",
+      "Curl the dumbbell up toward your shoulder.",
+      "Lower slowly back down."
+    ],
+    "formCues": [
+      "The thigh is just a support — don't actively push against it",
+      "Full supination at the top for peak contraction",
+      "Slow, deliberate reps"
+    ],
+    "commonMistakes": [
+      "Swinging the arm away from the thigh",
+      "Not supinating the wrist at the top",
+      "Going too heavy"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15 each arm",
+      "bulking": "4x10 each arm",
+      "maintenance": "3x12 each arm"
+    }
+  },
+  {
+    "id": "cable-bicep-curl",
+    "name": "Cable Bicep Curl",
+    "bodyPart": "arms",
+    "targetMuscle": "biceps brachii",
+    "secondaryMuscles": ["brachialis"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to the lowest position with a straight bar or EZ attachment.",
+      "Stand facing the machine and grip the attachment.",
+      "Curl upward to shoulder height.",
+      "Lower slowly under constant tension."
+    ],
+    "formCues": [
+      "Constant cable tension differs from free weights — embrace the full ROM",
+      "Keep elbows stationary at your sides",
+      "The eccentric under constant tension is very effective"
+    ],
+    "commonMistakes": [
+      "Elbows drifting forward at the top",
+      "Not taking advantage of the constant tension",
+      "Using too much weight"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, light-moderate weight",
+      "bulking": "4x10, moderate weight",
+      "maintenance": "3x12, moderate weight"
+    }
+  },
+  {
+    "id": "straight-arm-pulldown",
+    "name": "Straight-Arm Pulldown",
+    "bodyPart": "back",
+    "targetMuscle": "latissimus dorsi",
+    "secondaryMuscles": ["triceps", "rear deltoids"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to the highest position with a straight bar.",
+      "Stand with a slight forward lean and grip the bar.",
+      "With arms straight, pull the bar down to your thighs.",
+      "Return slowly to the starting position."
+    ],
+    "formCues": [
+      "Arms stay straight throughout — this is a lat isolation exercise",
+      "Hinge slightly forward at the hips for a better angle",
+      "Feel the lats stretch at the top"
+    ],
+    "commonMistakes": [
+      "Bending the elbows",
+      "Standing too upright",
+      "Not getting a full stretch at the top"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15",
+      "bulking": "3x12, moderate weight",
+      "maintenance": "3x12"
+    }
+  },
+  {
+    "id": "dumbbell-shoulder-press",
+    "name": "Dumbbell Shoulder Press",
+    "bodyPart": "shoulders",
+    "targetMuscle": "deltoids",
+    "secondaryMuscles": ["triceps", "upper traps"],
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit on a bench with back support, hold dumbbells at shoulder height.",
+      "Press both dumbbells upward until arms are fully extended.",
+      "Lower back to shoulder height under control."
+    ],
+    "formCues": [
+      "Keep your back pressed against the bench",
+      "Don't fully lock out your elbows at the top",
+      "Exhale on the way up"
+    ],
+    "commonMistakes": [
+      "Arching the lower back off the bench",
+      "Using too much weight and losing control",
+      "Pressing at an angle rather than straight up"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15, moderate weight",
+      "bulking": "4x8-10, heavy weight",
+      "maintenance": "3x10-12, moderate weight"
+    }
+  },
+  {
+    "id": "band-hip-thrust",
+    "name": "Resistance Band Hip Thrust",
+    "bodyPart": "legs",
+    "targetMuscle": "glutes",
+    "secondaryMuscles": ["hamstrings", "abductors"],
+    "equipment": "resistance band",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit with your upper back against a bench, band across your hips anchored under feet.",
+      "Drive your hips upward against the band resistance.",
+      "Squeeze your glutes at the top.",
+      "Lower hips back down."
+    ],
+    "formCues": [
+      "The band increases resistance at the top where glutes are strongest",
+      "Chin to chest to prevent lower back extension",
+      "Full hip extension at the top"
+    ],
+    "commonMistakes": [
+      "Not achieving full hip extension",
+      "Using too light a band",
+      "Hyperextending the lower back"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20",
+      "bulking": "4x15 (heavy band or add barbell)",
+      "maintenance": "3x15-20"
+    }
+  },
+  {
+    "id": "push-press",
+    "name": "Push Press",
+    "bodyPart": "shoulders",
+    "targetMuscle": "deltoids",
+    "secondaryMuscles": ["triceps", "quads", "core", "traps"],
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Hold the bar in a front rack position at shoulder height.",
+      "Perform a slight knee dip.",
+      "Drive through your legs and press the bar overhead explosively.",
+      "Lock out overhead and lower back to shoulders."
+    ],
+    "formCues": [
+      "The knee dip should be quick and shallow — just enough to create drive",
+      "The leg drive transitions into arm press seamlessly",
+      "Lock out fully overhead"
+    ],
+    "commonMistakes": [
+      "Too deep of a dip (becomes a push jerk)",
+      "Pushing the bar forward instead of straight up",
+      "Not using leg drive and just pressing"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x10, moderate weight",
+      "bulking": "4x5-6, heavy weight",
+      "maintenance": "3x8, moderate weight"
+    }
+  },
+  {
+    "id": "cable-upright-row",
+    "name": "Cable Upright Row",
+    "bodyPart": "shoulders",
+    "targetMuscle": "lateral deltoids",
+    "secondaryMuscles": ["traps", "biceps"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to the lowest position with a straight bar.",
+      "Stand and grip the bar with hands about shoulder-width apart.",
+      "Pull the bar upward toward your chin, elbows leading.",
+      "Lower slowly back to the starting position."
+    ],
+    "formCues": [
+      "Elbows should always be above hands",
+      "Keep the bar close to your body",
+      "Don't pull excessively high"
+    ],
+    "commonMistakes": [
+      "Too narrow a grip",
+      "Pulling too high causing shoulder impingement",
+      "Using momentum"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15",
+      "bulking": "4x10",
+      "maintenance": "3x12"
+    }
+  },
+  {
+    "id": "decline-crunch",
+    "name": "Decline Crunch",
+    "bodyPart": "core",
+    "targetMuscle": "rectus abdominis",
+    "secondaryMuscles": ["obliques"],
+    "equipment": "bodyweight",
+    "difficulty": "beginner",
+    "instructions": [
+      "Sit on a decline bench and secure your feet.",
+      "Lie back and place hands behind your head.",
+      "Crunch your torso up toward your knees.",
+      "Lower slowly back down."
+    ],
+    "formCues": [
+      "The decline increases the range of motion for the abs",
+      "Don't pull on the neck",
+      "Focus on spinal flexion rather than just sitting up"
+    ],
+    "commonMistakes": [
+      "Using hip flexors to pull up",
+      "Pulling on the neck",
+      "Not getting full range of motion"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "4x20",
+      "bulking": "3x15 (hold a weight plate)",
+      "maintenance": "3x15-20"
+    }
+  },
+  {
+    "id": "v-up",
+    "name": "V-Up",
+    "bodyPart": "core",
+    "targetMuscle": "rectus abdominis",
+    "secondaryMuscles": ["hip flexors", "obliques"],
+    "equipment": "bodyweight",
+    "difficulty": "intermediate",
+    "instructions": [
+      "Lie flat on your back with arms extended overhead.",
+      "Simultaneously raise your legs and torso to form a V shape.",
+      "Try to touch your toes at the top.",
+      "Lower back down slowly."
+    ],
+    "formCues": [
+      "Keep your legs straight throughout",
+      "The movement should be smooth, not jerky",
+      "Exhale as you come up"
+    ],
+    "commonMistakes": [
+      "Bending the knees",
+      "Using momentum instead of core strength",
+      "Not fully lowering between reps"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15",
+      "bulking": "3x15 (hold a dumbbell for resistance)",
+      "maintenance": "3x12-15"
+    }
+  },
+  {
+    "id": "woodchop",
+    "name": "Cable Woodchop",
+    "bodyPart": "core",
+    "targetMuscle": "obliques",
+    "secondaryMuscles": ["transverse abdominis", "shoulders", "lats"],
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": [
+      "Set a cable to the highest position with a single handle.",
+      "Stand sideways to the machine and grip the handle with both hands.",
+      "Pull the handle diagonally downward toward the opposite hip.",
+      "Rotate your torso and pivot your back foot.",
+      "Return to the starting position."
+    ],
+    "formCues": [
+      "The movement comes from the torso rotation, not the arms",
+      "Keep your arms relatively straight",
+      "Pivot your back foot to allow full rotation"
+    ],
+    "commonMistakes": [
+      "Using the arms to pull instead of rotating",
+      "Not pivoting the back foot",
+      "Going too heavy"
+    ],
+    "setsRepsGuidance": {
+      "cutting": "3x15 each side",
+      "bulking": "3x12 each side",
+      "maintenance": "3x12-15 each side"
+    }
+  }
+]

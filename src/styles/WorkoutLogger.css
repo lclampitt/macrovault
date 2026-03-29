@@ -215,20 +215,47 @@
   flex-shrink: 0;
 }
 
-.wl-muscle-tag {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--accent-light);
-  background: #0a2a1e;
-  border: 1px solid var(--accent);
+/* Muscle group pills */
+.wl-mg-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wl-mg-pill {
+  padding: 5px 13px;
   border-radius: 6px;
-  padding: 2px 9px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.wl-mg-pill--active {
+  background: #0a2a1e;
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+.wl-exercise-count {
+  font-size: 12px;
+  color: #555;
   white-space: nowrap;
 }
 
 .wl-btn-sm {
   font-size: 12px;
   padding: 5px 12px;
+}
+
+.wl-btn-icon {
+  padding: 5px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Exercise detail panel */

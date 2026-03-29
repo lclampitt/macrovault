@@ -9,3 +9,4 @@ python-multipart
 stripe
 supabase
 python-dotenv
+posthog

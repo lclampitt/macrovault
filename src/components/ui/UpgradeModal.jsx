@@ -8,24 +8,26 @@ import './UpgradeModal.css';
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
 const PRO_FEATURES = [
-  'AI Body Analyzer (measurements + photo)',
-  'All Calculators (TDEE, Protein, 1RM)',
-  'Advanced Progress Charts',
-  'Unlimited Workout Logs',
+  'Everything in Free',
+  'Unlimited workout logs',
   'Goal Planner',
+  'Progress Charts',
+  'Daily nutrition tracking',
 ];
 
 const FREE_FEATURES = [
   'Dashboard',
+  'AI Body Analyzer',
+  'All Calculators',
   'Exercise Library',
-  'Basic Workout Logging',
+  '10 workout logs',
 ];
 
 // Feature-specific headlines shown below the modal title
 const FEATURE_HEADLINES = {
-  analyzer: "You've used all 3 free analyses this month",
   workouts: "You've reached 10 workout logs on the free plan",
-  goals:    "You've reached the goal limit on the free plan",
+  goals:    "Goal Planner is a Pro feature",
+  progress: "Progress Charts is a Pro feature",
   default:  "Unlock everything with Gainlytics Pro",
 };
 

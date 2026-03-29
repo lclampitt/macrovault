@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { X, Target } from 'lucide-react';
+import { toast } from 'sonner';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
+import { useUpgrade } from '../../context/UpgradeContext';
 import '../../styles/goalplanner.css';
 
 /* Stagger container for card entrance */
@@ -38,7 +41,232 @@ function MacroBar({ label, value, max, color }) {
 
 const emptyMacros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
-export default function GoalPlanner({ compact = false }) {
+/* ── TOTALS ROW (count-up on change) ──────────────────── */
+function TotalsRow({ totals }) {
+  const [disp, setDisp] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
+
+  useEffect(() => {
+    const keys = ['calories', 'protein', 'carbs', 'fat'];
+    const steps = 24;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const t = Math.min(step / steps, 1);
+      const ease = 1 - Math.pow(1 - t, 2);
+      const next = {};
+      keys.forEach((k) => { next[k] = Math.round(totals[k] * ease); });
+      setDisp(next);
+      if (step >= steps) clearInterval(timer);
+    }, 20);
+    return () => clearInterval(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totals.calories, totals.protein, totals.carbs, totals.fat]);
+
+  return (
+    <div className="gp-log-totals">
+      <span className="gp-log-totals__label">Today's total</span>
+      <span>
+        {disp.calories} kcal · {disp.protein}g protein · {disp.carbs}g carbs · {disp.fat}g fat
+      </span>
+    </div>
+  );
+}
+
+/* ── NUTRITION LOGGER ─────────────────────────────────── */
+function NutritionLogger({ userId }) {
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  const [entries,     setEntries]     = useState([]);
+  const [form,        setForm]        = useState({ calories: '', protein: '', carbs: '', fat: '', meal_name: '' });
+  const [submitting,  setSubmitting]  = useState(false);
+  const [deletingId,  setDeletingId]  = useState(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    async function load() {
+      const { data } = await supabase
+        .from('food_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('logged_date', today)
+        .order('created_at', { ascending: false });
+      if (data) setEntries(data);
+    }
+
+    load();
+
+    const channel = supabase
+      .channel(`nl_${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'food_logs', filter: `user_id=eq.${userId}` }, load)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [userId, today]);
+
+  async function handleAdd(e) {
+    e.preventDefault();
+    const cal = parseFloat(form.calories) || 0;
+    const pro = parseFloat(form.protein)  || 0;
+    if (cal === 0 && pro === 0) { toast.error('Enter at least calories or protein.'); return; }
+    setSubmitting(true);
+    const { error } = await supabase.from('food_logs').insert({
+      user_id:    userId,
+      logged_date: today,
+      meal_name:  form.meal_name.trim() || null,
+      calories:   cal,
+      protein_g:  pro,
+      carbs_g:    parseFloat(form.carbs) || 0,
+      fat_g:      parseFloat(form.fat)   || 0,
+    });
+    setSubmitting(false);
+    if (error) { toast.error('Failed to log entry.'); return; }
+    toast.success('Entry logged');
+    setForm({ calories: '', protein: '', carbs: '', fat: '', meal_name: '' });
+  }
+
+  async function handleDelete(id) {
+    setDeletingId(id);
+    const { error } = await supabase.from('food_logs').delete().eq('id', id);
+    setDeletingId(null);
+    if (error) { toast.error('Failed to remove entry.'); return; }
+    toast.success('Entry removed');
+  }
+
+  const totals = useMemo(() => entries.reduce((acc, e) => ({
+    calories: acc.calories + (Number(e.calories)  || 0),
+    protein:  acc.protein  + (Number(e.protein_g) || 0),
+    carbs:    acc.carbs    + (Number(e.carbs_g)   || 0),
+    fat:      acc.fat      + (Number(e.fat_g)     || 0),
+  }), { calories: 0, protein: 0, carbs: 0, fat: 0 }), [entries]);
+
+  return (
+    <div className="gp-grid">
+      {/* Card 1 — Log form */}
+      <div className="gp-log-card">
+        <p className="gp-section-label">Log today's nutrition</p>
+        <form onSubmit={handleAdd} className="gp-log-form">
+          <div className="gp-macro-grid">
+            {[
+              { key: 'calories', label: 'Calories (kcal)' },
+              { key: 'protein',  label: 'Protein (g)' },
+              { key: 'carbs',    label: 'Carbs (g)' },
+              { key: 'fat',      label: 'Fat (g)' },
+            ].map(({ key, label }) => (
+              <div key={key} className="gp-field">
+                <label className="gp-field__label">{label}</label>
+                <input
+                  type="number"
+                  className="input gp-log-input"
+                  min="0"
+                  step="any"
+                  placeholder="0"
+                  value={form[key]}
+                  onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                />
+              </div>
+            ))}
+          </div>
+          <input
+            type="text"
+            className="input gp-log-input gp-log-meal-input"
+            placeholder="e.g. Breakfast, Lunch, Snack"
+            value={form.meal_name}
+            onChange={(e) => setForm((f) => ({ ...f, meal_name: e.target.value }))}
+            maxLength={80}
+          />
+          <motion.button
+            type="submit"
+            className="btn gp-log-btn"
+            disabled={submitting}
+            whileTap={{ scale: 0.97 }}
+          >
+            {submitting ? 'Logging…' : 'Add entry'}
+          </motion.button>
+        </form>
+      </div>
+
+      {/* Card 2 — Today's log */}
+      <div className="gp-log-card">
+        <p className="gp-section-label">Today's log</p>
+        <div className="gp-log-entries">
+          {entries.length === 0 ? (
+            <p className="gp-log-empty">No entries yet. Log your first meal above.</p>
+          ) : (
+            <AnimatePresence initial={false}>
+              {entries.map((entry, i) => (
+                <motion.div
+                  key={entry.id}
+                  className="gp-log-entry"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, height: 0, marginBottom: 0, overflow: 'hidden' }}
+                  transition={{ duration: 0.25, delay: i * 0.05 }}
+                  layout
+                >
+                  <div className="gp-log-entry__left">
+                    <span className="gp-log-entry__label">
+                      {entry.meal_name || `Entry ${entries.length - i}`}
+                    </span>
+                    <span className="gp-log-entry__time">
+                      {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <div className="gp-log-entry__right">
+                    <span className="gp-log-entry__cal">{entry.calories} kcal</span>
+                    <span className="gp-log-entry__macros">
+                      {entry.protein_g}g · {entry.carbs_g}g · {entry.fat_g}g
+                    </span>
+                  </div>
+                  <motion.button
+                    className="gp-log-entry__del"
+                    onClick={() => handleDelete(entry.id)}
+                    disabled={deletingId === entry.id}
+                    whileTap={{ scale: 0.9 }}
+                    aria-label="Remove entry"
+                  >
+                    <X size={14} />
+                  </motion.button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+        </div>
+        {entries.length > 0 && <TotalsRow totals={totals} />}
+      </div>
+    </div>
+  );
+}
+
+function GoalPlannerGate() {
+  const { triggerUpgrade } = useUpgrade();
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '80px 24px', textAlign: 'center' }}>
+      <Target size={48} style={{ color: '#1D9E75', opacity: 0.6 }} />
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Goal Planner</h2>
+      <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: 0, maxWidth: 320, lineHeight: 1.6 }}>
+        Set calorie and macro goals, track your daily nutrition, and plan your progress. A Pro feature.
+      </p>
+      <button
+        onClick={() => triggerUpgrade('goals')}
+        style={{
+          marginTop: 4, width: '100%', maxWidth: 320,
+          background: 'var(--accent)', color: '#fff',
+          fontSize: 14, fontWeight: 500, padding: '13px',
+          borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
+          fontFamily: 'inherit',
+          transition: 'background 0.15s ease',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--accent-dark)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'var(--accent)'}
+      >
+        Upgrade to Pro — $4.99/mo
+      </button>
+    </div>
+  );
+}
+
+function GoalPlannerContent({ compact = false }) {
   // Auth / data state
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -467,6 +695,16 @@ export default function GoalPlanner({ compact = false }) {
           )}
         </motion.div>
       )}
+
+      {/* Nutrition Logger — always visible on full page when logged in */}
+      {!loading && userId && !compact && (
+        <NutritionLogger userId={userId} />
+      )}
     </div>
   );
+}
+
+export default function GoalPlanner({ compact = false, isPro = false }) {
+  if (!isPro) return <GoalPlannerGate />;
+  return <GoalPlannerContent compact={compact} />;
 }

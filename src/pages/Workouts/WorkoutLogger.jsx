@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Trash2 } from 'lucide-react';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
+import { usePlan } from '../../hooks/usePlan';
 import '../../styles/WorkoutLogger.css';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
-/* Infer a muscle group tag from the workout name */
-function inferMuscleGroup(name = '') {
-  const n = name.toLowerCase();
-  if (n.includes('push') || n.includes('chest') || n.includes('shoulder') || n.includes('tricep')) return 'Upper body';
-  if (n.includes('pull') || n.includes('back') || n.includes('bicep') || n.includes('row')) return 'Upper body';
-  if (n.includes('leg') || n.includes('squat') || n.includes('lower') || n.includes('glute') || n.includes('hamstring')) return 'Lower body';
-  if (n.includes('full') || n.includes('total')) return 'Full body';
-  if (n.includes('core') || n.includes('abs')) return 'Core';
-  if (n.includes('cardio') || n.includes('run') || n.includes('bike')) return 'Cardio';
-  return 'General';
-}
 
 /* Format date string: "2025-12-12" → "Dec 12, 2025" */
 function formatDate(dateStr = '') {
@@ -33,10 +24,14 @@ const fadeUp = {
 
 export default function WorkoutLogger() {
   const { triggerUpgrade } = useUpgrade();
+  const { plan } = usePlan();
+
+  const MUSCLE_GROUPS = ['Upper Body', 'Lower Body', 'Legs', 'Full Body', 'Core', 'Cardio'];
 
   // Form state for creating/editing a workout
   const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
   const [workoutName, setWorkoutName] = useState('');
+  const [muscleGroup, setMuscleGroup] = useState('');
   const [exercises, setExercises] = useState([]);
   const [newExercise, setNewExercise] = useState('');
   const [message, setMessage] = useState('');
@@ -85,6 +80,13 @@ export default function WorkoutLogger() {
     else setWorkoutHistory(data);
   };
 
+  // Delete a workout from history
+  const deleteWorkout = async (id) => {
+    const { error } = await supabase.from('workouts').delete().eq('id', id);
+    if (error) console.error('Delete error:', error);
+    else setWorkoutHistory((prev) => prev.filter((w) => w.id !== id));
+  };
+
   // Add a new exercise row to the current workout
   const addExercise = () => {
     if (!newExercise.trim()) return;
@@ -130,6 +132,7 @@ export default function WorkoutLogger() {
       user_id: userId,
       workout_date: workoutDate,
       workout_name: workoutName.trim(),
+      muscle_group: muscleGroup || null,
       exercises,
     };
 
@@ -176,6 +179,7 @@ export default function WorkoutLogger() {
     } else {
       // Reset form and refresh history
       setWorkoutName('');
+      setMuscleGroup('');
       setExercises([]);
       setFormOpen(false);
       fetchWorkouts();
@@ -187,17 +191,20 @@ export default function WorkoutLogger() {
   const editWorkout = (workout) => {
     setWorkoutDate(workout.workout_date);
     setWorkoutName(workout.workout_name);
+    setMuscleGroup(workout.muscle_group || '');
     setExercises(workout.exercises || []);
     setEditingWorkoutId(workout.id);
     setFormOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setMessage('✏️ Editing workout...');
+    setMessage('Editing workout...');
   };
 
   // Expand/collapse a workout in the history list
   const toggleExpand = (id) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  const atLimit = plan !== 'pro' && workoutHistory.length >= 10;
 
   return (
     <div className="wl">
@@ -211,15 +218,46 @@ export default function WorkoutLogger() {
       >
         {/* Header row: title + expand toggle */}
         <div className="wl-log-header">
-          <p className="wl-section-title">Log a workout</p>
-          <motion.button
-            className="btn btn-primary wl-toggle-btn"
-            onClick={() => setFormOpen((o) => !o)}
-            whileTap={{ scale: 0.97 }}
-          >
-            {formOpen ? 'Cancel' : '+ New workout'}
-          </motion.button>
+          <div>
+            <p className="wl-section-title">Log a workout</p>
+            {plan !== 'pro' && workoutHistory.length > 0 && (
+              <p style={{
+                fontSize: 11,
+                color: workoutHistory.length >= 8 ? '#EF9F27' : 'var(--text-muted)',
+                margin: '2px 0 0',
+              }}>
+                {workoutHistory.length} / 10 free workout logs used
+              </p>
+            )}
+          </div>
+          {!atLimit && (
+            <motion.button
+              className="btn btn-primary wl-toggle-btn"
+              onClick={() => setFormOpen((o) => !o)}
+              whileTap={{ scale: 0.97 }}
+            >
+              {formOpen ? 'Cancel' : '+ New workout'}
+            </motion.button>
+          )}
         </div>
+
+        {/* Locked banner when free user hits limit */}
+        {atLimit && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0 4px' }}>
+            <Lock size={16} style={{ color: '#5DCAA5', flexShrink: 0 }} />
+            <div>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+                You've reached 10 workout logs on the free plan.
+              </p>
+              <button
+                onClick={() => triggerUpgrade('workouts')}
+                style={{ fontSize: 12, color: 'var(--accent-light)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginTop: 4, textDecoration: 'underline' }}
+              >
+                Upgrade to Pro for unlimited logging
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Collapsible form */}
         <AnimatePresence initial={false}>
@@ -253,6 +291,24 @@ export default function WorkoutLogger() {
                       onChange={(e) => setWorkoutName(e.target.value)}
                       placeholder="e.g. Push Day, Lower Body, Full Body"
                     />
+                  </div>
+                </div>
+
+                {/* Muscle group selector */}
+                <div className="wl-field">
+                  <label className="wl-label">Muscle group</label>
+                  <div className="wl-mg-pills">
+                    {MUSCLE_GROUPS.map((g) => (
+                      <motion.button
+                        key={g}
+                        type="button"
+                        className={`wl-mg-pill ${muscleGroup === g ? 'wl-mg-pill--active' : ''}`}
+                        onClick={() => setMuscleGroup(muscleGroup === g ? '' : g)}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {g}
+                      </motion.button>
+                    ))}
                   </div>
                 </div>
 
@@ -342,63 +398,70 @@ export default function WorkoutLogger() {
 
       <div className="wl-history-list">
         {workoutHistory.map((workout, idx) => (
-          <motion.div
-            key={workout.id}
-            className="wl-history-row"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, delay: idx * 0.04, ease: 'easeOut' }}
-            whileHover={{ scale: 1.01 }}
-            onClick={() => toggleExpand(workout.id)}
-          >
-            <div className="wl-history-row__left">
-              <span className="wl-history-name">{workout.workout_name}</span>
-              <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
-            </div>
-            <div className="wl-history-row__right">
-              <span className="wl-muscle-tag">{inferMuscleGroup(workout.workout_name)}</span>
-              <motion.button
-                className="btn btn-primary wl-btn-sm"
-                onClick={(e) => { e.stopPropagation(); editWorkout(workout); }}
-                whileTap={{ scale: 0.97 }}
-              >
-                Edit
-              </motion.button>
-            </div>
-          </motion.div>
+          <React.Fragment key={workout.id}>
+            <motion.div
+              className="wl-history-row"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, delay: idx * 0.04, ease: 'easeOut' }}
+              whileHover={{ scale: 1.01 }}
+              onClick={() => toggleExpand(workout.id)}
+            >
+              <div className="wl-history-row__left">
+                <span className="wl-history-name">{workout.workout_name}</span>
+                <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
+              </div>
+              <div className="wl-history-row__right">
+                {(workout.exercises || []).length > 0 && (
+                  <span className="wl-exercise-count">{workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}</span>
+                )}
+                <motion.button
+                  className="btn btn-primary wl-btn-sm"
+                  onClick={(e) => { e.stopPropagation(); editWorkout(workout); }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Edit
+                </motion.button>
+                <motion.button
+                  className="btn btn-destructive wl-btn-sm wl-btn-icon"
+                  onClick={(e) => { e.stopPropagation(); deleteWorkout(workout.id); }}
+                  whileTap={{ scale: 0.97 }}
+                  title="Delete workout"
+                >
+                  <Trash2 size={14} />
+                </motion.button>
+              </div>
+            </motion.div>
+            <AnimatePresence>
+              {expanded[workout.id] && (
+                <motion.div
+                  className="wl-exercise-detail"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  {workout.exercises?.map((ex, exIdx) => (
+                    <div key={exIdx} className="history-exercise">
+                      <h4>{ex.name}</h4>
+                      <table>
+                        <thead><tr><th>Set</th><th>Weight</th><th>Reps</th><th>Notes</th></tr></thead>
+                        <tbody>
+                          {ex.sets.map((set, j) => (
+                            <tr key={j}>
+                              <td>{j + 1}</td><td>{set.weight}</td><td>{set.reps}</td><td>{set.notes}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </React.Fragment>
         ))}
       </div>
-
-      {/* Expandable exercise detail */}
-      {workoutHistory.map((workout) =>
-        expanded[workout.id] ? (
-          <AnimatePresence key={workout.id}>
-            <motion.div
-              className="wl-exercise-detail"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              {workout.exercises?.map((ex, idx) => (
-                <div key={idx} className="history-exercise">
-                  <h4>{ex.name}</h4>
-                  <table>
-                    <thead><tr><th>Set</th><th>Weight</th><th>Reps</th><th>Notes</th></tr></thead>
-                    <tbody>
-                      {ex.sets.map((set, j) => (
-                        <tr key={j}>
-                          <td>{j + 1}</td><td>{set.weight}</td><td>{set.reps}</td><td>{set.notes}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
-        ) : null
-      )}
     </div>
   );
 }

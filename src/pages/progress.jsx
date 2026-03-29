@@ -1,8 +1,38 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { BarChart2, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useUpgrade } from '../context/UpgradeContext';
 import ProgressCharts from '../components/ProgressCharts';
 import '../styles/progress.css';
+
+function ProgressGate() {
+  const { triggerUpgrade } = useUpgrade();
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '80px 24px', textAlign: 'center' }}>
+      <BarChart2 size={48} style={{ color: '#1D9E75', opacity: 0.6 }} />
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Progress Charts</h2>
+      <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: 0, maxWidth: 320, lineHeight: 1.6 }}>
+        Track your weight and body composition over time with detailed charts. A Pro feature.
+      </p>
+      <button
+        onClick={() => triggerUpgrade('progress')}
+        style={{
+          marginTop: 4, width: '100%', maxWidth: 320,
+          background: 'var(--accent)', color: '#fff',
+          fontSize: 14, fontWeight: 500, padding: '13px',
+          borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
+          fontFamily: 'inherit',
+          transition: 'background 0.15s ease',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--accent-dark)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'var(--accent)'}
+      >
+        Upgrade to Pro — $4.99/mo
+      </button>
+    </div>
+  );
+}
 
 /* Count-up hook */
 function useCountUp(target, duration = 700) {
@@ -38,7 +68,7 @@ function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive
   );
 }
 
-export default function ProgressPage() {
+function ProgressPageContent() {
   const [session, setSession] = useState(null);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -288,8 +318,9 @@ export default function ProgressPage() {
                       onClick={() => handleDelete(r.id)}
                       disabled={deletingId === r.id}
                       whileTap={{ scale: 0.97 }}
+                      title="Delete entry"
                     >
-                      {deletingId === r.id ? 'Deleting…' : 'Delete'}
+                      {deletingId === r.id ? '…' : <Trash2 size={14} />}
                     </motion.button>
                   </td>
                 </motion.tr>
@@ -300,4 +331,9 @@ export default function ProgressPage() {
       </motion.div>
     </div>
   );
+}
+
+export default function ProgressPage({ isPro = false }) {
+  if (!isPro) return <ProgressGate />;
+  return <ProgressPageContent />;
 }

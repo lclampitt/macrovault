@@ -334,3 +334,169 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── NUTRITION LOGGER ───────────────────────────────── */
+.gp-log-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gp-log-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.gp-log-input {
+  transition: border-color 0.2s ease;
+}
+
+.gp-log-input:focus {
+  border-color: #1D9E75 !important;
+  outline: none;
+}
+
+/* Hide number input spinners */
+.gp-log-input[type="number"]::-webkit-inner-spin-button,
+.gp-log-input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.gp-log-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.gp-log-meal-input {
+  margin-top: 10px;
+}
+
+.gp-log-btn {
+  margin-top: 12px;
+  align-self: flex-start;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent-light);
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.gp-log-btn:hover:not(:disabled) {
+  background: #0a2a1e;
+}
+
+.gp-log-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.gp-log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 48px;
+}
+
+.gp-log-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px 0;
+  margin: 0;
+}
+
+.gp-log-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.gp-log-entry__left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gp-log-entry__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gp-log-entry__time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.gp-log-entry__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.gp-log-entry__cal {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.gp-log-entry__macros {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.gp-log-entry__del {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.gp-log-entry__del:hover:not(:disabled) {
+  color: var(--error);
+}
+
+.gp-log-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent-light);
+}
+
+.gp-log-totals__label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

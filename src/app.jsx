@@ -177,8 +177,8 @@ function App() {
       <Route path="/calculators/tdee"    element={protect(<TdeeCalculator />)} />
       <Route path="/calculators/protein" element={protect(<ProteinCalculator />)} />
       <Route path="/calculators/1rm"     element={protect(<OneRepMaxCalculator />)} />
-      <Route path="/goalplanner"         element={protect(<GoalPlanner />)} />
-      <Route path="/progress"            element={protect(<ProgressPage />)} />
+      <Route path="/goalplanner"         element={protect(<GoalPlanner isPro={isPro} />)} />
+      <Route path="/progress"            element={protect(<ProgressPage isPro={isPro} />)} />
       <Route path="/workouts"            element={protect(<WorkoutLogger />)} />
       <Route path="/billing"             element={protect(<BillingPage />)} />
       <Route path="/settings"            element={protect(<SettingsPage />)} />
