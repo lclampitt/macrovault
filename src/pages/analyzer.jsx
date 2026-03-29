@@ -25,7 +25,6 @@ function AnalyzerContent() {
   const [weightLbs, setWeightLbs] = useState('');
   const [waistIn, setWaistIn] = useState('');
   const [hipIn, setHipIn] = useState('');
-  const [neckIn, setNeckIn] = useState('');
 
   // Image upload state
   const [file, setFile] = useState(null);
@@ -53,8 +52,7 @@ function AnalyzerContent() {
       heightIn === '' ||
       !weightLbs ||
       !waistIn ||
-      !hipIn ||
-      !neckIn
+      !hipIn
     ) {
       setMeasureError('Please fill out all measurement fields.');
       return;
@@ -66,10 +64,9 @@ function AnalyzerContent() {
     const wLbsNum = Number(weightLbs);
     const waistNum = Number(waistIn);
     const hipNum = Number(hipIn);
-    const neckNum = Number(neckIn);
 
     if (
-      [hFtNum, hInNum, wLbsNum, waistNum, hipNum, neckNum].some(
+      [hFtNum, hInNum, wLbsNum, waistNum, hipNum].some(
         (v) => Number.isNaN(v) || v <= 0
       )
     ) {
@@ -88,7 +85,6 @@ function AnalyzerContent() {
     const weight_kg = wLbsNum * 0.453592;
     const waist_cm = waistNum * 2.54;
     const hip_cm = hipNum * 2.54;
-    const neck_cm = neckNum * 2.54;
 
     // Get the current user's ID for usage tracking
     const { data: { session: currentSession } } = await supabase.auth.getSession();
@@ -101,7 +97,6 @@ function AnalyzerContent() {
       weight_kg,
       waist_cm,
       hip_cm,
-      neck_cm,
       user_id: userId,
     };
 
@@ -325,16 +320,6 @@ function AnalyzerContent() {
               />
             </div>
 
-            <div className="field-group">
-              <label className="field-label">Neck (inches)</label>
-              <input
-                type="number"
-                min="0"
-                className="field-input"
-                value={neckIn}
-                onChange={(e) => setNeckIn(e.target.value)}
-              />
-            </div>
           </div>
 
           {/* Trigger measurement analysis */}
