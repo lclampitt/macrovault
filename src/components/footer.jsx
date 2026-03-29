@@ -27,7 +27,7 @@ export default function Footer() {
           <div className="footer-links-grid">
             <div className="footer-links-list">
               <Link to="/" className="footer-link">Home</Link>
-              <Link to="/analyzer" className="footer-link">Analyzer</Link>
+              <Link to="/measurements" className="footer-link">Measurements</Link>
               <Link to="/calculators" className="footer-link">Calculators</Link>
             </div>
 

@@ -379,7 +379,7 @@ function DailyChecklist({ userId }) {
 function QuickLinks() {
   const navigate = useNavigate();
   const links = [
-    { label: 'Body Analysis', icon: ScanLine,  route: '/analyzer' },
+    { label: 'Body Analysis', icon: ScanLine,  route: '/measurements' },
     { label: 'Progress',      icon: BarChart2, route: '/progress' },
     { label: 'Workouts',      icon: Dumbbell,  route: '/workouts' },
     { label: 'Exercise Library', icon: BookOpen, route: '/exercises' },

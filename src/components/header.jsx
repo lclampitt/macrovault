@@ -7,7 +7,7 @@ export default function Header({ onLogout, session }) {
   // Main navigation entries used across the app
   const navLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Analyzer', path: '/analyzer' },
+    { label: 'Measurements', path: '/measurements' },
     { label: 'Calculators', path: '/calculators' },
     { label: 'Goal Planner', path: '/goalplanner' },
     { label: 'Workouts', path: '/workouts' },   // Workouts page

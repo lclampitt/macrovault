@@ -171,7 +171,7 @@ function App() {
 
       {/* Protected — all inside AppShell */}
       <Route path="/home"                element={protect(<Dashboard />)} />
-      <Route path="/analyzer"            element={protect(<Analyzer isPro={isPro} />)} />
+      <Route path="/measurements"            element={protect(<Analyzer isPro={isPro} />)} />
       <Route path="/calculators"         element={protect(<Calculators isPro={isPro} />)} />
       <Route path="/calculators/macros"   element={protect(<MacroCalculator />)} />
       <Route path="/calculators/1rm"     element={protect(<OneRepMaxCalculator />)} />
