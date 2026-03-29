@@ -24,42 +24,6 @@
   margin: -10px 0 0;
 }
 
-/* ── Mode toggle pills ──────────────────────────────────────── */
-.analyzer-mode-toggle-container {
-  display: flex;
-}
-
-.mode-pill-group {
-  display: inline-flex;
-  padding: 3px;
-  border-radius: 8px;
-  background: var(--bg-base);
-  border: 1px solid var(--border);
-}
-
-.mode-pill {
-  border: none;
-  padding: 7px 18px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-  background: transparent;
-  color: var(--text-muted);
-  font-weight: 500;
-  transition: all var(--transition-fast);
-}
-
-.mode-pill:hover {
-  color: var(--text-primary);
-}
-
-.mode-pill.active {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(29, 158, 117, 0.35);
-}
-
 /* ── Measurement card ───────────────────────────────────────── */
 .measurement-card {
   background: var(--bg-surface);
@@ -137,61 +101,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-}
-
-/* ── Photo upload card ──────────────────────────────────────── */
-.upload-card {
-  background: var(--bg-surface);
-  border: 1px dashed var(--accent-dark);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-
-.upload-subtext {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  text-align: center;
-  margin: 0;
-}
-
-.upload-input {
-  display: none;
-}
-
-.upload-label {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 9px 20px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--accent);
-  color: var(--accent-light);
-  background: rgba(29, 158, 117, 0.08);
-  font-weight: 500;
-  font-size: 13px;
-  transition: all var(--transition-fast);
-}
-
-.upload-label:hover {
-  background: rgba(29, 158, 117, 0.16);
-  border-color: var(--accent-light);
-}
-
-.image-preview {
-  text-align: center;
-}
-
-.image-preview img {
-  width: 240px;
-  height: auto;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 /* ── Buttons ────────────────────────────────────────────────── */
