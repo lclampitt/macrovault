@@ -24,6 +24,7 @@ export default function Dropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const wrapperRef = useRef(null);
+  const listboxId = useRef(`dropdown-listbox-${Math.random().toString(36).slice(2)}`).current;
 
   const selectedOption = options.find((o) => o.value === value);
   const displayLabel = selectedOption ? selectedOption.label : null;
@@ -106,6 +107,7 @@ export default function Dropdown({
           type="button"
           role="combobox"
           aria-expanded={isOpen}
+          aria-controls={listboxId}
           aria-haspopup="listbox"
           onClick={() => { setIsOpen((o) => !o); setFocusedIndex(isOpen ? -1 : 0); }}
           onKeyDown={handleKeyDown}
@@ -148,6 +150,7 @@ export default function Dropdown({
         <AnimatePresence>
           {isOpen && (
             <motion.div
+              id={listboxId}
               role="listbox"
               variants={panelVariants}
               initial="hidden"
