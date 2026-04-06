@@ -910,3 +910,100 @@ Return a JSON array of 3 objects only."""
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI suggestion error: {str(e)}")
+
+
+# -------------------------------------------------
+# Meal Planner: AI suggest full week
+# -------------------------------------------------
+class WeekSuggestRequest(BaseModel):
+    user_id: str
+    goal: str = "maintenance"
+    diet_preference: str = "standard"
+    daily_targets: Optional[dict] = None  # {calories, protein, carbs, fat}
+
+@app.post("/meal-planner/suggest-week")
+async def suggest_week(body: WeekSuggestRequest):
+    """Generate a full Mon-Fri meal plan (15 meals) using Claude."""
+    plan = _get_plan(body.user_id)
+    if plan != "pro":
+        raise HTTPException(status_code=403, detail="Pro subscription required.")
+
+    if not anthropic_client:
+        raise HTTPException(status_code=500, detail="AI service not configured.")
+
+    targets = body.daily_targets or {"calories": 2000, "protein": 150, "carbs": 250, "fat": 65}
+
+    try:
+        message = anthropic_client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=4000,
+            system="You are a nutrition expert creating weekly meal plans. Return ONLY valid JSON, no markdown, no explanation.",
+            messages=[{
+                "role": "user",
+                "content": f"""Create a 5-day meal plan (Monday through Friday) with breakfast, lunch, and dinner for someone on a {body.goal} goal with a {body.diet_preference} diet preference.
+
+Daily targets:
+- Calories: {targets.get('calories', 2000)} kcal
+- Protein: {targets.get('protein', 150)}g
+- Carbs: {targets.get('carbs', 250)}g
+- Fat: {targets.get('fat', 65)}g
+
+Each day's 3 meals should roughly add up to the daily targets.
+
+Return a JSON array of 15 objects, each with:
+- day: "monday", "tuesday", "wednesday", "thursday", or "friday"
+- meal_type: "breakfast", "lunch", or "dinner"
+- meal_name: specific and descriptive
+- ingredients: array of strings with precise quantities
+- calories: integer
+- protein_g: number
+- carbs_g: number
+- fat_g: number
+
+Vary the meals across days. Make them realistic and easy to prepare. Return the JSON array only."""
+            }]
+        )
+
+        text = message.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+            if text.endswith("```"):
+                text = text[:-3]
+            text = text.strip()
+
+        meals = json.loads(text)
+        return {"suggestions": meals}
+
+    except json.JSONDecodeError:
+        # Fallback: generate a basic week plan
+        days = ["monday", "tuesday", "wednesday", "thursday", "friday"]
+        fallback = []
+        breakfast_opts = [
+            {"meal_name": "Greek Yogurt Parfait", "ingredients": ["200g Greek yogurt", "30g granola", "100g mixed berries"], "calories": 350, "protein_g": 25, "carbs_g": 45, "fat_g": 8},
+            {"meal_name": "Egg White Omelette", "ingredients": ["4 egg whites", "30g spinach", "30g feta cheese", "1 toast"], "calories": 280, "protein_g": 28, "carbs_g": 20, "fat_g": 8},
+            {"meal_name": "Overnight Oats", "ingredients": ["60g oats", "200ml almond milk", "1 scoop protein powder", "1 banana"], "calories": 420, "protein_g": 30, "carbs_g": 55, "fat_g": 10},
+            {"meal_name": "Protein Pancakes", "ingredients": ["2 eggs", "1 banana", "30g protein powder", "15ml maple syrup"], "calories": 380, "protein_g": 32, "carbs_g": 40, "fat_g": 10},
+            {"meal_name": "Avocado Toast with Eggs", "ingredients": ["2 slices sourdough", "1/2 avocado", "2 eggs", "cherry tomatoes"], "calories": 420, "protein_g": 20, "carbs_g": 35, "fat_g": 22},
+        ]
+        lunch_opts = [
+            {"meal_name": "Grilled Chicken Salad", "ingredients": ["150g chicken breast", "100g mixed greens", "50g tomatoes", "30g feta", "15ml dressing"], "calories": 450, "protein_g": 42, "carbs_g": 15, "fat_g": 22},
+            {"meal_name": "Turkey Wrap", "ingredients": ["120g turkey breast", "1 tortilla", "30g hummus", "50g greens", "30g avocado"], "calories": 420, "protein_g": 35, "carbs_g": 35, "fat_g": 15},
+            {"meal_name": "Tuna Rice Bowl", "ingredients": ["150g tuna", "150g brown rice", "50g edamame", "30g cucumber"], "calories": 480, "protein_g": 40, "carbs_g": 50, "fat_g": 10},
+            {"meal_name": "Chicken Burrito Bowl", "ingredients": ["150g chicken", "100g rice", "50g black beans", "30g salsa", "30g cheese"], "calories": 520, "protein_g": 40, "carbs_g": 50, "fat_g": 15},
+            {"meal_name": "Salmon Poke Bowl", "ingredients": ["130g salmon", "150g sushi rice", "50g cucumber", "30g avocado", "15ml soy sauce"], "calories": 490, "protein_g": 35, "carbs_g": 48, "fat_g": 18},
+        ]
+        dinner_opts = [
+            {"meal_name": "Salmon with Vegetables", "ingredients": ["180g salmon", "150g broccoli", "150g sweet potato"], "calories": 520, "protein_g": 40, "carbs_g": 35, "fat_g": 22},
+            {"meal_name": "Lean Beef Stir Fry", "ingredients": ["150g beef strips", "100g bell peppers", "80g snap peas", "150g rice"], "calories": 550, "protein_g": 38, "carbs_g": 55, "fat_g": 15},
+            {"meal_name": "Chicken Pasta", "ingredients": ["130g chicken", "80g penne", "100g marinara sauce", "20g parmesan"], "calories": 500, "protein_g": 42, "carbs_g": 48, "fat_g": 12},
+            {"meal_name": "Turkey Meatballs", "ingredients": ["150g ground turkey", "80g spaghetti", "100g tomato sauce", "parsley"], "calories": 480, "protein_g": 38, "carbs_g": 45, "fat_g": 14},
+            {"meal_name": "Shrimp Tacos", "ingredients": ["150g shrimp", "3 corn tortillas", "50g cabbage slaw", "30g avocado", "lime"], "calories": 450, "protein_g": 35, "carbs_g": 40, "fat_g": 15},
+        ]
+        for i, day in enumerate(days):
+            fallback.append({**breakfast_opts[i], "day": day, "meal_type": "breakfast"})
+            fallback.append({**lunch_opts[i], "day": day, "meal_type": "lunch"})
+            fallback.append({**dinner_opts[i], "day": day, "meal_type": "dinner"})
+        return {"suggestions": fallback}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI week suggestion error: {str(e)}")
