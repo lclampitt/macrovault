@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { Lock } from 'lucide-react';
 import '../styles/header.css';
 
 export default function Header({ onLogout, session }) {
@@ -21,11 +22,7 @@ export default function Header({ onLogout, session }) {
         {/* Brand section: logo + app name */}
         <Link to="/" className="header-brand">
           <div className="header-logo-wrapper">
-            <img
-              src="/images/gainlyticslogo.png"
-              alt="MacroVault Logo"
-              className="header-logo-img"
-            />
+            <Lock size={18} className="header-logo-img" />
           </div>
           <span className="header-logo-text">MacroVault</span>
         </Link>

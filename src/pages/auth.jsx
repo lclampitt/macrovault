@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Lock } from 'lucide-react';
 import '../styles/auth.css';
 
 const fadeUp = {
@@ -105,7 +106,7 @@ function AuthPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: 'easeOut' }}
       >
-        <img src="/images/gainlyticslogo.png" alt="MacroVault" className="auth-logo__icon" />
+        <span className="auth-logo__icon"><Lock size={20} /></span>
         <span className="auth-logo__name">MacroVault</span>
       </motion.div>
 

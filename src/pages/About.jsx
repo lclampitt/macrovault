@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Zap, Shield } from 'lucide-react';
+import { Heart, Zap, Shield, Lock } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import '../styles/landing.css';
 import '../styles/about.css';
@@ -52,7 +52,7 @@ function Navbar() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
     >
       <Link to="/" className="lp-nav__logo">
-        <img src="/images/gainlyticslogo.png" alt="MacroVault" className="lp-nav__logo-icon" />
+        <span className="lp-nav__logo-icon"><Lock size={16} /></span>
         <span className="lp-nav__logo-name">MacroVault</span>
       </Link>
 
@@ -216,7 +216,7 @@ export default function About() {
           <div className="lp-footer__top">
             <div className="lp-footer__brand">
               <Link to="/" className="lp-footer__logo">
-                <img src="/images/gainlyticslogo.png" alt="MacroVault" className="lp-footer__logo-icon" />
+                <span className="lp-footer__logo-icon"><Lock size={14} /></span>
                 <span className="lp-footer__logo-name">MacroVault</span>
               </Link>
               <p className="lp-footer__tagline">

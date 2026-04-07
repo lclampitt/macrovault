@@ -36,7 +36,11 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  object-fit: cover;
+  background: #1D9E75;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   flex-shrink: 0;
 }
 
@@ -680,7 +684,11 @@
   width: 26px;
   height: 26px;
   border-radius: 7px;
-  object-fit: cover;
+  background: #1D9E75;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   flex-shrink: 0;
 }
 

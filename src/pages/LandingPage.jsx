@@ -12,6 +12,7 @@ import {
   Zap,
   Sun,
   Moon,
+  Lock,
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useTheme } from '../hooks/useTheme';
@@ -110,7 +111,7 @@ function Navbar() {
       transition={{ duration: 0.2 }}
     >
       <Link to="/" className="lp-nav__logo">
-        <img src="/images/gainlyticslogo.png" alt="MacroVault" className="lp-nav__logo-icon" />
+        <span className="lp-nav__logo-icon"><Lock size={16} /></span>
         <span className="lp-nav__logo-name">MacroVault</span>
       </Link>
 
@@ -454,7 +455,7 @@ function Footer() {
         <div className="lp-footer__top">
           <div className="lp-footer__brand">
             <Link to="/" className="lp-footer__logo">
-              <img src="/images/gainlyticslogo.png" alt="MacroVault" className="lp-footer__logo-icon" />
+              <span className="lp-footer__logo-icon"><Lock size={14} /></span>
               <span className="lp-footer__logo-name">MacroVault</span>
             </Link>
             <p className="lp-footer__tagline">
