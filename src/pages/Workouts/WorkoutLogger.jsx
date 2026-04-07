@@ -24,7 +24,7 @@ const fadeUp = {
 
 export default function WorkoutLogger() {
   const { triggerUpgrade } = useUpgrade();
-  const { plan } = usePlan();
+  const { plan, isPro } = usePlan();
 
   const MUSCLE_GROUPS = ['Upper Body', 'Lower Body', 'Legs', 'Full Body', 'Core', 'Cardio'];
 
@@ -204,7 +204,7 @@ export default function WorkoutLogger() {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const atLimit = plan !== 'pro' && workoutHistory.length >= 10;
+  const atLimit = !isPro && workoutHistory.length >= 10;
 
   return (
     <div className="wl">
@@ -220,7 +220,7 @@ export default function WorkoutLogger() {
         <div className="wl-log-header">
           <div>
             <p className="wl-section-title">Log a workout</p>
-            {plan !== 'pro' && workoutHistory.length > 0 && (
+            {!isPro && workoutHistory.length > 0 && (
               <p style={{
                 fontSize: 11,
                 color: workoutHistory.length >= 8 ? '#EF9F27' : 'var(--text-muted)',

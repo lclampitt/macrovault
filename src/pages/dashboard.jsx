@@ -496,7 +496,7 @@ function DailyMacrosCard({ caloriesLogged, calorieGoal, proteinLogged, proteinGo
 export default function Dashboard() {
   const navigate = useNavigate();
   const { triggerUpgrade } = useUpgrade();
-  const { plan } = usePlan();
+  const { plan, isPro } = usePlan();
   const hour     = new Date().getHours();
   const today    = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -534,7 +534,7 @@ export default function Dashboard() {
 
   // Fetch goals + today's food totals, then subscribe to live changes
   useEffect(() => {
-    if (!session?.user?.id || plan !== 'pro') return;
+    if (!session?.user?.id || !isPro) return;
     const uid       = session.user.id;
     const todayDate = new Date().toISOString().slice(0, 10);
 
@@ -607,7 +607,7 @@ export default function Dashboard() {
               index={2}
             >
               <div style={{ position: 'relative' }}>
-                <div style={{ filter: plan !== 'pro' ? 'blur(4px)' : 'none', pointerEvents: plan !== 'pro' ? 'none' : 'auto', userSelect: plan !== 'pro' ? 'none' : 'auto' }}>
+                <div style={{ filter: !isPro ? 'blur(4px)' : 'none', pointerEvents: !isPro ? 'none' : 'auto', userSelect: !isPro ? 'none' : 'auto' }}>
                   <DailyMacrosCard
                     caloriesLogged={caloriesLogged}
                     calorieGoal={calorieGoal}
@@ -619,7 +619,7 @@ export default function Dashboard() {
                     fatGoal={fatGoal}
                   />
                 </div>
-                {plan !== 'pro' && (
+                {!isPro && (
                   <div className="dm__lock-overlay">
                     <Lock size={18} style={{ color: '#1D9E75' }} />
                     <span className="dm__lock-label">Pro feature</span>
