@@ -629,4 +629,270 @@
   .mob-action-sheet__item--cancel:active {
     background: #2a3548;
   }
+
+  /* ── Mobile top bar right group ── */
+  .mob-topbar__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mob-topbar__theme-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #1e2536;
+    border: 1px solid #2a3548;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mob-topbar__theme-btn:active {
+    background: #2a3548;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Quick Theme Sheet ── */
+  .mob-theme-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 80;
+  }
+
+  .mob-theme-sheet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #161b27;
+    border-radius: 20px 20px 0 0;
+    border-top: 1px solid var(--accent);
+    z-index: 90;
+    padding: 0 0 calc(20px + env(safe-area-inset-bottom)) 0;
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mob-theme-sheet__handle {
+    width: 36px;
+    height: 4px;
+    background: #2a3548;
+    border-radius: 99px;
+    margin: 12px auto 12px;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .mob-theme-sheet__header {
+    padding: 0 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #1e2536;
+    flex-shrink: 0;
+  }
+
+  .mob-theme-sheet__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .mob-theme-sheet__done {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-family: inherit;
+  }
+
+  /* ── Theme sheet sections ── */
+  .mob-theme-sheet__section {
+    padding: 16px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mob-theme-sheet__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* UI mode + dark/light pills */
+  .mob-theme-sheet__pills {
+    display: flex;
+    gap: 8px;
+  }
+
+  .mob-theme-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    border: 1px solid #2a3548;
+    background: #0f1117;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mob-theme-pill--active {
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.12);
+    color: var(--accent-light);
+  }
+
+  /* Color theme dot grid */
+  .mob-theme-sheet__colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .mob-theme-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
+  }
+
+  .mob-theme-dot__circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .mob-theme-dot--active .mob-theme-dot__circle {
+    border-color: #fff;
+    transform: scale(1.1);
+  }
+
+  .mob-theme-dot__check {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    color: #fff;
+    background: var(--accent);
+    border-radius: 50%;
+    padding: 2px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .mob-theme-dot__name {
+    font-size: 9px;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  .mob-theme-dot--active .mob-theme-dot__name {
+    color: var(--accent-light);
+  }
+
+  /* Full settings link */
+  .mob-theme-sheet__link {
+    margin: 16px 20px 0;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #1e2536;
+    background: #0f1117;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mob-theme-sheet__link:active {
+    background: #1e2536;
+  }
+
+  /* Pro note */
+  .mob-theme-sheet__pro-note {
+    margin: 12px 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #666;
+    justify-content: center;
+  }
+
+  .mob-theme-sheet__pro-note svg {
+    color: var(--accent);
+  }
+
+  /* ── More sheet theme indicator row ── */
+  .mob-more-theme-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 16px 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #0f1117;
+    border: 1px solid #1e2536;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mob-more-theme-row:active {
+    border-color: var(--accent);
+    background: #1e2536;
+  }
+
+  .mob-more-theme-row__dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .mob-more-theme-row__text {
+    font-size: 13px;
+    color: #888;
+    flex: 1;
+  }
+
+  .mob-more-theme-row__icon {
+    color: #555;
+    flex-shrink: 0;
+  }
 }

@@ -23,6 +23,8 @@ import {
   TrendingUp,
   LayoutGrid,
   X,
+  Palette,
+  Check,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import './Sidebar.css';
@@ -57,6 +59,19 @@ const MORE_PAGES = [
 ];
 
 const MORE_ROUTES = ['/goalplanner', '/calculators', '/exercises', '/measurements', '/settings'];
+
+const QUICK_THEMES = [
+  { id: 'teal',       label: 'Teal',       color: '#1D9E75' },
+  { id: 'blue',       label: 'Blue',       color: '#3B82F6' },
+  { id: 'orange',     label: 'Orange',     color: '#F97316' },
+  { id: 'rose',       label: 'Rose',       color: '#F43F5E' },
+  { id: 'violet',     label: 'Violet',     color: '#8B5CF6' },
+  { id: 'crimson',    label: 'Crimson',    color: '#DC2626' },
+  { id: 'spectrum',   label: 'Spectrum',   color: '#7C3AED',  gradient: 'linear-gradient(135deg, #7C3AED, #2563EB, #DB2777)' },
+  { id: 'xp-aqua',    label: 'XP Aqua',    color: '#00BFFF',  gradient: 'linear-gradient(135deg, #00BFFF, #39FF14)', retro: true },
+  { id: 'myspace',    label: 'MySpace',    color: '#FF00FF',  gradient: 'linear-gradient(135deg, #FF00FF, #8800FF)', retro: true },
+  { id: 'y2k-chrome', label: 'Y2K Chrome', color: '#FFD700',  gradient: 'linear-gradient(135deg, #888, #FFD700)', retro: true },
+];
 
 const getNavColor = (route, accent) => {
   if (accent === 'spectrum') {
@@ -100,6 +115,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
+  const [themeSheetOpen, setThemeSheetOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -107,8 +123,8 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
   const isMoreActive = moreOpen || isOverflowPage;
 
   // Close More sheet on route change
-  useEffect(() => { setMoreOpen(false); }, [location.pathname]);
-  const { theme, toggle: toggleTheme, isDark, isSpectrum, isXpAqua, isMyspace, isY2kChrome, isRetro, accent, isY2K } = useTheme();
+  useEffect(() => { setMoreOpen(false); setThemeSheetOpen(false); }, [location.pathname]);
+  const { theme, toggle: toggleTheme, isDark, isSpectrum, isXpAqua, isMyspace, isY2kChrome, isRetro, accent, isY2K, uiMode, setAccent, setUiMode } = useTheme();
 
   const userEmail = session?.user?.email ?? '';
   const emailFallback = userEmail.split('@')[0] || 'User';
@@ -435,14 +451,23 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
           <div className="mob-topbar__logo-icon" style={isSpectrum ? { background: 'linear-gradient(135deg, #7C3AED, #2563EB)' } : isXpAqua ? { background: 'linear-gradient(135deg, #00BFFF, #39FF14)' } : isMyspace ? { background: 'linear-gradient(135deg, #FF00FF, #8800FF)' } : isY2kChrome ? { background: 'linear-gradient(135deg, #888888, #FFD700)' } : undefined}><Lock size={16} /></div>
           <span className="mob-topbar__logo-name">MacroVault</span>
         </Link>
-        <button
-          className="mob-topbar__avatar"
-          onClick={() => setActionSheetOpen(true)}
-          aria-label="Open user menu"
-          style={isSpectrum ? { background: 'linear-gradient(135deg, #7C3AED, #DB2777)' } : isXpAqua ? { background: 'linear-gradient(135deg, #00BFFF, #39FF14)' } : isMyspace ? { background: 'linear-gradient(135deg, #FF00FF, #8800FF)' } : isY2kChrome ? { background: 'linear-gradient(135deg, #888888, #FFD700)' } : undefined}
-        >
-          {initials}
-        </button>
+        <div className="mob-topbar__right">
+          <button
+            className="mob-topbar__theme-btn"
+            onClick={() => setThemeSheetOpen(true)}
+            aria-label="Quick theme switcher"
+          >
+            <Palette size={16} />
+          </button>
+          <button
+            className="mob-topbar__avatar"
+            onClick={() => setActionSheetOpen(true)}
+            aria-label="Open user menu"
+            style={isSpectrum ? { background: 'linear-gradient(135deg, #7C3AED, #DB2777)' } : isXpAqua ? { background: 'linear-gradient(135deg, #00BFFF, #39FF14)' } : isMyspace ? { background: 'linear-gradient(135deg, #FF00FF, #8800FF)' } : isY2kChrome ? { background: 'linear-gradient(135deg, #888888, #FFD700)' } : undefined}
+          >
+            {initials}
+          </button>
+        </div>
       </div>
 
       {/* ── Mobile bottom nav — 5 tabs ── */}
@@ -525,6 +550,129 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
                 })}
                 <div className="mob-more-item mob-more-item--empty" />
               </div>
+              {/* Theme indicator row */}
+              <button
+                className="mob-more-theme-row"
+                onClick={() => { setMoreOpen(false); setTimeout(() => setThemeSheetOpen(true), 200); }}
+              >
+                <span
+                  className="mob-more-theme-row__dot"
+                  style={{ background: (QUICK_THEMES.find(t => t.id === accent)?.gradient || QUICK_THEMES.find(t => t.id === accent)?.color || 'var(--accent)') }}
+                />
+                <span className="mob-more-theme-row__text">
+                  {uiMode === 'y2k' ? 'Y2K' : 'Modern'} · {QUICK_THEMES.find(t => t.id === accent)?.label || accent}
+                </span>
+                <Palette size={14} className="mob-more-theme-row__icon" />
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Quick Theme Sheet ── */}
+      <AnimatePresence>
+        {themeSheetOpen && (
+          <>
+            <motion.div
+              className="mob-theme-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setThemeSheetOpen(false)}
+            />
+            <motion.div
+              className="mob-theme-sheet"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 280 }}
+            >
+              <div className="mob-theme-sheet__handle" />
+              <div className="mob-theme-sheet__header">
+                <span className="mob-theme-sheet__title">Appearance</span>
+                <button className="mob-theme-sheet__done" onClick={() => setThemeSheetOpen(false)}>Done</button>
+              </div>
+
+              {/* UI Mode */}
+              <div className="mob-theme-sheet__section">
+                <span className="mob-theme-sheet__label">UI Mode</span>
+                <div className="mob-theme-sheet__pills">
+                  <button
+                    className={`mob-theme-pill${uiMode === 'modern' ? ' mob-theme-pill--active' : ''}`}
+                    onClick={() => isPro && setUiMode('modern')}
+                  >
+                    Modern
+                  </button>
+                  <button
+                    className={`mob-theme-pill${uiMode === 'y2k' ? ' mob-theme-pill--active' : ''}`}
+                    onClick={() => isPro && setUiMode('y2k')}
+                  >
+                    Y2K
+                  </button>
+                </div>
+              </div>
+
+              {/* Dark / Light */}
+              {!isRetro && (
+                <div className="mob-theme-sheet__section">
+                  <span className="mob-theme-sheet__label">Mode</span>
+                  <div className="mob-theme-sheet__pills">
+                    <button
+                      className={`mob-theme-pill${isDark ? ' mob-theme-pill--active' : ''}`}
+                      onClick={() => isPro && !isDark && toggleTheme()}
+                    >
+                      <Moon size={14} /> Dark
+                    </button>
+                    <button
+                      className={`mob-theme-pill${!isDark ? ' mob-theme-pill--active' : ''}`}
+                      onClick={() => isPro && isDark && toggleTheme()}
+                    >
+                      <Sun size={14} /> Light
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Color themes */}
+              <div className="mob-theme-sheet__section">
+                <span className="mob-theme-sheet__label">Color</span>
+                <div className="mob-theme-sheet__colors">
+                  {QUICK_THEMES.map((t) => (
+                    <button
+                      key={t.id}
+                      className={`mob-theme-dot${accent === t.id ? ' mob-theme-dot--active' : ''}`}
+                      onClick={() => {
+                        if (!isPro) return;
+                        if (t.retro && theme !== 'dark') toggleTheme();
+                        setAccent(t.id);
+                      }}
+                    >
+                      <span
+                        className="mob-theme-dot__circle"
+                        style={{ background: t.gradient || t.color }}
+                      />
+                      {accent === t.id && <Check size={10} className="mob-theme-dot__check" />}
+                      <span className="mob-theme-dot__name">{t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Full settings link */}
+              <button
+                className="mob-theme-sheet__link"
+                onClick={() => { setThemeSheetOpen(false); navigate('/settings'); }}
+              >
+                Full appearance settings →
+              </button>
+
+              {!isPro && (
+                <div className="mob-theme-sheet__pro-note">
+                  <Lock size={12} />
+                  <span>Pro feature — themes require a Pro subscription</span>
+                </div>
+              )}
             </motion.div>
           </>
         )}

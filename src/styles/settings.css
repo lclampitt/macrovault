@@ -355,6 +355,43 @@
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .settings-accent-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .settings-accent-card {
+    padding: 12px;
+  }
+
+  .settings-theme-picker {
+    width: 100%;
+  }
+
+  .settings-theme-card {
+    flex: 1;
+    width: auto;
+  }
+
+  .settings-toggle__opt {
+    padding: 8px 16px;
+  }
+
+  .settings-retro-card__preview {
+    height: 60px;
+  }
+
+  .settings-card__body {
+    padding: 18px 16px;
+  }
+
+  .settings-card__header {
+    padding: 14px 16px 12px;
+  }
+
+  .settings-divider {
+    margin: 14px -16px;
+  }
 }
 
 /* ── Appearance pro-lock overlay ── */
