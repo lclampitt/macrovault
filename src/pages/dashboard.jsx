@@ -10,12 +10,13 @@ import { usePlan } from '../hooks/usePlan';
 import { useUpgrade } from '../context/UpgradeContext';
 import BentoCard from '../components/ui/BentoCard';
 import { supabase } from '../supabaseClient';
+import { useTheme } from '../hooks/useTheme';
 import '../styles/dashboard.css';
 
 /* ============================================================
    CONSISTENCY CALENDAR
    ============================================================ */
-function ConsistencyCalendar({ userId }) {
+function ConsistencyCalendar({ userId, isSpectrum }) {
   const STORAGE_KEY = 'macrovault_consistency_calendar_v1';
   const today = new Date();
 
@@ -185,7 +186,10 @@ function ConsistencyCalendar({ userId }) {
             <span>{monthLabel}</span>
             <button onClick={goForward}>›</button>
           </div>
-          <span className="cal__consistency">{consistency}% consistent</span>
+          <span
+            className="cal__consistency"
+            style={isSpectrum ? { background: '#0a1a0f', border: '1px solid #1D9E75', color: '#5DCAA5' } : undefined}
+          >{consistency}% consistent</span>
         </div>
         <div className="cal__weekdays">
           {['S','M','T','W','T','F','S'].map((d, i) => <span key={i}>{d}</span>)}
@@ -200,11 +204,12 @@ function ConsistencyCalendar({ userId }) {
               <motion.button
                 key={i}
                 className={`cal__cell ${isActive ? 'cal__cell--active' : ''}`}
+                style={isSpectrum && isActive ? { backgroundColor: '#1D9E75' } : undefined}
                 onClick={() => toggleDay(day)}
                 whileTap={{ scale: 0.8 }}
               >
                 <span className="cal__day-num">{day}</span>
-                {hasData && <span className="cal__dot" />}
+                {hasData && <span className="cal__dot" style={isSpectrum ? { backgroundColor: '#1D9E75' } : undefined} />}
                 {userId && (
                   <span
                     className="cal__info-btn"
@@ -272,9 +277,12 @@ function ConsistencyCalendar({ userId }) {
 /* ============================================================
    DAILY CHECKLIST
    ============================================================ */
-function CheckCircle({ checked }) {
+function CheckCircle({ checked, checkColor, bgColor }) {
   return (
-    <div className={`dc__circle ${checked ? 'dc__circle--checked' : ''}`}>
+    <div
+      className={`dc__circle ${checked ? 'dc__circle--checked' : ''}`}
+      style={checked && bgColor ? { backgroundColor: bgColor } : undefined}
+    >
       <AnimatePresence>
         {checked && (
           <motion.span
@@ -283,6 +291,7 @@ function CheckCircle({ checked }) {
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            style={checkColor ? { color: checkColor } : undefined}
           >
             ✓
           </motion.span>
@@ -292,9 +301,15 @@ function CheckCircle({ checked }) {
   );
 }
 
-function DailyChecklist({ userId }) {
+function DailyChecklist({ userId, isSpectrum }) {
   const navigate = useNavigate();
   const confettiFired = useRef(false);
+
+  const spectrumColors = {
+    workout:   { check: 'var(--color-workouts)',       bg: 'var(--color-workouts-bg)' },
+    nutrition: { check: 'var(--color-calories)',        bg: 'var(--color-calories-bg)' },
+    progress:  { check: 'var(--color-progress-chart)',  bg: 'var(--color-progress-bg)' },
+  };
 
   const items = [
     { key: 'workout',   label: 'Log your workout',     route: '/workouts' },
@@ -332,9 +347,9 @@ function DailyChecklist({ userId }) {
   useEffect(() => {
     if (allDone && !confettiFired.current) {
       confettiFired.current = true;
-      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#1D9E75', '#5DCAA5', '#fff'] });
+      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: isSpectrum ? ['#7C3AED', '#2563EB', '#EA580C', '#DB2777', '#1D9E75', '#EF9F27'] : ['var(--accent)', 'var(--accent-light)', '#fff'] });
     }
-  }, [allDone]);
+  }, [allDone, isSpectrum]);
 
   if (loading) return <p className="dc__loading">Checking today…</p>;
 
@@ -360,10 +375,14 @@ function DailyChecklist({ userId }) {
             key={key}
             className={`dc__item ${checks[key] ? 'dc__item--done' : ''}`}
             onClick={() => navigate(route)}
-            whileHover={{ backgroundColor: checks[key] ? 'var(--accent-bg)' : 'rgba(29,158,117,0.06)' }}
+            whileHover={{ backgroundColor: checks[key] ? 'var(--accent-bg)' : 'rgba(var(--accent-rgb),0.06)' }}
             transition={{ duration: 0.15 }}
           >
-            <CheckCircle checked={checks[key]} />
+            <CheckCircle
+              checked={checks[key]}
+              checkColor={isSpectrum && checks[key] ? spectrumColors[key].check : undefined}
+              bgColor={isSpectrum && checks[key] ? spectrumColors[key].bg : undefined}
+            />
             <span className="dc__label">{label}</span>
             <ArrowUpRight size={12} className="dc__arrow" />
           </motion.li>
@@ -377,19 +396,19 @@ function DailyChecklist({ userId }) {
 /* ============================================================
    QUICK LINKS
    ============================================================ */
-function QuickLinks() {
+function QuickLinks({ isSpectrum }) {
   const navigate = useNavigate();
   const links = [
-    { label: 'Measurements', icon: Ruler,     route: '/measurements' },
-    { label: 'Progress',      icon: BarChart2, route: '/progress' },
-    { label: 'Workouts',      icon: Dumbbell,  route: '/workouts' },
-    { label: 'Exercise Library', icon: BookOpen, route: '/exercises' },
+    { label: 'Measurements', icon: Ruler,     route: '/measurements', spectrumColor: '#7C3AED' },
+    { label: 'Progress',      icon: BarChart2, route: '/progress',     spectrumColor: '#EF9F27' },
+    { label: 'Workouts',      icon: Dumbbell,  route: '/workouts',     spectrumColor: '#1D9E75' },
+    { label: 'Exercise Library', icon: BookOpen, route: '/exercises',  spectrumColor: '#5DCAA5' },
   ];
   return (
     <div className="quick-links">
-      {links.map(({ label, icon: Icon, route }) => (
+      {links.map(({ label, icon: Icon, route, spectrumColor }) => (
         <button key={route} className="quick-links__item" onClick={() => navigate(route)}>
-          <Icon size={20} className="quick-links__icon" />
+          <Icon size={20} className="quick-links__icon" style={isSpectrum ? { color: spectrumColor } : undefined} />
           <span>{label}</span>
         </button>
       ))}
@@ -401,10 +420,11 @@ function QuickLinks() {
 /* ============================================================
    STREAK BADGE
    ============================================================ */
-function StreakBadge({ streak }) {
+function StreakBadge({ streak, isSpectrum }) {
   return (
     <motion.div
       className="streak-badge"
+      style={isSpectrum ? { color: 'var(--color-streak)' } : undefined}
       animate={{ scale: [1, 1.05, 1] }}
       transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
     >
@@ -419,19 +439,20 @@ function StreakBadge({ streak }) {
    ============================================================ */
 const CIRC = 2 * Math.PI * 40;
 
-function DailyMacrosCard({ caloriesLogged, calorieGoal, proteinLogged, proteinGoal, carbsLogged, carbsGoal, fatLogged, fatGoal }) {
+function DailyMacrosCard({ caloriesLogged, calorieGoal, proteinLogged, proteinGoal, carbsLogged, carbsGoal, fatLogged, fatGoal, isSpectrum }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { const id = requestAnimationFrame(() => setMounted(true)); return () => cancelAnimationFrame(id); }, []);
 
   const calPct    = calorieGoal > 0 ? Math.min(caloriesLogged / calorieGoal, 1) : 0;
   const calOver   = calorieGoal != null && caloriesLogged > calorieGoal;
   const ringOffset = mounted ? CIRC * (1 - calPct) : CIRC;
-  const ringColor  = calOver ? '#EF9F27' : '#1D9E75';
+  const ringColor  = calOver ? '#EF9F27' : isSpectrum ? 'var(--color-calories)' : 'var(--accent)';
+  const ringTextColor = isSpectrum ? 'var(--color-calories-light)' : 'var(--text-primary)';
 
   const macros = [
-    { name: 'Protein', logged: proteinLogged, goal: proteinGoal, color: '#1D9E75' },
-    { name: 'Carbs',   logged: carbsLogged,   goal: carbsGoal,   color: '#5DCAA5' },
-    { name: 'Fat',     logged: fatLogged,     goal: fatGoal,     color: '#0F6E56' },
+    { name: 'Protein', logged: proteinLogged, goal: proteinGoal, color: isSpectrum ? 'var(--color-protein)' : 'var(--accent)' },
+    { name: 'Carbs',   logged: carbsLogged,   goal: carbsGoal,   color: isSpectrum ? 'var(--color-carbs)' : 'var(--accent-light)' },
+    { name: 'Fat',     logged: fatLogged,     goal: fatGoal,     color: isSpectrum ? 'var(--color-fat)' : 'var(--accent-dark)' },
   ];
 
   const hasGoal = calorieGoal != null || proteinGoal != null;
@@ -454,7 +475,7 @@ function DailyMacrosCard({ caloriesLogged, calorieGoal, proteinLogged, proteinGo
             transform="rotate(-90 50 50)"
             style={{ transition: 'stroke-dashoffset 0.8s ease-out, stroke 0.3s ease' }}
           />
-          <text x="50" y="43" textAnchor="middle" fontSize="15" fontWeight="500" fill="var(--text-primary)" fontFamily="inherit">{caloriesLogged.toLocaleString()}</text>
+          <text x="50" y="43" textAnchor="middle" fontSize="15" fontWeight="500" fill={ringTextColor} fontFamily="inherit">{caloriesLogged.toLocaleString()}</text>
           <text x="50" y="60" textAnchor="middle" fontSize="9"  fill="var(--text-muted)" fontFamily="inherit">kcal</text>
         </svg>
         <p className="dm__ring-sub">
@@ -498,6 +519,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { triggerUpgrade } = useUpgrade();
   const { plan, isPro } = usePlan();
+  const { isSpectrum } = useTheme();
   const hour     = new Date().getHours();
   const today    = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -587,7 +609,7 @@ export default function Dashboard() {
           <h1 className="dashboard-v2__greeting">{greeting}</h1>
           <p className="dashboard-v2__date">{today}</p>
         </div>
-        {streak > 1 && <StreakBadge streak={streak} />}
+        {streak > 1 && <StreakBadge streak={streak} isSpectrum={isSpectrum} />}
       </div>
 
       {/* Bento grid */}
@@ -595,11 +617,11 @@ export default function Dashboard() {
         return (
           <div className="bento-grid">
             <BentoCard title="Consistency Calendar" span="wide" index={0}>
-              <ConsistencyCalendar userId={session?.user?.id} />
+              <ConsistencyCalendar userId={session?.user?.id} isSpectrum={isSpectrum} />
             </BentoCard>
 
             <BentoCard title="Daily checklist" index={1}>
-              <DailyChecklist userId={session?.user?.id} />
+              <DailyChecklist userId={session?.user?.id} isSpectrum={isSpectrum} />
             </BentoCard>
 
             <BentoCard
@@ -619,11 +641,12 @@ export default function Dashboard() {
                     carbsGoal={carbsGoal}
                     fatLogged={fatLogged}
                     fatGoal={fatGoal}
+                    isSpectrum={isSpectrum}
                   />
                 </div>
                 {!isPro && (
                   <div className="dm__lock-overlay">
-                    <Lock size={18} style={{ color: '#1D9E75' }} />
+                    <Lock size={18} style={{ color: 'var(--accent)' }} />
                     <span className="dm__lock-label">Pro feature</span>
                     <button className="dm__lock-btn" onClick={() => triggerUpgrade('goals')}>
                       Upgrade to Pro
@@ -634,7 +657,7 @@ export default function Dashboard() {
             </BentoCard>
 
             <BentoCard title="Quick Access" index={3}>
-              <QuickLinks />
+              <QuickLinks isSpectrum={isSpectrum} />
             </BentoCard>
           </div>
         );

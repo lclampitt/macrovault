@@ -4,8 +4,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Plus, X, ChevronDown, Check, Loader, Search } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
+import { useTheme } from '../../hooks/useTheme';
 import localExercises from '../../data/exercises.json';
 import '../../styles/ExerciseLibrary.css';
+
+const SPECTRUM_MUSCLE_COLORS = {
+  'chest':     '#EA580C',
+  'back':      '#2563EB',
+  'shoulders': '#7C3AED',
+  'arms':      '#DB2777',
+  'legs':      '#1D9E75',
+  'core':      '#EF9F27',
+  'cardio':    '#60A5FA',
+  'full body': '#5DCAA5',
+};
 
 const PAGE_SIZE = 30;
 
@@ -34,6 +46,21 @@ function titleCase(str = '') {
   return str.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function spectrumColorForBodyPart(bp = '') {
+  const n = bp.toLowerCase();
+  if (n === 'chest')                         return SPECTRUM_MUSCLE_COLORS['chest'];
+  if (n === 'back')                          return SPECTRUM_MUSCLE_COLORS['back'];
+  if (n === 'shoulders')                     return SPECTRUM_MUSCLE_COLORS['shoulders'];
+  if (n === 'upper arms' || n === 'arms')    return SPECTRUM_MUSCLE_COLORS['arms'];
+  if (n === 'lower arms')                    return SPECTRUM_MUSCLE_COLORS['arms'];
+  if (n === 'upper legs' || n === 'legs')    return SPECTRUM_MUSCLE_COLORS['legs'];
+  if (n === 'lower legs')                    return SPECTRUM_MUSCLE_COLORS['legs'];
+  if (n === 'waist' || n === 'core')         return SPECTRUM_MUSCLE_COLORS['core'];
+  if (n === 'full body')                     return SPECTRUM_MUSCLE_COLORS['full body'];
+  if (n === 'cardio')                        return SPECTRUM_MUSCLE_COLORS['cardio'];
+  return SPECTRUM_MUSCLE_COLORS['chest']; // fallback
+}
+
 function difficultyStyle(d) {
   if (d === 'beginner')     return { bg: 'rgba(151, 196, 89, 0.12)', text: '#97C459' };
   if (d === 'intermediate') return { bg: 'rgba(239, 159, 39, 0.12)', text: '#EF9F27' };
@@ -42,7 +69,7 @@ function difficultyStyle(d) {
 }
 
 /* ── Dropdown ─────────────────────────────────────────────── */
-function Dropdown({ label, options, value, onChange }) {
+function Dropdown({ label, options, value, onChange, isSpectrum, spectrumColorMap }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -50,9 +77,17 @@ function Dropdown({ label, options, value, onChange }) {
     document.addEventListener('mousedown', fn);
     return () => document.removeEventListener('mousedown', fn);
   }, []);
+
+  // Spectrum styling for the active button when a specific muscle group is selected
+  const activeSpectrumColor = isSpectrum && spectrumColorMap && value !== 'All'
+    ? spectrumColorMap[value.toLowerCase()] : null;
+  const btnStyle = activeSpectrumColor
+    ? { borderColor: activeSpectrumColor, color: activeSpectrumColor }
+    : undefined;
+
   return (
     <div className="el-dropdown" ref={ref}>
-      <button className="el-dropdown__btn" onClick={() => setOpen((o) => !o)}>
+      <button className="el-dropdown__btn" style={btnStyle} onClick={() => setOpen((o) => !o)}>
         {value === 'All' ? label : value}
         <ChevronDown size={14} className={`el-dropdown__chevron ${open ? 'el-dropdown__chevron--open' : ''}`} />
       </button>
@@ -65,16 +100,22 @@ function Dropdown({ label, options, value, onChange }) {
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
           >
-            {options.map((o) => (
-              <button
-                key={o}
-                className={`el-dropdown__item ${value === o ? 'el-dropdown__item--active' : ''}`}
-                onClick={() => { onChange(o); setOpen(false); }}
-              >
-                {o}
-                {value === o && <Check size={12} />}
-              </button>
-            ))}
+            {options.map((o) => {
+              const isActive = value === o;
+              const itemColor = isSpectrum && spectrumColorMap && isActive && o !== 'All'
+                ? spectrumColorMap[o.toLowerCase()] : null;
+              return (
+                <button
+                  key={o}
+                  className={`el-dropdown__item ${isActive ? 'el-dropdown__item--active' : ''}`}
+                  style={itemColor ? { color: itemColor } : undefined}
+                  onClick={() => { onChange(o); setOpen(false); }}
+                >
+                  {o}
+                  {isActive && <Check size={12} />}
+                </button>
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
@@ -83,8 +124,9 @@ function Dropdown({ label, options, value, onChange }) {
 }
 
 /* ── Exercise Card ────────────────────────────────────────── */
-function ExerciseCard({ exercise, isFavorited, onFavorite, onView, onAdd, index }) {
+function ExerciseCard({ exercise, isFavorited, onFavorite, onView, onAdd, index, isSpectrum }) {
   const { bg, text } = difficultyStyle(exercise.difficulty);
+  const muscleColor = isSpectrum ? spectrumColorForBodyPart(exercise.body_part) : null;
   return (
     <motion.div
       className="el-card"
@@ -96,16 +138,21 @@ function ExerciseCard({ exercise, isFavorited, onFavorite, onView, onAdd, index 
     >
       {/* Typography panel */}
       <div className="el-card__illustration">
-        <div className="el-card__illus-bar" />
-        <p className="el-card__illus-group">{displayBodyPart(exercise.body_part)}</p>
-        <p className="el-card__illus-muscle">{titleCase(exercise.target_muscle)}</p>
+        <div className="el-card__illus-bar" style={muscleColor ? { background: muscleColor } : undefined} />
+        <p className="el-card__illus-group" style={muscleColor ? { color: muscleColor } : undefined}>{displayBodyPart(exercise.body_part)}</p>
+        <p className="el-card__illus-muscle" style={muscleColor ? { color: muscleColor, opacity: 0.7 } : undefined}>{titleCase(exercise.target_muscle)}</p>
       </div>
 
       {/* Info panel */}
       <div className="el-card__info">
         <p className="el-card__name">{exercise.name}</p>
         <div className="el-card__tags">
-          <span className="el-tag el-tag--accent">{exercise.target_muscle}</span>
+          <span
+            className="el-tag el-tag--accent"
+            style={muscleColor ? { background: `${muscleColor}1A`, color: muscleColor } : undefined}
+          >
+            {exercise.target_muscle}
+          </span>
           <span className="el-tag el-tag--gray">{exercise.equipment}</span>
           <span className="el-tag" style={{ background: bg, color: text }}>{exercise.difficulty}</span>
         </div>
@@ -128,9 +175,10 @@ function ExerciseCard({ exercise, isFavorited, onFavorite, onView, onAdd, index 
 }
 
 /* ── Detail Sheet ─────────────────────────────────────────── */
-function DetailSheet({ exercise, isFavorited, onFavorite, onAdd, onClose, userGoal }) {
+function DetailSheet({ exercise, isFavorited, onFavorite, onAdd, onClose, userGoal, isSpectrum }) {
   const { bg, text } = difficultyStyle(exercise.difficulty);
   const isMobile = window.innerWidth < 768;
+  const muscleColor = isSpectrum ? spectrumColorForBodyPart(exercise.body_part) : null;
 
   return createPortal(
     <AnimatePresence>
@@ -171,9 +219,9 @@ function DetailSheet({ exercise, isFavorited, onFavorite, onAdd, onClose, userGo
         <div className="el-sheet__body">
           {/* Typography panel */}
           <div className="el-sheet__illustration el-sheet__illustration--typo">
-            <div className="el-sheet__illus-bar" />
-            <p className="el-sheet__illus-group">{displayBodyPart(exercise.body_part)}</p>
-            <p className="el-sheet__illus-muscle">{titleCase(exercise.target_muscle)}</p>
+            <div className="el-sheet__illus-bar" style={muscleColor ? { background: muscleColor } : undefined} />
+            <p className="el-sheet__illus-group" style={muscleColor ? { color: muscleColor } : undefined}>{displayBodyPart(exercise.body_part)}</p>
+            <p className="el-sheet__illus-muscle" style={muscleColor ? { color: muscleColor, opacity: 0.7 } : undefined}>{titleCase(exercise.target_muscle)}</p>
           </div>
 
           {/* Tags */}
@@ -550,6 +598,7 @@ function AddWorkoutSheet({ exercise, userId, onClose, onToast }) {
    MAIN COMPONENT
 ══════════════════════════════════════════════════════════════ */
 export default function ExerciseLibrary() {
+  const { isSpectrum } = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Filter state from URL
@@ -726,15 +775,22 @@ export default function ExerciseLibrary() {
 
       {/* Tabs */}
       <motion.div className="el-tabs" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-        {[['all', 'All Exercises'], ['favorites', '♥ Favorites'], ['recent', 'Recently Used']].map(([key, label]) => (
-          <button
-            key={key}
-            className={`el-tab ${tab === key ? 'el-tab--active' : ''}`}
-            onClick={() => { setTab(key); setPage(1); }}
-          >
-            {label}
-          </button>
-        ))}
+        {[['all', 'All Exercises'], ['favorites', '\u2665 Favorites'], ['recent', 'Recently Used']].map(([key, label]) => {
+          const isActive = tab === key;
+          const spectrumTabStyle = isSpectrum && isActive && key === 'all'
+            ? { background: '#1a0d30', border: '1px solid #7C3AED', color: '#A78BFA' }
+            : undefined;
+          return (
+            <button
+              key={key}
+              className={`el-tab ${isActive ? 'el-tab--active' : ''}`}
+              style={spectrumTabStyle}
+              onClick={() => { setTab(key); setPage(1); }}
+            >
+              {label}
+            </button>
+          );
+        })}
       </motion.div>
 
       {/* Filters — only show on "All Exercises" tab */}
@@ -749,7 +805,7 @@ export default function ExerciseLibrary() {
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          <Dropdown label="Muscle Group" options={BODY_PARTS}   value={bodyPart}   onChange={(v) => setFilter('bp', v)} />
+          <Dropdown label="Muscle Group" options={BODY_PARTS}   value={bodyPart}   onChange={(v) => setFilter('bp', v)} isSpectrum={isSpectrum} spectrumColorMap={SPECTRUM_MUSCLE_COLORS} />
           <Dropdown label="Equipment"    options={EQUIPMENTS}   value={equipment}  onChange={(v) => setFilter('eq', v)} />
           <Dropdown label="Difficulty"   options={DIFFICULTIES} value={difficulty} onChange={(v) => setFilter('diff', v)} />
         </motion.div>
@@ -783,6 +839,7 @@ export default function ExerciseLibrary() {
               onFavorite={handleFavorite}
               onView={setSelectedExercise}
               onAdd={setAddingExercise}
+              isSpectrum={isSpectrum}
             />
           ))}
         </AnimatePresence>
@@ -806,6 +863,7 @@ export default function ExerciseLibrary() {
           onAdd={(ex) => { setAddingExercise(ex); }}
           onClose={() => setSelectedExercise(null)}
           userGoal={userGoal}
+          isSpectrum={isSpectrum}
         />
       )}
 

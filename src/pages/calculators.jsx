@@ -4,6 +4,7 @@ import { ChartPie, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import '../styles/CalculatorsPage.css';
 import CalculatorCard from '../components/ui/CalculatorCard';
+import { useTheme } from '../hooks/useTheme';
 
 const calculators = [
   {
@@ -13,6 +14,9 @@ const calculators = [
     href: '/calculators/macros',
     description:
       'Get your personalized daily calorie target and complete protein, carbs, and fat breakdown based on your body and goals.',
+    spectrumIconBg: '#1a0d30',
+    spectrumIconBorder: '1px solid #7C3AED',
+    spectrumIconStroke: '#7C3AED',
   },
   {
     title: '1RM Calculator',
@@ -21,6 +25,9 @@ const calculators = [
     href: '/calculators/1rm',
     description:
       'Calculate your estimated one-rep max using Epley, Brzycki, and Lombardi formulas.',
+    spectrumIconBg: '#0a1a0f',
+    spectrumIconBorder: '1px solid #1D9E75',
+    spectrumIconStroke: '#1D9E75',
   },
 ];
 
@@ -41,14 +48,17 @@ const tips = [
   {
     title: 'Protein comes first',
     body: 'Your protein target is set first based on lean mass. Carbs and fat fill the remaining calories around it.',
+    spectrumColor: '#A78BFA',
   },
   {
     title: 'Recalculate regularly',
     body: 'Update your macros every 4–6 weeks as your weight changes — especially during a cut.',
+    spectrumColor: '#60A5FA',
   },
   {
     title: 'Carbs are flexible',
     body: 'If you follow keto or low-carb, use your fat target as the primary lever and drop carbs accordingly.',
+    spectrumColor: '#FB923C',
   },
 ];
 
@@ -66,7 +76,7 @@ function SectionLabel({ text }) {
 function ResultChip({ value, label, source }) {
   return (
     <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px' }}>
-      <div style={{ fontSize: 18, fontWeight: 500, color: '#1D9E75', lineHeight: 1 }}>{value ?? '—'}</div>
+      <div style={{ fontSize: 18, fontWeight: 500, color: 'var(--accent)', lineHeight: 1 }}>{value ?? '—'}</div>
       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>{label}</div>
       <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>{source}</div>
     </div>
@@ -79,6 +89,7 @@ function formatDate(iso) {
 }
 
 function CalculatorsPage() {
+  const { isSpectrum } = useTheme();
   const [saved, setSaved] = useState({ macro: null, orm: null });
 
   useEffect(() => {
@@ -114,6 +125,9 @@ function CalculatorsPage() {
             description={calc.description}
             icon={calc.icon}
             href={calc.href}
+            spectrumIconBg={isSpectrum ? calc.spectrumIconBg : undefined}
+            spectrumIconBorder={isSpectrum ? calc.spectrumIconBorder : undefined}
+            spectrumIconStroke={isSpectrum ? calc.spectrumIconStroke : undefined}
           />
         ))}
       </div>
@@ -181,10 +195,10 @@ function CalculatorsPage() {
             >
               <div style={{
                 width: 30, height: 30, borderRadius: 6, background: 'var(--accent-bg)',
-                border: '1px solid #1D9E75', display: 'flex', alignItems: 'center',
+                border: '1px solid var(--accent)', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', flexShrink: 0,
               }}>
-                <row.icon width={13} height={13} stroke="#1D9E75" strokeWidth={1.5} fill="none" />
+                <row.icon width={13} height={13} stroke="var(--accent)" strokeWidth={1.5} fill="none" />
               </div>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 3 }}>{row.title}</div>
@@ -207,7 +221,7 @@ function CalculatorsPage() {
               transition={{ duration: 0.25, delay: 0.5 + i * 0.06 }}
               style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 14px' }}
             >
-              <div style={{ fontSize: 11, fontWeight: 500, color: '#5DCAA5', marginBottom: 4 }}>{tip.title}</div>
+              <div style={{ fontSize: 11, fontWeight: 500, color: isSpectrum ? tip.spectrumColor : 'var(--accent-light)', marginBottom: 4 }}>{tip.title}</div>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5 }}>{tip.body}</div>
             </motion.div>
           ))}

@@ -35,13 +35,13 @@
 }
 
 .billing__plan-badge--pro {
-  background: var(--pro-bg, rgba(29,158,117,0.15));
-  color: var(--pro-text, #1D9E75);
+  background: var(--pro-bg, rgba(var(--accent-rgb),0.15));
+  color: var(--pro-text, var(--accent));
 }
 
 .billing__plan-badge--pro_plus {
-  background: var(--pro-bg, rgba(29,158,117,0.15));
-  color: var(--pro-text, #1D9E75);
+  background: var(--pro-bg, rgba(var(--accent-rgb),0.15));
+  color: var(--pro-text, var(--accent));
 }
 
 .billing__plan-badge--free {
@@ -56,8 +56,8 @@
 }
 
 .billing__alert--success {
-  background: rgba(29, 158, 117, 0.12);
-  color: #1D9E75;
+  background: rgba(var(--accent-rgb), 0.12);
+  color: var(--accent);
 }
 
 .billing__alert--warn {
@@ -116,7 +116,7 @@
 }
 
 .billing__btn--upgrade {
-  background: var(--accent, #1D9E75);
+  background: var(--accent);
   color: #fff;
 }
 

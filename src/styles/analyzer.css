@@ -82,7 +82,7 @@
 
 .field-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(29, 158, 117, 0.2);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
 }
 
 /* Hide browser spinner arrows on number inputs */
@@ -146,7 +146,7 @@
 }
 
 .analyze-btn.outline:hover:not(:disabled) {
-  background: rgba(29, 158, 117, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
 }
 
 /* ── Error + loading ────────────────────────────────────────── */
@@ -245,7 +245,7 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: 20px;
-  background: rgba(29, 158, 117, 0.15);
+  background: rgba(var(--accent-rgb), 0.15);
   border: 1px solid var(--accent);
   color: var(--accent-light);
   font-size: 12px;

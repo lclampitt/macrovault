@@ -357,7 +357,7 @@
 }
 
 .gp-log-input:focus {
-  border-color: #1D9E75 !important;
+  border-color: var(--accent) !important;
   outline: none;
 }
 
@@ -513,7 +513,7 @@
   position: absolute;
   inset: -3px;
   border-radius: calc(var(--radius-lg) + 3px);
-  border: 2px solid #1D9E75;
+  border: 2px solid var(--accent);
   opacity: 0;
   animation: gp-spotlight-ring 3s ease-out forwards;
   pointer-events: none;
@@ -521,9 +521,9 @@
 }
 
 @keyframes gp-spotlight-glow {
-  0%   { box-shadow: 0 0 0 0 rgba(29, 158, 117, 0); }
-  15%  { box-shadow: 0 0 20px 4px rgba(29, 158, 117, 0.25); }
-  100% { box-shadow: 0 0 0 0 rgba(29, 158, 117, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
+  15%  { box-shadow: 0 0 20px 4px rgba(var(--accent-rgb), 0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
 }
 
 @keyframes gp-spotlight-ring {

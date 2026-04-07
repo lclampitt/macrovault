@@ -284,7 +284,7 @@ function AnalyzerContent() {
                 </div>
                 <div className="tdee-chip">
                   <span className="tdee-chip__value" style={{
-                    color: result.deficit_or_surplus < 0 ? '#f87171' : result.deficit_or_surplus > 0 ? '#5DCAA5' : 'var(--accent)',
+                    color: result.deficit_or_surplus < 0 ? '#f87171' : result.deficit_or_surplus > 0 ? 'var(--accent-light)' : 'var(--accent)',
                   }}>
                     {result.deficit_or_surplus > 0 ? '+' : ''}{result.deficit_or_surplus?.toLocaleString()}
                   </span>

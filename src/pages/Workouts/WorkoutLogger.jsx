@@ -5,6 +5,7 @@ import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import { usePlan } from '../../hooks/usePlan';
+import { useTheme } from '../../hooks/useTheme';
 import '../../styles/WorkoutLogger.css';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
@@ -25,6 +26,7 @@ const fadeUp = {
 export default function WorkoutLogger() {
   const { triggerUpgrade } = useUpgrade();
   const { plan, isPro } = usePlan();
+  const { isSpectrum } = useTheme();
 
   const MUSCLE_GROUPS = ['Upper Body', 'Lower Body', 'Legs', 'Full Body', 'Core', 'Cardio'];
 
@@ -235,6 +237,7 @@ export default function WorkoutLogger() {
               className="btn btn-primary wl-toggle-btn"
               onClick={() => setFormOpen((o) => !o)}
               whileTap={{ scale: 0.97 }}
+              style={isSpectrum ? { border: '1px solid #1D9E75', color: '#5DCAA5', background: '#0a1a0f' } : undefined}
             >
               {formOpen ? 'Cancel' : '+ New workout'}
             </motion.button>
@@ -244,7 +247,7 @@ export default function WorkoutLogger() {
         {/* Locked banner when free user hits limit */}
         {atLimit && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0 4px' }}>
-            <Lock size={16} style={{ color: '#5DCAA5', flexShrink: 0 }} />
+            <Lock size={16} style={{ color: 'var(--accent-light)', flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
                 You've reached 10 workout logs on the free plan.
@@ -390,7 +393,7 @@ export default function WorkoutLogger() {
       </motion.div>
 
       {/* ── HISTORY SECTION ── */}
-      <p className="wl-history-title">Workout history</p>
+      <p className="wl-history-title" style={isSpectrum ? { color: '#1D9E75' } : undefined}>Workout history</p>
 
       {workoutHistory.length === 0 && (
         <p className="wl-empty">No workouts logged yet.</p>
@@ -408,7 +411,7 @@ export default function WorkoutLogger() {
               onClick={() => toggleExpand(workout.id)}
             >
               <div className="wl-history-row__left">
-                <span className="wl-history-name">{workout.workout_name}</span>
+                <span className="wl-history-name" style={isSpectrum ? { color: '#5DCAA5' } : undefined}>{workout.workout_name}</span>
                 <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
               </div>
               <div className="wl-history-row__right">
@@ -419,6 +422,7 @@ export default function WorkoutLogger() {
                   className="btn btn-primary wl-btn-sm"
                   onClick={(e) => { e.stopPropagation(); editWorkout(workout); }}
                   whileTap={{ scale: 0.97 }}
+                  style={isSpectrum ? { border: '1px solid #1D9E75', color: '#5DCAA5' } : undefined}
                 >
                   Edit
                 </motion.button>

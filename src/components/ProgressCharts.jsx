@@ -10,6 +10,7 @@ import {
   Legend,
   ComposedChart,
 } from 'recharts';
+import { useTheme } from '../hooks/useTheme';
 
 /**
  * Props:
@@ -17,6 +18,8 @@ import {
  *  (weight_kg column is treated as lbs — naming quirk in the DB)
  */
 export default function ProgressCharts({ rows = [] }) {
+  const { isSpectrum } = useTheme();
+
   // Normalize + sort ascending
   const data = [...rows]
     .map((r) => ({
@@ -60,8 +63,8 @@ export default function ProgressCharts({ rows = [] }) {
         <ComposedChart data={data}>
           <defs>
             <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%"  stopColor="#1D9E75" stopOpacity={0.18} />
-              <stop offset="95%" stopColor="#1D9E75" stopOpacity={0} />
+              <stop offset="5%"  stopColor={isSpectrum ? 'var(--color-progress-chart)' : 'var(--accent)'} stopOpacity={0.18} />
+              <stop offset="95%" stopColor={isSpectrum ? 'var(--color-progress-chart)' : 'var(--accent)'} stopOpacity={0} />
             </linearGradient>
           </defs>
 
@@ -80,7 +83,7 @@ export default function ProgressCharts({ rows = [] }) {
             yAxisId="left"
             type="monotone"
             dataKey="weight_lbs"
-            stroke="#1D9E75"
+            stroke={isSpectrum ? 'var(--color-progress-chart)' : 'var(--accent)'}
             strokeWidth={2}
             fill="url(#weightGradient)"
             dot={false}
@@ -92,7 +95,7 @@ export default function ProgressCharts({ rows = [] }) {
             yAxisId="right"
             type="monotone"
             dataKey="body_fat_pct"
-            stroke="#5DCAA5"
+            stroke={isSpectrum ? 'var(--color-fat)' : 'var(--accent-light)'}
             strokeWidth={2}
             strokeDasharray="5 3"
             dot={false}

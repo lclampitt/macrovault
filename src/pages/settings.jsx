@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Sliders, CreditCard, AlertTriangle, Crown, Sun, Moon } from 'lucide-react';
+import { User, Sliders, CreditCard, AlertTriangle, Crown, Sun, Moon, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '../supabaseClient';
 import { usePlan } from '../hooks/usePlan';
@@ -8,6 +8,15 @@ import { useTheme } from '../hooks/useTheme';
 import '../styles/settings.css';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
+
+const ACCENT_THEMES = [
+  { id: 'teal',    label: 'Teal',    color: '#1D9E75' },
+  { id: 'blue',    label: 'Blue',    color: '#3B82F6' },
+  { id: 'orange',  label: 'Orange',  color: '#F97316' },
+  { id: 'rose',    label: 'Rose',    color: '#F43F5E' },
+  { id: 'violet',  label: 'Violet',  color: '#8B5CF6' },
+  { id: 'crimson', label: 'Crimson', color: '#DC2626' },
+];
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 16 },
@@ -109,7 +118,7 @@ function DeleteModal({ onClose }) {
 /* ── Main page ── */
 export default function SettingsPage() {
   const { plan, isPro, isProPlus, stripeCustomerId, isLoading: planLoading } = usePlan();
-  const { theme, toggle: toggleTheme } = useTheme();
+  const { theme, toggle: toggleTheme, accent, setAccent, isDark } = useTheme();
 
   const [session,     setSession]     = useState(null);
   const [displayName, setDisplayName] = useState('');
@@ -240,6 +249,60 @@ export default function SettingsPage() {
                 <div /><div /><div />
               </div>
               <span>Light</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="settings-divider" />
+
+        <div className="settings-row" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+          <span className="settings-row__label">Accent color</span>
+          <div className="settings-accent-grid">
+            {ACCENT_THEMES.map((t) => (
+              <button
+                key={t.id}
+                className={`settings-accent-card${accent === t.id ? ' settings-accent-card--active' : ''}`}
+                onClick={() => setAccent(t.id)}
+                style={{ '--preview-accent': t.color }}
+              >
+                <div className="settings-accent-card__preview">
+                  <div /><div /><div />
+                </div>
+                <span>{t.label}</span>
+              </button>
+            ))}
+
+            {/* Spectrum — full-width card */}
+            <button
+              className={`settings-spectrum-card${accent === 'spectrum' ? ' settings-spectrum-card--active' : ''}`}
+              onClick={() => setAccent('spectrum')}
+            >
+              <div className="settings-spectrum-card__preview" style={{ background: isDark ? '#09080f' : '#FAFAF7' }}>
+                {[
+                  { label: 'Protein', color: '#7C3AED', fill: '70%' },
+                  { label: 'Carbs',   color: '#EA580C', fill: '45%' },
+                  { label: 'Fat',     color: '#DB2777', fill: '25%' },
+                  { label: 'Calories', color: '#2563EB', fill: '55%' },
+                ].map((m) => (
+                  <div key={m.label} className="settings-spectrum-card__bar-col">
+                    <span className="settings-spectrum-card__bar-label">{m.label}</span>
+                    <div className="settings-spectrum-card__bar-track">
+                      <div className="settings-spectrum-card__bar-fill" style={{ background: m.color, width: m.fill }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="settings-spectrum-card__info">
+                <div>
+                  <div className="settings-spectrum-card__name">Spectrum</div>
+                  <div className="settings-spectrum-card__desc">Each macro gets its own color</div>
+                </div>
+                <div className="settings-spectrum-card__swatches">
+                  {['#7C3AED','#EA580C','#DB2777','#2563EB','#1D9E75','#EF9F27'].map((c) => (
+                    <div key={c} className="settings-spectrum-card__dot" style={{ background: c }} />
+                  ))}
+                </div>
+              </div>
             </button>
           </div>
         </div>

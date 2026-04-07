@@ -4,13 +4,14 @@ import { BarChart2, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useUpgrade } from '../context/UpgradeContext';
 import ProgressCharts from '../components/ProgressCharts';
+import { useTheme } from '../hooks/useTheme';
 import '../styles/progress.css';
 
 function ProgressGate() {
   const { triggerUpgrade } = useUpgrade();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '80px 24px', textAlign: 'center' }}>
-      <BarChart2 size={48} style={{ color: '#1D9E75', opacity: 0.6 }} />
+      <BarChart2 size={48} style={{ color: 'var(--accent)', opacity: 0.6 }} />
       <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Progress Charts</h2>
       <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: 0, maxWidth: 320, lineHeight: 1.6 }}>
         Track your weight and body composition over time with detailed charts. A Pro feature.
@@ -65,7 +66,7 @@ function useCountUp(target, duration = 700) {
 }
 
 /* Stat chip with count-up */
-function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive }) {
+function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive, spectrumColor }) {
   const num = useCountUp(Math.abs(value ?? 0));
   const display = value == null ? '—' : `${positive === false ? '-' : positive ? '+' : ''}${num.toFixed(decimals)}${suffix}`;
   return (
@@ -75,13 +76,14 @@ function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.06, ease: 'easeOut' }}
     >
-      <span className="pg-chip__value">{display}</span>
+      <span className="pg-chip__value" style={spectrumColor ? { color: spectrumColor } : undefined}>{display}</span>
       <span className="pg-chip__label">{label}</span>
     </motion.div>
   );
 }
 
 function ProgressPageContent() {
+  const { isSpectrum } = useTheme();
   const [session, setSession] = useState(null);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -245,12 +247,16 @@ function ProgressPageContent() {
 
       {/* Stat chips */}
       <div className="pg-chips">
-        <StatChip label="Current weight" value={currentWeight} suffix=" lbs" decimals={1} index={0} />
-        <StatChip label="Body fat %" value={currentBf} suffix="%" decimals={1} index={1} />
+        <StatChip label="Current weight" value={currentWeight} suffix=" lbs" decimals={1} index={0}
+          spectrumColor={isSpectrum ? '#EF9F27' : undefined} />
+        <StatChip label="Body fat %" value={currentBf} suffix="%" decimals={1} index={1}
+          spectrumColor={isSpectrum ? '#DB2777' : undefined} />
         <StatChip label="Weight change" value={weightChange} suffix=" lbs" decimals={1} index={2}
-          positive={weightChange != null ? weightChange <= 0 : undefined} />
+          positive={weightChange != null ? weightChange <= 0 : undefined}
+          spectrumColor={isSpectrum ? '#1D9E75' : undefined} />
         <StatChip label="BF% change" value={bfChange} suffix="%" decimals={1} index={3}
-          positive={bfChange != null ? bfChange <= 0 : undefined} />
+          positive={bfChange != null ? bfChange <= 0 : undefined}
+          spectrumColor={isSpectrum ? '#DB2777' : undefined} />
       </div>
 
       {/* Chart */}

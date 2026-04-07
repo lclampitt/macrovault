@@ -58,6 +58,29 @@ const MORE_PAGES = [
 
 const MORE_ROUTES = ['/goalplanner', '/calculators', '/exercises', '/measurements', '/settings'];
 
+const getNavColor = (route, isSpectrum) => {
+  if (!isSpectrum) return null;
+  const map = {
+    '/home':         { bg:'#0a1a0f', border:'#1D9E75', text:'#5DCAA5', icon:'#5DCAA5' },
+    '/calculators':  { bg:'#1a0d30', border:'#7C3AED', text:'#A78BFA', icon:'#A78BFA' },
+    '/workouts':     { bg:'#0a1a0f', border:'#1D9E75', text:'#5DCAA5', icon:'#5DCAA5' },
+    '/exercises':    { bg:'#2a0d1a', border:'#DB2777', text:'#F472B6', icon:'#F472B6' },
+    '/measurements': { bg:'#2a0d1a', border:'#DB2777', text:'#F472B6', icon:'#F472B6' },
+    '/goalplanner':  { bg:'#0a1a3a', border:'#2563EB', text:'#60A5FA', icon:'#60A5FA' },
+    '/meal-planner': { bg:'#2a1208', border:'#EA580C', text:'#FB923C', icon:'#FB923C' },
+    '/progress':     { bg:'#2a1a04', border:'#EF9F27', text:'#FAC775', icon:'#FAC775' },
+    '/settings':     { bg:'#1e1a30', border:'#7C3AED', text:'#A78BFA', icon:'#A78BFA' },
+  };
+  return map[route] || map['/home'];
+};
+
+const SPECTRUM_MOBILE_DOT = {
+  '/home': '#1D9E75',
+  '/workouts': '#1D9E75',
+  '/meal-planner': '#EA580C',
+  '/progress': '#EF9F27',
+};
+
 export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) {
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -70,7 +93,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
 
   // Close More sheet on route change
   useEffect(() => { setMoreOpen(false); }, [location.pathname]);
-  const { theme, toggle: toggleTheme, isDark } = useTheme();
+  const { theme, toggle: toggleTheme, isDark, isSpectrum } = useTheme();
 
   const userEmail = session?.user?.email ?? '';
   const emailFallback = userEmail.split('@')[0] || 'User';
@@ -109,7 +132,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
     <div className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>
       {/* Logo */}
       <div className="sidebar__logo">
-        <div className="sidebar__logo-icon"><Lock size={18} /></div>
+        <div className="sidebar__logo-icon" style={isSpectrum ? { background: 'linear-gradient(135deg, #7C3AED, #2563EB)' } : undefined}><Lock size={18} /></div>
         <AnimatePresence>
           {!collapsed && (
             <motion.span
@@ -127,32 +150,51 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
 
       {/* Nav — Free items */}
       <nav className="sidebar__nav">
-        {FREE_NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
-            }
-            title={collapsed ? label : undefined}
-          >
-            <Icon size={18} className="sidebar__nav-icon" />
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.span
-                  className="sidebar__nav-label"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  {label}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </NavLink>
-        ))}
+        {FREE_NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/'}
+              className={({ isActive }) =>
+                `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
+              }
+              title={collapsed ? item.label : undefined}
+              style={({ isActive }) => {
+                const sc = getNavColor(item.to, isSpectrum);
+                if (!isActive || !sc) return undefined;
+                return {
+                  background: sc.bg,
+                  borderLeftColor: sc.border,
+                  color: sc.text,
+                };
+              }}
+            >
+              {({ isActive }) => {
+                const sc = getNavColor(item.to, isSpectrum);
+                return (
+                  <>
+                    <Icon size={18} className="sidebar__nav-icon" style={isActive && sc ? { color: sc.icon } : undefined} />
+                    <AnimatePresence>
+                      {!collapsed && (
+                        <motion.span
+                          className="sidebar__nav-label"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </>
+                );
+              }}
+            </NavLink>
+          );
+        })}
       </nav>
 
       {/* Nav — Pro section */}
@@ -164,6 +206,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
+              style={isSpectrum ? { color: '#7C3AED' } : undefined}
             >
               PRO
             </motion.span>
@@ -179,35 +222,54 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
         </AnimatePresence>
       </div>
       <nav className="sidebar__nav sidebar__nav--pro">
-        {PRO_NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
-            }
-            title={collapsed ? label : undefined}
-          >
-            <Icon size={18} className="sidebar__nav-icon" />
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.span
-                  className="sidebar__nav-label"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  {label}
-                </motion.span>
-              )}
-            </AnimatePresence>
-            {!isPro && !collapsed && (
-              <Lock size={12} style={{ color: 'var(--text-muted)', flexShrink: 0, marginLeft: 'auto' }} title="Pro feature" />
-            )}
-          </NavLink>
-        ))}
+        {PRO_NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/'}
+              className={({ isActive }) =>
+                `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
+              }
+              title={collapsed ? item.label : undefined}
+              style={({ isActive }) => {
+                const sc = getNavColor(item.to, isSpectrum);
+                if (!isActive || !sc) return undefined;
+                return {
+                  background: sc.bg,
+                  borderLeftColor: sc.border,
+                  color: sc.text,
+                };
+              }}
+            >
+              {({ isActive }) => {
+                const sc = getNavColor(item.to, isSpectrum);
+                return (
+                  <>
+                    <Icon size={18} className="sidebar__nav-icon" style={isActive && sc ? { color: sc.icon } : undefined} />
+                    <AnimatePresence>
+                      {!collapsed && (
+                        <motion.span
+                          className="sidebar__nav-label"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                    {!isPro && !collapsed && (
+                      <Lock size={12} style={{ color: 'var(--text-muted)', flexShrink: 0, marginLeft: 'auto' }} title="Pro feature" />
+                    )}
+                  </>
+                );
+              }}
+            </NavLink>
+          );
+        })}
       </nav>
 
       {/* Spacer */}
@@ -244,27 +306,43 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
             `sidebar__nav-item ${isActive ? 'sidebar__nav-item--active' : ''}`
           }
           title={collapsed ? 'Settings' : undefined}
+          style={({ isActive }) => {
+            const sc = getNavColor('/settings', isSpectrum);
+            if (!isActive || !sc) return undefined;
+            return {
+              background: sc.bg,
+              borderLeftColor: sc.border,
+              color: sc.text,
+            };
+          }}
         >
-          <Settings size={18} className="sidebar__nav-icon" />
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span
-                className="sidebar__nav-label"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-              >
-                Settings
-              </motion.span>
-            )}
-          </AnimatePresence>
+          {({ isActive }) => {
+            const sc = getNavColor('/settings', isSpectrum);
+            return (
+              <>
+                <Settings size={18} className="sidebar__nav-icon" style={isActive && sc ? { color: sc.icon } : undefined} />
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.span
+                      className="sidebar__nav-label"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      Settings
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </>
+            );
+          }}
         </NavLink>
       </div>
 
       {/* User section */}
       <div className="sidebar__user">
-        <div className="sidebar__avatar">
+        <div className="sidebar__avatar" style={isSpectrum ? { background: 'linear-gradient(135deg, #7C3AED, #DB2777)' } : undefined}>
           <User size={14} />
         </div>
         <AnimatePresence>
@@ -334,13 +412,14 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
       {/* ── Mobile top bar ── */}
       <div className="mob-topbar">
         <Link to="/home" className="mob-topbar__logo">
-          <div className="mob-topbar__logo-icon"><Lock size={16} /></div>
+          <div className="mob-topbar__logo-icon" style={isSpectrum ? { background: 'linear-gradient(135deg, #7C3AED, #2563EB)' } : undefined}><Lock size={16} /></div>
           <span className="mob-topbar__logo-name">MacroVault</span>
         </Link>
         <button
           className="mob-topbar__avatar"
           onClick={() => setActionSheetOpen(true)}
           aria-label="Open user menu"
+          style={isSpectrum ? { background: 'linear-gradient(135deg, #7C3AED, #DB2777)' } : undefined}
         >
           {initials}
         </button>
@@ -350,6 +429,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
       <nav className="mob-bottom-nav">
         {MOBILE_TABS.map(({ to, icon: Icon, label }) => {
           const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
+          const spectrumDotColor = isSpectrum && SPECTRUM_MOBILE_DOT[to];
           return (
             <motion.button
               key={to}
@@ -357,7 +437,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
               onClick={() => navigate(to)}
               whileTap={{ scale: 0.9 }}
             >
-              {isActive && <span className="mob-nav-tab__dot" />}
+              {isActive && <span className="mob-nav-tab__dot" style={spectrumDotColor ? { background: spectrumDotColor } : undefined} />}
               <Icon size={20} />
               <span className="mob-nav-tab__label">{label}</span>
             </motion.button>
@@ -368,7 +448,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
           onClick={() => setMoreOpen((p) => !p)}
           whileTap={{ scale: 0.9 }}
         >
-          {isMoreActive && <span className="mob-nav-tab__dot" />}
+          {isMoreActive && <span className="mob-nav-tab__dot" style={isSpectrum ? { background: '#7C3AED' } : undefined} />}
           <LayoutGrid size={20} />
           <span className="mob-nav-tab__label">More</span>
         </motion.button>

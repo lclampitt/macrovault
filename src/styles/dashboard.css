@@ -186,7 +186,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #1D9E75;
+  background: var(--accent);
   pointer-events: none;
 }
 
@@ -215,7 +215,7 @@
   position: fixed;
   z-index: 9999;
   background: var(--bg-surface-2);
-  border: 1px solid #1D9E75;
+  border: 1px solid var(--accent);
   border-radius: 10px;
   padding: 16px;
   min-width: 220px;
@@ -383,7 +383,7 @@
 .dc__all-done {
   font-size: 14px;
   font-weight: 500;
-  color: #1D9E75;
+  color: var(--accent);
   margin: 0 0 4px;
 }
 
@@ -402,7 +402,7 @@
 
 .dc__bar-fill {
   height: 100%;
-  background: #1D9E75;
+  background: var(--accent);
   border-radius: 2px;
 }
 
@@ -442,8 +442,8 @@
 }
 
 .dc__circle--checked {
-  background: #1D9E75;
-  border-color: #1D9E75;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .dc__checkmark {
@@ -461,7 +461,7 @@
 }
 
 .dc__item--done .dc__label {
-  color: #5DCAA5;
+  color: var(--accent-light);
   text-decoration: line-through;
 }
 

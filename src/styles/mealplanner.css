@@ -251,7 +251,7 @@
 .mp-summary-bar__chip-value {
   font-size: 15px;
   font-weight: 600;
-  color: #1D9E75;
+  color: var(--accent);
   line-height: 1;
 }
 
@@ -302,11 +302,11 @@
 }
 
 .mp-day-header--today .mp-day-header__name {
-  color: #1D9E75;
+  color: var(--accent);
 }
 
 .mp-day-header--today .mp-day-header__date {
-  color: #1D9E75;
+  color: var(--accent);
 }
 
 /* Corner spacer in top-left of grid */
@@ -378,9 +378,9 @@
 }
 
 .mp-slot--empty:hover {
-  border-color: #1D9E75;
+  border-color: var(--accent);
   border-style: solid;
-  color: #1D9E75;
+  color: var(--accent);
 }
 
 /* Filled slot */
@@ -446,7 +446,7 @@
 }
 
 .mp-slot__expand-btn:hover {
-  color: #1D9E75;
+  color: var(--accent);
 }
 
 /* ── Expanded ingredient list ────────────── */
@@ -470,7 +470,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #1D9E75;
+  background: var(--accent);
   flex-shrink: 0;
 }
 
@@ -480,11 +480,11 @@
 }
 
 .mp-slot__heart:hover {
-  border-color: #1D9E75 !important;
+  border-color: var(--accent) !important;
 }
 
 .mp-slot__heart--active {
-  border-color: #1D9E75;
+  border-color: var(--accent);
 }
 
 /* Hover action icons */
@@ -550,13 +550,13 @@
 }
 
 .mp-day-action-btn--teal {
-  border: 1px solid #1D9E75;
-  color: #5DCAA5;
+  border: 1px solid var(--accent);
+  color: var(--accent-light);
   flex: 1;
 }
 
 .mp-day-action-btn--teal:hover:not(:disabled) {
-  background: rgba(29, 158, 117, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
 }
 
 .mp-day-action-btn--muted {
@@ -570,9 +570,9 @@
 }
 
 .mp-day-action-btn--logged {
-  border: 1px solid #1D9E75;
-  color: #1D9E75;
-  background: rgba(29, 158, 117, 0.08);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.08);
   flex: 1;
   cursor: default;
   opacity: 0.85;
@@ -676,7 +676,7 @@
 }
 
 .mp-tabs__tab--active {
-  background: #1D9E75;
+  background: var(--accent);
   color: #fff;
 }
 
@@ -739,7 +739,7 @@
 
 .mp-remaining-chip span {
   font-weight: 600;
-  color: #1D9E75;
+  color: var(--accent);
 }
 
 .mp-suggestion-card {
@@ -766,7 +766,7 @@
 }
 
 .mp-suggestion-card__dot--good {
-  background: #1D9E75;
+  background: var(--accent);
 }
 
 .mp-suggestion-card__dot--ok {
@@ -957,7 +957,7 @@
 }
 
 .mp-form__checkbox input[type="checkbox"] {
-  accent-color: #1D9E75;
+  accent-color: var(--accent);
   width: 16px;
   height: 16px;
   cursor: pointer;
@@ -1040,7 +1040,7 @@
 
 .mp-ai-overlay__spinner {
   animation: mp-spin 1s linear infinite;
-  color: #1D9E75;
+  color: var(--accent);
 }
 
 @keyframes mp-spin {
@@ -1074,10 +1074,10 @@
 }
 
 .mp-snack-btn:hover {
-  border-color: #1D9E75;
+  border-color: var(--accent);
   border-style: solid;
-  color: #5DCAA5;
-  background: rgba(29, 158, 117, 0.04);
+  color: var(--accent-light);
+  background: rgba(var(--accent-rgb), 0.04);
 }
 
 /* ── SNACK SHEET (bottom sheet) ──────────── */
@@ -1156,8 +1156,8 @@
 }
 
 .mp-snack-sheet__goto:hover {
-  border-color: #1D9E75;
-  color: #5DCAA5;
+  border-color: var(--accent);
+  color: var(--accent-light);
 }
 
 /* ── RESPONSIVE ──────────────────────────── */

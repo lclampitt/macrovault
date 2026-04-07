@@ -58,7 +58,7 @@
   height: 17px;
   font-size: 11px;
   border-radius: 50%;
-  background: rgba(29, 158, 117, 0.15);
+  background: rgba(var(--accent-rgb), 0.15);
   border: 1px solid var(--accent);
   color: var(--accent-light);
   cursor: pointer;
@@ -68,7 +68,7 @@
 }
 
 .tooltip-icon:hover {
-  background: rgba(29, 158, 117, 0.28);
+  background: rgba(var(--accent-rgb), 0.28);
 }
 
 .tooltip-text {

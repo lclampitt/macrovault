@@ -117,7 +117,7 @@ export default function Dropdown({
             justifyContent: 'space-between',
             alignItems: 'center',
             background: 'var(--bg-base)',
-            border: `1px solid ${isOpen ? '#1D9E75' : 'var(--border)'}`,
+            border: `1px solid ${isOpen ? 'var(--accent)' : 'var(--border)'}`,
             borderRadius: isOpen ? '8px 8px 0 0' : '8px',
             padding: '8px 12px',
             cursor: 'pointer',
@@ -128,7 +128,7 @@ export default function Dropdown({
             outline: 'none',
           }}
           onMouseEnter={(e) => {
-            if (!isOpen) e.currentTarget.style.borderColor = '#1D9E75';
+            if (!isOpen) e.currentTarget.style.borderColor = 'var(--accent)';
           }}
           onMouseLeave={(e) => {
             if (!isOpen) e.currentTarget.style.borderColor = 'var(--border)';
@@ -138,7 +138,7 @@ export default function Dropdown({
           <ChevronDown
             size={14}
             style={{
-              color: '#5DCAA5',
+              color: 'var(--accent-light)',
               transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
               transition: 'transform 0.2s ease',
               flexShrink: 0,
@@ -163,7 +163,7 @@ export default function Dropdown({
                 right: 0,
                 zIndex: 50,
                 background: 'var(--bg-surface)',
-                border: '1px solid #1D9E75',
+                border: '1px solid var(--accent)',
                 borderTop: 'none',
                 borderRadius: '0 0 8px 8px',
                 overflow: 'hidden',
@@ -191,7 +191,7 @@ export default function Dropdown({
                       alignItems: 'center',
                       gap: 8,
                       background: isSelected || isFocused ? 'var(--accent-bg)' : 'transparent',
-                      color: isSelected ? '#1D9E75' : isFocused ? '#5DCAA5' : 'var(--text-secondary)',
+                      color: isSelected ? 'var(--accent)' : isFocused ? 'var(--accent-light)' : 'var(--text-secondary)',
                       fontWeight: isSelected ? 500 : 400,
                       transition: 'background 0.1s ease, color 0.1s ease',
                     }}
@@ -199,7 +199,7 @@ export default function Dropdown({
                     {isSelected && (
                       <span style={{
                         width: 4, height: 4, borderRadius: '50%',
-                        background: '#1D9E75', flexShrink: 0,
+                        background: 'var(--accent)', flexShrink: 0,
                       }} />
                     )}
                     {opt.label}

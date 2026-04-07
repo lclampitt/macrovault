@@ -9,7 +9,9 @@
     <script>
       (function() {
         var t = localStorage.getItem('macrovault-theme') || 'dark';
+        var a = localStorage.getItem('macrovault-accent') || 'teal';
         document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('data-accent', a);
       })();
     </script>
   </head>

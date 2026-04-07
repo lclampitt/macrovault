@@ -26,8 +26,8 @@
   bottom: 0;
   left: var(--sidebar-width);
   background-image:
-    linear-gradient(rgba(29, 158, 117, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(29, 158, 117, 0.035) 1px, transparent 1px);
+    linear-gradient(rgba(var(--accent-rgb), 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--accent-rgb), 0.035) 1px, transparent 1px);
   background-size: 64px 64px;
   pointer-events: none;
   z-index: 0;
@@ -42,7 +42,7 @@
   transform: translateX(-50%);
   width: 800px;
   height: 500px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(29, 158, 117, 0.06) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(var(--accent-rgb), 0.06) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -89,6 +89,17 @@
   position: relative;
   top: -1px;
 }
+
+/* Spectrum — per-page dot colors */
+[data-accent="spectrum"] .app-shell__page-title[data-page="/home"]::before         { background: #1D9E75; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/calculators"]::before   { background: #7C3AED; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/workouts"]::before      { background: #1D9E75; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/exercises"]::before     { background: #DB2777; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/measurements"]::before  { background: #DB2777; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/goalplanner"]::before   { background: #2563EB; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/meal-planner"]::before  { background: #EA580C; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/progress"]::before      { background: #EF9F27; }
+[data-accent="spectrum"] .app-shell__page-title[data-page="/settings"]::before      { background: #7C3AED; }
 
 .app-shell__action-btn {
   background: var(--accent);

@@ -35,7 +35,7 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-sm);
-  background: #1D9E75;
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,7 +82,7 @@
 .sidebar__nav-item--active {
   background: var(--accent-muted);
   color: var(--accent-light);
-  border-color: rgba(29, 158, 117, 0.25);
+  border-color: rgba(var(--accent-rgb), 0.25);
 }
 
 .sidebar__nav-icon {
@@ -335,7 +335,7 @@
     width: 26px;
     height: 26px;
     border-radius: var(--radius-sm);
-    background: #1D9E75;
+    background: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -353,7 +353,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: #1D9E75;
+    background: var(--accent);
     border: none;
     color: #fff;
     font-size: 11px;
@@ -409,18 +409,18 @@
   }
 
   .mob-nav-tab--active svg {
-    color: #1D9E75;
+    color: var(--accent);
   }
 
   .mob-nav-tab--active .mob-nav-tab__label {
-    color: #1D9E75;
+    color: var(--accent);
   }
 
   .mob-nav-tab__dot {
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: #1D9E75;
+    background: var(--accent);
     margin-bottom: 1px;
   }
 
@@ -443,7 +443,7 @@
     right: 0;
     background: #161b27;
     border-radius: 20px 20px 0 0;
-    border-top: 1px solid #1D9E75;
+    border-top: 1px solid var(--accent);
     z-index: 70;
     padding: 0 0 calc(16px + env(safe-area-inset-bottom)) 0;
   }
@@ -511,12 +511,12 @@
   }
 
   .mob-more-item:active {
-    border-color: #1D9E75;
+    border-color: var(--accent);
     background: #0a2a1e;
   }
 
   .mob-more-item--active {
-    border-color: #1D9E75;
+    border-color: var(--accent);
     background: #0a2a1e;
   }
 
@@ -536,7 +536,7 @@
 
   .mob-more-item--active .mob-more-item__icon,
   .mob-more-item__icon--active {
-    background: #1D9E75;
+    background: var(--accent);
   }
 
   .mob-more-item--active .mob-more-item__icon svg,
@@ -552,7 +552,7 @@
   }
 
   .mob-more-item--active .mob-more-item__label {
-    color: #5DCAA5;
+    color: var(--accent-light);
   }
 
   .mob-more-item__badge {
@@ -560,10 +560,10 @@
     top: 6px;
     right: 6px;
     background: #0a2a1e;
-    border: 1px solid #1D9E75;
+    border: 1px solid var(--accent);
     border-radius: 99px;
     font-size: 8px;
-    color: #5DCAA5;
+    color: var(--accent-light);
     padding: 1px 5px;
   }
 

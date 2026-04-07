@@ -18,7 +18,7 @@
   font-size: 13px;
 }
 .pg-alert--error   { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
-.pg-alert--success { background: rgba(29,158,117,0.08); border: 1px solid rgba(29,158,117,0.25); color: var(--accent-light); }
+.pg-alert--success { background: rgba(var(--accent-rgb),0.08); border: 1px solid rgba(var(--accent-rgb),0.25); color: var(--accent-light); }
 
 /* ── STAT CHIPS ─────────────────────────── */
 .pg-chips {

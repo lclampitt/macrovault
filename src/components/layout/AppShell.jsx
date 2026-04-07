@@ -47,7 +47,7 @@ export default function AppShell({ session, onLogout, isPro, isProPlus, children
         {/* Top bar */}
         <div className="app-shell__topbar">
           <div className="app-shell__topbar-left">
-            <h1 className="app-shell__page-title">{meta.title}</h1>
+            <h1 className="app-shell__page-title" data-page={location.pathname}>{meta.title}</h1>
           </div>
           {meta.action && (
             <button className="app-shell__action-btn">{meta.action}</button>

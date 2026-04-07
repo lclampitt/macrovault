@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
+import { useTheme } from '../../hooks/useTheme';
 import '../../styles/goalplanner.css';
 
 /* Stagger container for card entrance */
@@ -247,7 +248,7 @@ function GoalPlannerGate() {
   const { triggerUpgrade } = useUpgrade();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '80px 24px', textAlign: 'center' }}>
-      <Target size={48} style={{ color: '#1D9E75', opacity: 0.6 }} />
+      <Target size={48} style={{ color: 'var(--accent)', opacity: 0.6 }} />
       <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Goal Planner</h2>
       <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: 0, maxWidth: 320, lineHeight: 1.6 }}>
         Set calorie and macro goals, track your daily nutrition, and plan your progress. A Pro feature.
@@ -285,6 +286,8 @@ function GoalPlannerGate() {
 }
 
 function GoalPlannerContent({ compact = false }) {
+  const { isSpectrum } = useTheme();
+
   // Spotlight via query param
   const [searchParams, setSearchParams] = useSearchParams();
   const nutritionRef = useRef(null);
@@ -646,9 +649,9 @@ function GoalPlannerContent({ compact = false }) {
 
             {/* Macro bars */}
             <motion.div variants={fadeUp} className="gp-macro-bars">
-              <MacroBar label="Protein" value={macros.protein} max={totalMacroG} color="#1D9E75" />
-              <MacroBar label="Carbs"   value={macros.carbs}   max={totalMacroG} color="#5DCAA5" />
-              <MacroBar label="Fat"     value={macros.fat}     max={totalMacroG} color="#0F6E56" />
+              <MacroBar label="Protein" value={macros.protein} max={totalMacroG} color={isSpectrum ? 'var(--color-protein)' : 'var(--accent)'} />
+              <MacroBar label="Carbs"   value={macros.carbs}   max={totalMacroG} color={isSpectrum ? 'var(--color-carbs)' : 'var(--accent-light)'} />
+              <MacroBar label="Fat"     value={macros.fat}     max={totalMacroG} color={isSpectrum ? 'var(--color-fat)' : 'var(--accent-dark)'} />
             </motion.div>
 
             {/* Actions */}
@@ -705,13 +708,13 @@ function GoalPlannerContent({ compact = false }) {
                 <p className="gp-macro-chips-title">Macro targets</p>
                 <div className="gp-macro-chips-grid">
                   {[
-                    { label: 'Calories', value: macros.calories, unit: 'kcal' },
-                    { label: 'Protein',  value: macros.protein,  unit: 'g' },
-                    { label: 'Carbs',    value: macros.carbs,    unit: 'g' },
-                    { label: 'Fat',      value: macros.fat,      unit: 'g' },
-                  ].map(({ label, value, unit }) => (
+                    { label: 'Calories', value: macros.calories, unit: 'kcal', spectrumColor: 'var(--color-calories)' },
+                    { label: 'Protein',  value: macros.protein,  unit: 'g',    spectrumColor: 'var(--color-protein)' },
+                    { label: 'Carbs',    value: macros.carbs,    unit: 'g',    spectrumColor: 'var(--color-carbs)' },
+                    { label: 'Fat',      value: macros.fat,      unit: 'g',    spectrumColor: 'var(--color-fat)' },
+                  ].map(({ label, value, unit, spectrumColor }) => (
                     <div key={label} className="gp-macro-chip">
-                      <span className="gp-macro-chip__value">{value}<span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 2 }}>{unit}</span></span>
+                      <span className="gp-macro-chip__value" style={isSpectrum ? { color: spectrumColor } : undefined}>{value}<span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 2 }}>{unit}</span></span>
                       <span className="gp-macro-chip__label">{label}</span>
                     </div>
                   ))}

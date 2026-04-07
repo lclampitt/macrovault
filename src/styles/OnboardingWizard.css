@@ -23,7 +23,7 @@
   border-radius: 18px;
   width: 100%;
   max-width: 520px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(29,158,117,0.08);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(var(--accent-rgb),0.08);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -149,7 +149,7 @@
 
 .ob-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
 }
 
 /* Units toggle */
@@ -209,7 +209,7 @@
 .ob-goal-card--selected {
   border-color: var(--accent);
   background: var(--accent-muted);
-  box-shadow: 0 0 0 1px rgba(29,158,117,0.2);
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb),0.2);
 }
 
 .ob-goal-card__icon {
@@ -293,7 +293,7 @@
   height: 24px;
   border-radius: 50%;
   background: var(--accent-muted);
-  border: 1px solid rgba(29,158,117,0.25);
+  border: 1px solid rgba(var(--accent-rgb),0.25);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
  *   href        string      — react-router navigation target
  *   index       number      — stagger delay index (0, 1, 2)
  */
-export default function CalculatorCard({ title, subtitle, description, icon: Icon, href, index = 0 }) {
+export default function CalculatorCard({ title, subtitle, description, icon: Icon, href, index = 0, spectrumIconBg, spectrumIconBorder, spectrumIconStroke }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
 
@@ -27,7 +27,7 @@ export default function CalculatorCard({ title, subtitle, description, icon: Ico
       onMouseLeave={() => setHovered(false)}
       style={{
         background: 'var(--bg-surface)',
-        border: `1px solid ${hovered ? '#1D9E75' : 'var(--border)'}`,
+        border: `1px solid ${hovered ? 'var(--accent)' : 'var(--border)'}`,
         borderRadius: 12,
         padding: '18px 20px',
         cursor: 'pointer',
@@ -45,20 +45,20 @@ export default function CalculatorCard({ title, subtitle, description, icon: Ico
           width: 38,
           height: 38,
           borderRadius: 8,
-          background: 'var(--accent-bg)',
-          border: '1px solid #1D9E75',
+          background: spectrumIconBg || 'var(--accent-bg)',
+          border: spectrumIconBorder || '1px solid var(--accent)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <Icon width={16} height={16} stroke="#1D9E75" strokeWidth={1.5} fill="none" />
+          <Icon width={16} height={16} stroke={spectrumIconStroke || 'var(--accent)'} strokeWidth={1.5} fill="none" />
         </div>
 
         {/* Title + subtitle */}
         <div>
           <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{title}</div>
-          <div style={{ fontSize: 10, color: '#5DCAA5', marginTop: 2 }}>{subtitle}</div>
+          <div style={{ fontSize: 10, color: 'var(--accent-light)', marginTop: 2 }}>{subtitle}</div>
         </div>
       </div>
 
@@ -75,11 +75,11 @@ export default function CalculatorCard({ title, subtitle, description, icon: Ico
 
       {/* ── Open button ── */}
       <div style={{
-        border: `1px solid ${hovered ? '#1D9E75' : 'var(--border)'}`,
+        border: `1px solid ${hovered ? 'var(--accent)' : 'var(--border)'}`,
         borderRadius: 6,
         padding: '6px 0',
         fontSize: 11,
-        color: hovered ? '#5DCAA5' : 'var(--text-secondary)',
+        color: hovered ? 'var(--accent-light)' : 'var(--text-secondary)',
         background: 'transparent',
         width: '100%',
         textAlign: 'center',

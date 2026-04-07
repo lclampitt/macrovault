@@ -83,7 +83,7 @@
 
 .input-group input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(29, 158, 117, 0.2);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
   outline: none;
 }
 
@@ -155,7 +155,7 @@
 }
 
 .result-table tr:hover td {
-  background: rgba(29, 158, 117, 0.04);
+  background: rgba(var(--accent-rgb), 0.04);
 }
 
 /* ── About section ──────────────────────────────────────────── */
