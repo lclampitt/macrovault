@@ -152,12 +152,10 @@ function SlotPanel({
         user_id: user.id,
         day: slot.day,
         meal_type: slot.mealType,
-        remaining: {
-          calories: Math.max((goalData?.calories || 2000) - dayTotals.calories, 0),
-          protein: Math.max((goalData?.protein || 150) - dayTotals.protein, 0),
-          carbs: Math.max((goalData?.carbs || 250) - dayTotals.carbs, 0),
-          fat: Math.max((goalData?.fat || 65) - dayTotals.fat, 0),
-        },
+        remaining_calories: Math.max((goalData?.calories || 2000) - dayTotals.calories, 0),
+        remaining_protein: Math.max((goalData?.protein || 150) - dayTotals.protein, 0),
+        remaining_carbs: Math.max((goalData?.carbs || 250) - dayTotals.carbs, 0),
+        remaining_fat: Math.max((goalData?.fat || 65) - dayTotals.fat, 0),
         goal: goalData?.goal || 'Maintenance',
       };
 

@@ -950,11 +950,11 @@ Remaining macros for today:
 
 For each meal return:
 - meal_name: specific and descriptive
-- ingredients: array of strings with quantities (e.g. '150g grilled chicken breast' not just 'chicken')
+- ingredients: a single string listing all ingredients with quantities, comma-separated (e.g. "150g grilled chicken breast, 100g mixed greens, 50g cherry tomatoes")
 - calories: integer
-- protein_g: number
-- carbs_g: number
-- fat_g: number
+- protein: number (grams)
+- carbs: number (grams)
+- fat: number (grams)
 
 Make suggestions realistic and specific. Quantities should be precise. Each meal should fit within the remaining macros without going significantly over.
 
@@ -971,6 +971,13 @@ Return a JSON array of 3 objects only."""
             text = text.strip()
 
         meals = json.loads(text)
+        # Normalize field names: Claude may return protein_g instead of protein, or ingredients as array
+        for m in meals:
+            if isinstance(m.get("ingredients"), list):
+                m["ingredients"] = ", ".join(m["ingredients"])
+            for old_key, new_key in [("protein_g", "protein"), ("carbs_g", "carbs"), ("fat_g", "fat")]:
+                if old_key in m and new_key not in m:
+                    m[new_key] = m.pop(old_key)
         increment_ai_suggestion_use(body.user_id)
         return {"suggestions": meals}
 
@@ -978,19 +985,19 @@ Return a JSON array of 3 objects only."""
         # Return fallback suggestions if Claude doesn't return valid JSON
         fallbacks = {
             "breakfast": [
-                {"meal_name": "Greek Yogurt Parfait", "ingredients": ["200g Greek yogurt", "30g granola", "100g mixed berries", "10g honey"], "calories": 350, "protein_g": 25, "carbs_g": 45, "fat_g": 8},
-                {"meal_name": "Egg White Omelette", "ingredients": ["4 egg whites", "30g spinach", "30g feta cheese", "1 slice whole wheat toast"], "calories": 280, "protein_g": 28, "carbs_g": 20, "fat_g": 8},
-                {"meal_name": "Overnight Oats", "ingredients": ["60g rolled oats", "200ml almond milk", "1 scoop protein powder", "1 banana"], "calories": 420, "protein_g": 30, "carbs_g": 55, "fat_g": 10},
+                {"meal_name": "Greek Yogurt Parfait", "ingredients": "200g Greek yogurt, 30g granola, 100g mixed berries, 10g honey", "calories": 350, "protein": 25, "carbs": 45, "fat": 8},
+                {"meal_name": "Egg White Omelette", "ingredients": "4 egg whites, 30g spinach, 30g feta cheese, 1 slice whole wheat toast", "calories": 280, "protein": 28, "carbs": 20, "fat": 8},
+                {"meal_name": "Overnight Oats", "ingredients": "60g rolled oats, 200ml almond milk, 1 scoop protein powder, 1 banana", "calories": 420, "protein": 30, "carbs": 55, "fat": 10},
             ],
             "lunch": [
-                {"meal_name": "Grilled Chicken Salad", "ingredients": ["150g grilled chicken breast", "100g mixed greens", "50g cherry tomatoes", "30g feta", "15ml olive oil dressing"], "calories": 450, "protein_g": 42, "carbs_g": 15, "fat_g": 22},
-                {"meal_name": "Turkey Wrap", "ingredients": ["120g sliced turkey breast", "1 whole wheat tortilla", "30g hummus", "50g mixed greens", "30g avocado"], "calories": 420, "protein_g": 35, "carbs_g": 35, "fat_g": 15},
-                {"meal_name": "Tuna Rice Bowl", "ingredients": ["150g canned tuna", "150g brown rice", "50g edamame", "30g cucumber", "10ml soy sauce"], "calories": 480, "protein_g": 40, "carbs_g": 50, "fat_g": 10},
+                {"meal_name": "Grilled Chicken Salad", "ingredients": "150g grilled chicken breast, 100g mixed greens, 50g cherry tomatoes, 30g feta, 15ml olive oil dressing", "calories": 450, "protein": 42, "carbs": 15, "fat": 22},
+                {"meal_name": "Turkey Wrap", "ingredients": "120g sliced turkey breast, 1 whole wheat tortilla, 30g hummus, 50g mixed greens, 30g avocado", "calories": 420, "protein": 35, "carbs": 35, "fat": 15},
+                {"meal_name": "Tuna Rice Bowl", "ingredients": "150g canned tuna, 150g brown rice, 50g edamame, 30g cucumber, 10ml soy sauce", "calories": 480, "protein": 40, "carbs": 50, "fat": 10},
             ],
             "dinner": [
-                {"meal_name": "Salmon with Vegetables", "ingredients": ["180g Atlantic salmon fillet", "150g roasted broccoli", "150g sweet potato", "10ml olive oil"], "calories": 520, "protein_g": 40, "carbs_g": 35, "fat_g": 22},
-                {"meal_name": "Lean Beef Stir Fry", "ingredients": ["150g lean beef strips", "100g bell peppers", "80g snap peas", "150g jasmine rice", "15ml teriyaki sauce"], "calories": 550, "protein_g": 38, "carbs_g": 55, "fat_g": 15},
-                {"meal_name": "Chicken Pasta", "ingredients": ["130g grilled chicken breast", "80g whole wheat penne", "100g marinara sauce", "20g parmesan", "50g spinach"], "calories": 500, "protein_g": 42, "carbs_g": 48, "fat_g": 12},
+                {"meal_name": "Salmon with Vegetables", "ingredients": "180g Atlantic salmon fillet, 150g roasted broccoli, 150g sweet potato, 10ml olive oil", "calories": 520, "protein": 40, "carbs": 35, "fat": 22},
+                {"meal_name": "Lean Beef Stir Fry", "ingredients": "150g lean beef strips, 100g bell peppers, 80g snap peas, 150g jasmine rice, 15ml teriyaki sauce", "calories": 550, "protein": 38, "carbs": 55, "fat": 15},
+                {"meal_name": "Chicken Pasta", "ingredients": "130g grilled chicken breast, 80g whole wheat penne, 100g marinara sauce, 20g parmesan, 50g spinach", "calories": 500, "protein": 42, "carbs": 48, "fat": 12},
             ],
         }
         increment_ai_suggestion_use(body.user_id)
@@ -1041,14 +1048,14 @@ Daily targets:
 Each day's 3 meals should roughly add up to the daily targets.
 
 Return a JSON array of 15 objects, each with:
-- day: "monday", "tuesday", "wednesday", "thursday", or "friday"
+- day_of_week: 0 for monday, 1 for tuesday, 2 for wednesday, 3 for thursday, 4 for friday
 - meal_type: "breakfast", "lunch", or "dinner"
 - meal_name: specific and descriptive
-- ingredients: array of strings with precise quantities
+- ingredients: a single string listing all ingredients with quantities, comma-separated
 - calories: integer
-- protein_g: number
-- carbs_g: number
-- fat_g: number
+- protein: number (grams)
+- carbs: number (grams)
+- fat: number (grams)
 
 Vary the meals across days. Make them realistic and easy to prepare. Return the JSON array only."""
             }]
@@ -1062,40 +1069,44 @@ Vary the meals across days. Make them realistic and easy to prepare. Return the 
             text = text.strip()
 
         meals = json.loads(text)
+        # Normalize: if ingredients came back as a list, join into a string
+        for m in meals:
+            if isinstance(m.get("ingredients"), list):
+                m["ingredients"] = ", ".join(m["ingredients"])
         increment_ai_suggestion_use(body.user_id, count=15)
-        return {"suggestions": meals}
+        return {"entries": meals}
 
     except json.JSONDecodeError:
         # Fallback: generate a basic week plan
-        days = ["monday", "tuesday", "wednesday", "thursday", "friday"]
+        days = [0, 1, 2, 3, 4]
         fallback = []
         breakfast_opts = [
-            {"meal_name": "Greek Yogurt Parfait", "ingredients": ["200g Greek yogurt", "30g granola", "100g mixed berries"], "calories": 350, "protein_g": 25, "carbs_g": 45, "fat_g": 8},
-            {"meal_name": "Egg White Omelette", "ingredients": ["4 egg whites", "30g spinach", "30g feta cheese", "1 toast"], "calories": 280, "protein_g": 28, "carbs_g": 20, "fat_g": 8},
-            {"meal_name": "Overnight Oats", "ingredients": ["60g oats", "200ml almond milk", "1 scoop protein powder", "1 banana"], "calories": 420, "protein_g": 30, "carbs_g": 55, "fat_g": 10},
-            {"meal_name": "Protein Pancakes", "ingredients": ["2 eggs", "1 banana", "30g protein powder", "15ml maple syrup"], "calories": 380, "protein_g": 32, "carbs_g": 40, "fat_g": 10},
-            {"meal_name": "Avocado Toast with Eggs", "ingredients": ["2 slices sourdough", "1/2 avocado", "2 eggs", "cherry tomatoes"], "calories": 420, "protein_g": 20, "carbs_g": 35, "fat_g": 22},
+            {"meal_name": "Greek Yogurt Parfait", "ingredients": "200g Greek yogurt, 30g granola, 100g mixed berries", "calories": 350, "protein": 25, "carbs": 45, "fat": 8},
+            {"meal_name": "Egg White Omelette", "ingredients": "4 egg whites, 30g spinach, 30g feta cheese, 1 toast", "calories": 280, "protein": 28, "carbs": 20, "fat": 8},
+            {"meal_name": "Overnight Oats", "ingredients": "60g oats, 200ml almond milk, 1 scoop protein powder, 1 banana", "calories": 420, "protein": 30, "carbs": 55, "fat": 10},
+            {"meal_name": "Protein Pancakes", "ingredients": "2 eggs, 1 banana, 30g protein powder, 15ml maple syrup", "calories": 380, "protein": 32, "carbs": 40, "fat": 10},
+            {"meal_name": "Avocado Toast with Eggs", "ingredients": "2 slices sourdough, 1/2 avocado, 2 eggs, cherry tomatoes", "calories": 420, "protein": 20, "carbs": 35, "fat": 22},
         ]
         lunch_opts = [
-            {"meal_name": "Grilled Chicken Salad", "ingredients": ["150g chicken breast", "100g mixed greens", "50g tomatoes", "30g feta", "15ml dressing"], "calories": 450, "protein_g": 42, "carbs_g": 15, "fat_g": 22},
-            {"meal_name": "Turkey Wrap", "ingredients": ["120g turkey breast", "1 tortilla", "30g hummus", "50g greens", "30g avocado"], "calories": 420, "protein_g": 35, "carbs_g": 35, "fat_g": 15},
-            {"meal_name": "Tuna Rice Bowl", "ingredients": ["150g tuna", "150g brown rice", "50g edamame", "30g cucumber"], "calories": 480, "protein_g": 40, "carbs_g": 50, "fat_g": 10},
-            {"meal_name": "Chicken Burrito Bowl", "ingredients": ["150g chicken", "100g rice", "50g black beans", "30g salsa", "30g cheese"], "calories": 520, "protein_g": 40, "carbs_g": 50, "fat_g": 15},
-            {"meal_name": "Salmon Poke Bowl", "ingredients": ["130g salmon", "150g sushi rice", "50g cucumber", "30g avocado", "15ml soy sauce"], "calories": 490, "protein_g": 35, "carbs_g": 48, "fat_g": 18},
+            {"meal_name": "Grilled Chicken Salad", "ingredients": "150g chicken breast, 100g mixed greens, 50g tomatoes, 30g feta, 15ml dressing", "calories": 450, "protein": 42, "carbs": 15, "fat": 22},
+            {"meal_name": "Turkey Wrap", "ingredients": "120g turkey breast, 1 tortilla, 30g hummus, 50g greens, 30g avocado", "calories": 420, "protein": 35, "carbs": 35, "fat": 15},
+            {"meal_name": "Tuna Rice Bowl", "ingredients": "150g tuna, 150g brown rice, 50g edamame, 30g cucumber", "calories": 480, "protein": 40, "carbs": 50, "fat": 10},
+            {"meal_name": "Chicken Burrito Bowl", "ingredients": "150g chicken, 100g rice, 50g black beans, 30g salsa, 30g cheese", "calories": 520, "protein": 40, "carbs": 50, "fat": 15},
+            {"meal_name": "Salmon Poke Bowl", "ingredients": "130g salmon, 150g sushi rice, 50g cucumber, 30g avocado, 15ml soy sauce", "calories": 490, "protein": 35, "carbs": 48, "fat": 18},
         ]
         dinner_opts = [
-            {"meal_name": "Salmon with Vegetables", "ingredients": ["180g salmon", "150g broccoli", "150g sweet potato"], "calories": 520, "protein_g": 40, "carbs_g": 35, "fat_g": 22},
-            {"meal_name": "Lean Beef Stir Fry", "ingredients": ["150g beef strips", "100g bell peppers", "80g snap peas", "150g rice"], "calories": 550, "protein_g": 38, "carbs_g": 55, "fat_g": 15},
-            {"meal_name": "Chicken Pasta", "ingredients": ["130g chicken", "80g penne", "100g marinara sauce", "20g parmesan"], "calories": 500, "protein_g": 42, "carbs_g": 48, "fat_g": 12},
-            {"meal_name": "Turkey Meatballs", "ingredients": ["150g ground turkey", "80g spaghetti", "100g tomato sauce", "parsley"], "calories": 480, "protein_g": 38, "carbs_g": 45, "fat_g": 14},
-            {"meal_name": "Shrimp Tacos", "ingredients": ["150g shrimp", "3 corn tortillas", "50g cabbage slaw", "30g avocado", "lime"], "calories": 450, "protein_g": 35, "carbs_g": 40, "fat_g": 15},
+            {"meal_name": "Salmon with Vegetables", "ingredients": "180g salmon, 150g broccoli, 150g sweet potato", "calories": 520, "protein": 40, "carbs": 35, "fat": 22},
+            {"meal_name": "Lean Beef Stir Fry", "ingredients": "150g beef strips, 100g bell peppers, 80g snap peas, 150g rice", "calories": 550, "protein": 38, "carbs": 55, "fat": 15},
+            {"meal_name": "Chicken Pasta", "ingredients": "130g chicken, 80g penne, 100g marinara sauce, 20g parmesan", "calories": 500, "protein": 42, "carbs": 48, "fat": 12},
+            {"meal_name": "Turkey Meatballs", "ingredients": "150g ground turkey, 80g spaghetti, 100g tomato sauce, parsley", "calories": 480, "protein": 38, "carbs": 45, "fat": 14},
+            {"meal_name": "Shrimp Tacos", "ingredients": "150g shrimp, 3 corn tortillas, 50g cabbage slaw, 30g avocado, lime", "calories": 450, "protein": 35, "carbs": 40, "fat": 15},
         ]
         for i, day in enumerate(days):
-            fallback.append({**breakfast_opts[i], "day": day, "meal_type": "breakfast"})
-            fallback.append({**lunch_opts[i], "day": day, "meal_type": "lunch"})
-            fallback.append({**dinner_opts[i], "day": day, "meal_type": "dinner"})
+            fallback.append({**breakfast_opts[i], "day_of_week": day, "meal_type": "breakfast"})
+            fallback.append({**lunch_opts[i], "day_of_week": day, "meal_type": "lunch"})
+            fallback.append({**dinner_opts[i], "day_of_week": day, "meal_type": "dinner"})
         increment_ai_suggestion_use(body.user_id, count=15)
-        return {"suggestions": fallback}
+        return {"entries": fallback}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI week suggestion error: {str(e)}")
