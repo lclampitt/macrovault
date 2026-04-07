@@ -202,10 +202,14 @@ def can_use_ai_suggestions(user_id: str) -> bool:
     """Return True if the user has AI suggestion uses remaining (Pro+ only, 300/month)."""
     if not supabase_admin:
         return True
-    result = supabase_admin.table("profiles") \
-        .select("subscription_tier,ai_suggestions_this_month,ai_suggestions_month") \
-        .eq("id", user_id).maybe_single().execute()
-    profile = result.data or {}
+    try:
+        result = supabase_admin.table("profiles") \
+            .select("subscription_tier,ai_suggestions_this_month,ai_suggestions_month") \
+            .eq("id", user_id).maybe_single().execute()
+        profile = result.data or {}
+    except Exception:
+        # Columns may not exist yet — allow usage
+        return True
     if profile.get("subscription_tier") != "pro_plus":
         return False
     month = _current_month()
@@ -217,21 +221,24 @@ def increment_ai_suggestion_use(user_id: str, count: int = 1):
     """Increment the AI suggestion counter for this month."""
     if not supabase_admin:
         return
-    month = _current_month()
-    result = supabase_admin.table("profiles") \
-        .select("ai_suggestions_this_month,ai_suggestions_month") \
-        .eq("id", user_id).maybe_single().execute()
-    profile = result.data or {}
-    if profile.get("ai_suggestions_month", "") != month:
-        supabase_admin.table("profiles").update({
-            "ai_suggestions_this_month": count,
-            "ai_suggestions_month": month,
-        }).eq("id", user_id).execute()
-    else:
-        current = profile.get("ai_suggestions_this_month") or 0
-        supabase_admin.table("profiles").update({
-            "ai_suggestions_this_month": current + count,
-        }).eq("id", user_id).execute()
+    try:
+        month = _current_month()
+        result = supabase_admin.table("profiles") \
+            .select("ai_suggestions_this_month,ai_suggestions_month") \
+            .eq("id", user_id).maybe_single().execute()
+        profile = result.data or {}
+        if profile.get("ai_suggestions_month", "") != month:
+            supabase_admin.table("profiles").update({
+                "ai_suggestions_this_month": count,
+                "ai_suggestions_month": month,
+            }).eq("id", user_id).execute()
+        else:
+            current = profile.get("ai_suggestions_this_month") or 0
+            supabase_admin.table("profiles").update({
+                "ai_suggestions_this_month": current + count,
+            }).eq("id", user_id).execute()
+    except Exception:
+        pass  # Columns may not exist yet — silently skip tracking
 
 def can_use_analyzer(user_id: str) -> bool:
     """Return True if the user is allowed to run an analysis."""
@@ -935,7 +942,7 @@ async def suggest_meal(body: MealSuggestRequest):
 
     try:
         message = anthropic_client.messages.create(
-            model="claude-haiku-3-5-20241022",
+            model="claude-3-5-haiku-20241022",
             max_tokens=1200,
             system="You are a nutrition expert helping someone hit their daily macro targets. Return ONLY valid JSON, no markdown, no explanation.",
             messages=[{
@@ -1032,7 +1039,7 @@ async def suggest_week(body: WeekSuggestRequest):
 
     try:
         message = anthropic_client.messages.create(
-            model="claude-haiku-3-5-20241022",
+            model="claude-3-5-haiku-20241022",
             max_tokens=4000,
             system="You are a nutrition expert creating weekly meal plans. Return ONLY valid JSON, no markdown, no explanation.",
             messages=[{
