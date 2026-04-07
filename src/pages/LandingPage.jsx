@@ -10,8 +10,11 @@ import {
   BookOpen,
   Check,
   Zap,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useTheme } from '../hooks/useTheme';
 import '../styles/landing.css';
 
 /* -- Animation variants -- */
@@ -98,6 +101,7 @@ const STATS = [
 
 /* -- Navbar -- */
 function Navbar() {
+  const { isDark, toggle } = useTheme();
   return (
     <motion.nav
       className="lp-nav"
@@ -117,6 +121,9 @@ function Navbar() {
       </div>
 
       <div className="lp-nav__actions">
+        <button className="lp-theme-toggle" onClick={toggle} aria-label="Toggle theme">
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
         <Link to="/auth" className="lp-nav__signin">Sign in</Link>
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
           <Link to="/auth" className="lp-nav__cta">Get started</Link>
