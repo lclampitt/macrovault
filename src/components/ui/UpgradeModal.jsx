@@ -275,7 +275,7 @@ export default function UpgradeModal({ isOpen, onClose, feature = null, tier = '
                           Redirecting…
                         </span>
                       ) : (
-                        'Pro+ — $9.99/mo'
+                        'Upgrade to Pro+ — $9.99/mo'
                       )}
                     </button>
                   </div>
