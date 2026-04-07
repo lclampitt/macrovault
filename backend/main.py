@@ -1026,6 +1026,22 @@ async def stripe_webhook(request: Request):
             tier = "pro_plus" if tier_val == "pro_plus" else "pro"
 
             if user_id:
+                # Cancel any existing subscription before activating the new one.
+                # This prevents double-billing when upgrading from Pro to Pro+.
+                try:
+                    existing = supabase_admin.table("profiles") \
+                        .select("stripe_subscription_id") \
+                        .eq("id", user_id) \
+                        .maybe_single() \
+                        .execute()
+                    old_sub_id = existing.data.get("stripe_subscription_id") if existing.data else None
+                    if old_sub_id and old_sub_id != subscription_id:
+                        stripe.Subscription.cancel(old_sub_id)
+                        print(f"[STRIPE] Cancelled old subscription {old_sub_id} for user {user_id} (upgrading to {tier})")
+                except Exception as cancel_err:
+                    # Log but don't block the new subscription from activating
+                    print(f"[STRIPE] Could not cancel old subscription for {user_id}: {cancel_err}")
+
                 supabase_admin.table("profiles").upsert({
                     "id": user_id,
                     "subscription_tier": tier,
