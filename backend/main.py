@@ -935,7 +935,7 @@ async def suggest_meal(body: MealSuggestRequest):
 
     try:
         message = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-haiku-3-5-20241022",
             max_tokens=1200,
             system="You are a nutrition expert helping someone hit their daily macro targets. Return ONLY valid JSON, no markdown, no explanation.",
             messages=[{
@@ -1025,7 +1025,7 @@ async def suggest_week(body: WeekSuggestRequest):
 
     try:
         message = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-haiku-3-5-20241022",
             max_tokens=4000,
             system="You are a nutrition expert creating weekly meal plans. Return ONLY valid JSON, no markdown, no explanation.",
             messages=[{
