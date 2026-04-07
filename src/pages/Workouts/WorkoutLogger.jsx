@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Trash2 } from 'lucide-react';
+import { Lock, Trash2, Dumbbell } from 'lucide-react';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
@@ -26,7 +26,7 @@ const fadeUp = {
 export default function WorkoutLogger() {
   const { triggerUpgrade } = useUpgrade();
   const { plan, isPro } = usePlan();
-  const { isSpectrum } = useTheme();
+  const { isSpectrum, isY2K } = useTheme();
 
   const MUSCLE_GROUPS = ['Upper Body', 'Lower Body', 'Legs', 'Full Body', 'Core', 'Cardio'];
 
@@ -211,6 +211,28 @@ export default function WorkoutLogger() {
   return (
     <div className="wl">
 
+      {/* ── Y2K FREE TIER USAGE COUNTER ── */}
+      {isY2K && !isPro && workoutHistory.length > 0 && (
+        <div className="wl-y2k-usage">
+          <div className="wl-y2k-usage__bar-track">
+            <div
+              className="wl-y2k-usage__bar-fill"
+              style={{
+                width: `${Math.min((workoutHistory.length / 10) * 100, 100)}%`,
+                background: workoutHistory.length >= 8
+                  ? 'linear-gradient(180deg, #FFD700, #CC9900)'
+                  : `linear-gradient(180deg, var(--accent-light), var(--accent))`,
+              }}
+            />
+          </div>
+          <span className={`wl-y2k-usage__text ${workoutHistory.length >= 8 ? 'wl-y2k-usage__text--warn' : ''}`}>
+            {workoutHistory.length >= 8
+              ? `WARNING: [${workoutHistory.length}] / 10 logs used. Upgrade to Pro for unlimited.`
+              : `[${workoutHistory.length}] / 10 free workout logs used`}
+          </span>
+        </div>
+      )}
+
       {/* ── LOG SECTION ── */}
       <motion.div
         className="wl-log-card"
@@ -218,11 +240,19 @@ export default function WorkoutLogger() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       >
+        {/* Y2K gradient title bar */}
+        {isY2K && (
+          <div className="wl-y2k-titlebar">
+            <Dumbbell width={10} height={10} stroke="var(--accent-light)" strokeWidth={2} fill="none" />
+            <span>LOG WORKOUT</span>
+          </div>
+        )}
+
         {/* Header row: title + expand toggle */}
         <div className="wl-log-header">
           <div>
             <p className="wl-section-title">Log a workout</p>
-            {!isPro && workoutHistory.length > 0 && (
+            {!isPro && !isY2K && workoutHistory.length > 0 && (
               <p style={{
                 fontSize: 11,
                 color: workoutHistory.length >= 8 ? '#EF9F27' : 'var(--text-muted)',
@@ -239,7 +269,7 @@ export default function WorkoutLogger() {
               whileTap={{ scale: 0.97 }}
               style={isSpectrum ? { border: '1px solid #1D9E75', color: '#5DCAA5', background: '#0a1a0f' } : undefined}
             >
-              {formOpen ? 'Cancel' : '+ New workout'}
+              {formOpen ? (isY2K ? '[ Cancel ]' : 'Cancel') : (isY2K ? '[ + New workout ]' : '+ New workout')}
             </motion.button>
           )}
         </div>
@@ -274,6 +304,9 @@ export default function WorkoutLogger() {
               style={{ overflow: 'hidden' }}
             >
               <div className="wl-form-inner">
+                {/* Y2K form section label */}
+                {isY2K && <div className="wl-y2k-form-label">NEW WORKOUT ENTRY</div>}
+
                 {/* Date + Name row */}
                 <div className="wl-top-row">
                   <div className="wl-field">
@@ -326,7 +359,7 @@ export default function WorkoutLogger() {
                     placeholder="Add an exercise…"
                   />
                   <motion.button className="btn btn-primary" onClick={addExercise} whileTap={{ scale: 0.97 }}>
-                    Add
+                    {isY2K ? '[ Add ]' : 'Add'}
                   </motion.button>
                 </div>
 
@@ -346,7 +379,7 @@ export default function WorkoutLogger() {
                         onClick={() => deleteExercise(i)}
                         whileTap={{ scale: 0.97 }}
                       >
-                        Remove
+                        {isY2K ? '[ Remove ]' : 'Remove'}
                       </motion.button>
                     </div>
 
@@ -372,7 +405,7 @@ export default function WorkoutLogger() {
                     </table>
 
                     <motion.button className="btn btn-primary wl-add-set" onClick={() => addSet(i)} whileTap={{ scale: 0.97 }}>
-                      + Add Set
+                      {isY2K ? '[ + Add Set ]' : '+ Add Set'}
                     </motion.button>
                   </motion.div>
                 ))}
@@ -380,10 +413,21 @@ export default function WorkoutLogger() {
                 {/* Feedback message */}
                 {message && <p className="wl-message">{message}</p>}
 
-                {/* Save button — right aligned */}
+                {/* Save / Cancel row */}
                 <div className="wl-save-row">
+                  {isY2K && (
+                    <motion.button
+                      className="btn wl-y2k-cancel-btn"
+                      onClick={() => { setFormOpen(false); setEditingWorkoutId(null); }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      [ Cancel ]
+                    </motion.button>
+                  )}
                   <motion.button className="btn btn-primary" onClick={saveWorkout} whileTap={{ scale: 0.97 }}>
-                    {editingWorkoutId ? 'Update Workout' : 'Save Workout'}
+                    {isY2K
+                      ? (editingWorkoutId ? '[ Update Workout ]' : '[ Save Workout ]')
+                      : (editingWorkoutId ? 'Update Workout' : 'Save Workout')}
                   </motion.button>
                 </div>
               </div>
@@ -393,41 +437,71 @@ export default function WorkoutLogger() {
       </motion.div>
 
       {/* ── HISTORY SECTION ── */}
-      <p className="wl-history-title" style={isSpectrum ? { color: '#1D9E75' } : undefined}>Workout history</p>
-
-      {workoutHistory.length === 0 && (
-        <p className="wl-empty">No workouts logged yet.</p>
+      {isY2K ? (
+        <div className="wl-y2k-history-heading">
+          <div className="wl-y2k-history-heading__bar" />
+          <span className="wl-y2k-history-heading__text">Workout History</span>
+          {workoutHistory.length > 0 && (
+            <span className="wl-y2k-history-heading__count">[{workoutHistory.length}] workouts logged</span>
+          )}
+        </div>
+      ) : (
+        <p className="wl-history-title" style={isSpectrum ? { color: '#1D9E75' } : undefined}>Workout history</p>
       )}
 
-      <div className="wl-history-list">
+      {workoutHistory.length === 0 && (
+        isY2K ? (
+          <div className="wl-y2k-empty">
+            <div className="wl-y2k-empty__icon">
+              <Dumbbell size={32} stroke="#334466" strokeWidth={1.5} fill="none" />
+            </div>
+            <span className="wl-y2k-empty__primary">NO WORKOUTS LOGGED</span>
+            <span className="wl-y2k-empty__secondary">Click [ + New workout ] to log your first session.</span>
+            <span className="wl-y2k-empty__deco">--- [ MacroVault Workout Tracker ] ---</span>
+          </div>
+        ) : (
+          <p className="wl-empty">No workouts logged yet.</p>
+        )
+      )}
+
+      <div className={`wl-history-list ${isY2K ? 'wl-history-list--y2k' : ''}`}>
         {workoutHistory.map((workout, idx) => (
           <React.Fragment key={workout.id}>
             <motion.div
-              className="wl-history-row"
+              className={`wl-history-row ${isY2K ? (idx % 2 === 0 ? 'wl-history-row--y2k-odd' : 'wl-history-row--y2k-even') : ''}`}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, delay: idx * 0.04, ease: 'easeOut' }}
-              whileHover={{ scale: 1.01 }}
+              whileHover={isY2K ? undefined : { scale: 1.01 }}
               onClick={() => toggleExpand(workout.id)}
             >
               <div className="wl-history-row__left">
-                <span className="wl-history-name" style={isSpectrum ? { color: '#5DCAA5' } : undefined}>{workout.workout_name}</span>
-                <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
+                {isY2K && (
+                  <div className="wl-y2k-row-icon">
+                    <Dumbbell size={14} stroke="var(--accent-light)" strokeWidth={1.5} fill="none" />
+                  </div>
+                )}
+                <div className="wl-history-row__text">
+                  <span className="wl-history-name" style={isSpectrum ? { color: '#5DCAA5' } : undefined}>{workout.workout_name}</span>
+                  <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
+                </div>
               </div>
               <div className="wl-history-row__right">
                 {(workout.exercises || []).length > 0 && (
-                  <span className="wl-exercise-count">{workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}</span>
+                  <span className={`wl-exercise-count ${isY2K ? 'wl-exercise-count--y2k' : ''}`}>
+                    {isY2K ? `[${workout.exercises.length}] exercise${workout.exercises.length !== 1 ? 's' : ''}` : `${workout.exercises.length} exercise${workout.exercises.length !== 1 ? 's' : ''}`}
+                  </span>
                 )}
                 <motion.button
-                  className="btn btn-primary wl-btn-sm"
+                  className={`btn btn-primary wl-btn-sm ${isY2K ? 'wl-btn-sm--y2k-edit' : ''}`}
                   onClick={(e) => { e.stopPropagation(); editWorkout(workout); }}
                   whileTap={{ scale: 0.97 }}
                   style={isSpectrum ? { border: '1px solid #1D9E75', color: '#5DCAA5' } : undefined}
                 >
-                  Edit
+                  {isY2K ? '[ Edit ]' : 'Edit'}
                 </motion.button>
                 <motion.button
-                  className="btn btn-destructive wl-btn-sm wl-btn-icon"
+                  className={`btn btn-destructive wl-btn-sm wl-btn-icon ${isY2K ? 'wl-btn-sm--y2k-delete' : ''}`}
                   onClick={(e) => { e.stopPropagation(); deleteWorkout(workout.id); }}
                   whileTap={{ scale: 0.97 }}
                   title="Delete workout"

@@ -795,3 +795,488 @@
   border-right: 4px solid transparent;
   border-top: 4px solid #FFFFCC;
 }
+
+/* ══════════════════════════════════════════
+   WORKOUT LOGGER — Y2K OVERRIDES
+   ══════════════════════════════════════════ */
+
+/* ── Log card container ── */
+[data-ui-mode="y2k"] .wl-log-card {
+  border: 2px outset #6688aa !important;
+  border-radius: 4px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+/* ── Y2K gradient title bar ── */
+.wl-y2k-titlebar {
+  height: 22px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 50%, #3344aa),
+    color-mix(in srgb, var(--accent) 25%, #1a2266)
+  );
+  border-bottom: 1px solid #223388;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.wl-y2k-titlebar span {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Log header (below title bar in Y2K) ── */
+[data-ui-mode="y2k"] .wl-log-header {
+  padding: 12px 14px;
+}
+
+[data-ui-mode="y2k"] .wl-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* ── "+ New workout" button — Y2K raised ── */
+[data-ui-mode="y2k"] .wl-toggle-btn {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-light) 60%, var(--accent)),
+    var(--accent-dark)
+  ) !important;
+  border: 1px outset var(--accent-light) !important;
+  border-radius: 3px !important;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+}
+
+[data-ui-mode="y2k"] .wl-toggle-btn:active {
+  border: 1px inset var(--accent-dark) !important;
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ── Form inner area ── */
+[data-ui-mode="y2k"] .wl-form-inner {
+  padding: 0 14px 14px !important;
+}
+
+/* ── Y2K form section label ── */
+.wl-y2k-form-label {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830);
+  border: 1px outset #4466aa;
+  border-radius: 2px;
+  padding: 4px 10px;
+  margin-bottom: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-light);
+  font-family: 'Courier New', Courier, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+}
+
+/* ── Y2K Cancel button (secondary) ── */
+.wl-y2k-cancel-btn {
+  background: linear-gradient(180deg, #2a2a2a, #1a1a1a) !important;
+  border: 1px outset #666 !important;
+  border-radius: 3px !important;
+  padding: 8px 14px;
+  color: #888 !important;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.wl-y2k-cancel-btn:active {
+  border: 1px inset #444 !important;
+  transform: translateY(1px);
+}
+
+/* ── Save row gap ── */
+[data-ui-mode="y2k"] .wl-save-row {
+  gap: 8px;
+}
+
+/* ── Muscle group pills — Y2K ── */
+[data-ui-mode="y2k"] .wl-mg-pill {
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  font-weight: 700;
+  font-size: 11px;
+  background: linear-gradient(180deg, #0d1830, #060c18);
+  color: #4488cc;
+}
+
+[data-ui-mode="y2k"] .wl-mg-pill--active {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-light) 40%, var(--accent)),
+    var(--accent-dark)
+  ) !important;
+  border: 1px outset var(--accent-light) !important;
+  color: #fff !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* ── Y2K labels ── */
+[data-ui-mode="y2k"] .wl-label {
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+  color: #4488cc;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* ── Exercise block — Y2K ── */
+[data-ui-mode="y2k"] .wl-exercise-block {
+  border: 2px inset #334466 !important;
+  border-radius: 4px !important;
+  background: #060c18 !important;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .wl-exercise-name {
+  font-weight: 700;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Sets table — Y2K ── */
+[data-ui-mode="y2k"] .wl-sets-table th {
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: #4466aa;
+  letter-spacing: 0.06em;
+  border-bottom-color: #1a2a4a;
+}
+
+[data-ui-mode="y2k"] .wl-sets-table td {
+  border-bottom-color: #1a2a4a;
+}
+
+[data-ui-mode="y2k"] .wl-set-num {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: #4466aa;
+}
+
+/* ══════════════════════════════════════════
+   WORKOUT HISTORY — Y2K
+   ══════════════════════════════════════════ */
+
+/* ── Y2K History heading ── */
+.wl-y2k-history-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.wl-y2k-history-heading__bar {
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(180deg, var(--accent-light), var(--accent));
+  border: 1px outset var(--accent);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.wl-y2k-history-heading__text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: system-ui, sans-serif;
+}
+
+.wl-y2k-history-heading__count {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830);
+  border: 1px outset #4466aa;
+  border-radius: 2px;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-light);
+  margin-left: auto;
+  font-family: 'Courier New', Courier, monospace;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* ── History container — inset border ── */
+[data-ui-mode="y2k"] .wl-history-list--y2k {
+  border: 2px inset #334466;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0a1220, #060c18);
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5);
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ── Zebra-striped rows ── */
+[data-ui-mode="y2k"] .wl-history-row {
+  border: none !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #1a2a3a !important;
+  box-shadow: none;
+  padding: 10px 14px;
+  gap: 12px;
+  transition: background 0.15s ease, border-left 0.15s ease, padding-left 0.15s ease;
+}
+
+[data-ui-mode="y2k"] .wl-history-row:last-child {
+  border-bottom: none !important;
+}
+
+[data-ui-mode="y2k"] .wl-history-row--y2k-odd {
+  background: linear-gradient(180deg, #0d1830, #0a1220);
+}
+
+[data-ui-mode="y2k"] .wl-history-row--y2k-even {
+  background: linear-gradient(180deg, #111f38, #0d1830);
+}
+
+[data-ui-mode="y2k"] .wl-history-row:hover {
+  background: linear-gradient(180deg,
+    var(--accent-bg),
+    color-mix(in srgb, var(--accent-bg) 80%, #060c18)
+  ) !important;
+  border-left: 3px solid var(--accent) !important;
+  padding-left: 11px;
+}
+
+/* ── Row layout with icon ── */
+[data-ui-mode="y2k"] .wl-history-row__left {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.wl-y2k-row-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  background: linear-gradient(135deg, var(--accent-bg), #060c18);
+  border: 1px outset #334466;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wl-history-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+[data-ui-mode="y2k"] .wl-history-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-light) !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .wl-history-date {
+  font-size: 10px;
+  color: #4466aa;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Exercise count pill — Y2K ── */
+.wl-exercise-count--y2k {
+  background: #0a1220 !important;
+  border: 1px inset #334466 !important;
+  border-radius: 2px !important;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #4488cc !important;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Edit button — Y2K ── */
+[data-ui-mode="y2k"] .wl-btn-sm--y2k-edit {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-light) 60%, var(--accent)),
+    var(--accent-dark)
+  ) !important;
+  border: 1px outset var(--accent-light) !important;
+  border-radius: 3px !important;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+[data-ui-mode="y2k"] .wl-btn-sm--y2k-edit:active {
+  border: 1px inset var(--accent-dark) !important;
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ── Delete button — Y2K ── */
+[data-ui-mode="y2k"] .wl-btn-sm--y2k-delete {
+  background: linear-gradient(180deg, #2a0a0a, #1a0606) !important;
+  border: 1px outset #aa3333 !important;
+  border-radius: 3px !important;
+  padding: 4px 8px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+[data-ui-mode="y2k"] .wl-btn-sm--y2k-delete svg {
+  color: #ff6666;
+}
+
+[data-ui-mode="y2k"] .wl-btn-sm--y2k-delete:hover {
+  background: linear-gradient(180deg, #3a0a0a, #2a0606) !important;
+}
+
+[data-ui-mode="y2k"] .wl-btn-sm--y2k-delete:active {
+  border: 1px inset #882222 !important;
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ── Exercise detail — Y2K ── */
+[data-ui-mode="y2k"] .wl-exercise-detail {
+  border: none !important;
+  border-radius: 0 !important;
+  background: #060c18 !important;
+  border-bottom: 1px solid #1a2a3a !important;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.4);
+  padding: 12px 16px;
+}
+
+[data-ui-mode="y2k"] .history-exercise h4 {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 11px;
+}
+
+[data-ui-mode="y2k"] .history-exercise th {
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: #4466aa;
+  letter-spacing: 0.06em;
+  border-bottom-color: #1a2a4a;
+}
+
+[data-ui-mode="y2k"] .history-exercise td {
+  color: #6688aa;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  border-bottom-color: #1a2a4a;
+}
+
+/* ══════════════════════════════════════════
+   WORKOUT — Y2K EMPTY STATE
+   ══════════════════════════════════════════ */
+
+.wl-y2k-empty {
+  border: 2px inset #334466;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0a1220, #060c18);
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.wl-y2k-empty__icon {
+  border: 2px inset #223355;
+  border-radius: 4px;
+  padding: 8px;
+  background: #0a1220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wl-y2k-empty__primary {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4466aa;
+  font-family: 'Courier New', Courier, monospace;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+.wl-y2k-empty__secondary {
+  font-size: 11px;
+  color: #334466;
+  text-align: center;
+}
+
+.wl-y2k-empty__deco {
+  font-size: 10px;
+  color: #223355;
+  font-family: 'Courier New', Courier, monospace;
+  margin-top: 4px;
+}
+
+/* ══════════════════════════════════════════
+   WORKOUT — Y2K USAGE COUNTER
+   ══════════════════════════════════════════ */
+
+.wl-y2k-usage {
+  background: #0a1220;
+  border: 2px inset #334466;
+  border-radius: 3px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wl-y2k-usage__bar-track {
+  height: 8px;
+  border: 2px inset #223355;
+  border-radius: 2px;
+  background: #060c18;
+  overflow: hidden;
+}
+
+.wl-y2k-usage__bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 0.4s ease;
+}
+
+.wl-y2k-usage__text {
+  font-size: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: #4466aa;
+}
+
+.wl-y2k-usage__text--warn {
+  color: #FFD700;
+}
