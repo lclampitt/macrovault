@@ -23,10 +23,10 @@ import './Sidebar.css';
 
 const NAV_ITEMS = [
   { to: '/home',          label: 'Home',             icon: Home             },
-  { to: '/measurements',  label: 'Measurements',     icon: Ruler            },
   { to: '/calculators',   label: 'Calculators',      icon: Calculator       },
   { to: '/workouts',      label: 'Workouts',         icon: Dumbbell         },
   { to: '/exercises',     label: 'Exercise Library',  icon: BookOpen         },
+  { to: '/measurements',  label: 'Measurements',     icon: Ruler            },
   { to: '/goalplanner',   label: 'Goal Planner',     icon: Target,     locked: true },
   { to: '/meal-planner',  label: 'Meal Planner',     icon: UtensilsCrossed, locked: true },
   { to: '/progress',      label: 'Progress',         icon: BarChart2,  locked: true },
