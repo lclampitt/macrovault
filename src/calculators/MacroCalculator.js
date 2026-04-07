@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { User, UserRound, TrendingDown, Minus, TrendingUp } from 'lucide-react';
+import { User, UserRound, TrendingDown, Minus, TrendingUp, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '../supabaseClient';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -126,7 +127,7 @@ function computeMacros({ sex, age, heightUnit, heightFt, heightIn, heightCm, wei
 
 // ── Results view ───────────────────────────────────────────────────────────────
 
-function ResultsView({ results, goal, onReset, onSave, onCopy }) {
+function ResultsView({ results, goal, onReset, onSave, onCopy, saving = false }) {
   const { tdee, targetCals, proteinG, carbG, fatG } = results;
   const goalBadge  = { cut: 'Cutting phase', maintain: 'Maintenance', bulk: 'Building phase' }[goal] ?? '';
   const deltaLabel = goal === 'cut' ? 'Deficit: −500 kcal' : goal === 'bulk' ? 'Surplus: +300 kcal' : 'Maintenance';
@@ -236,7 +237,9 @@ function ResultsView({ results, goal, onReset, onSave, onCopy }) {
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <button style={tealBtn} onClick={onSave}>Save to Goal Planner</button>
+          <button style={{ ...tealBtn, opacity: saving ? 0.7 : 1 }} onClick={onSave} disabled={saving}>
+            {saving ? 'Saving...' : 'Save to Goal Planner'}
+          </button>
           <button style={outlineBtn} onClick={onReset}>Recalculate</button>
           <button style={outlineBtn} onClick={onCopy}>Copy results</button>
         </div>
@@ -314,14 +317,69 @@ export default function MacroCalculator() {
     setGoal('cut'); setDiet('standard'); dirRef.current = 1; setStep(1);
   }
 
-  function saveToGoalPlanner() {
-    localStorage.setItem('gainlytics_macro_prefill', JSON.stringify({
-      calories: results.targetCals, protein_g: results.proteinG,
-      carbs_g: results.carbG, fat_g: results.fatG,
-      goal_type: goal === 'cut' ? 'cutting' : goal === 'bulk' ? 'bulking' : 'maintenance',
-    }));
-    toast.success('Macro targets loaded into Goal Planner');
-    navigate('/goalplanner');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [savingGoal, setSavingGoal]   = useState(false);
+
+  async function saveToGoalPlanner() {
+    setSavingGoal(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error('Please sign in to save.'); setSavingGoal(false); return; }
+
+      // Check if user already has goal data with actual values
+      const { data: existing } = await supabase
+        .from('goals')
+        .select('calories, protein, carbs, fat')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const hasExisting = existing && (existing.calories > 0 || existing.protein > 0);
+
+      if (hasExisting) {
+        // Ask user to confirm overwrite
+        setSavingGoal(false);
+        setShowConfirm(true);
+      } else {
+        // No existing data — save automatically
+        await doSaveToGoals(user.id);
+      }
+    } catch (err) {
+      toast.error('Something went wrong.');
+      setSavingGoal(false);
+    }
+  }
+
+  async function doSaveToGoals(uid) {
+    setSavingGoal(true);
+    try {
+      const goalType = goal === 'cut' ? 'Cutting' : goal === 'bulk' ? 'Bulking' : 'Maintenance';
+
+      const { error } = await supabase
+        .from('goals')
+        .upsert({
+          user_id: uid,
+          goal: goalType,
+          calories: results.targetCals,
+          protein: results.proteinG,
+          carbs: results.carbG,
+          fat: results.fatG,
+        }, { onConflict: ['user_id'] });
+
+      if (error) throw error;
+
+      toast.success('Macro targets saved to Goal Planner!');
+      navigate('/goalplanner');
+    } catch (err) {
+      toast.error('Failed to save to Goal Planner.');
+    } finally {
+      setSavingGoal(false);
+      setShowConfirm(false);
+    }
+  }
+
+  async function handleConfirmUpdate() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await doSaveToGoals(user.id);
   }
 
   function copyResults() {
@@ -509,7 +567,79 @@ export default function MacroCalculator() {
   }
 
   if (results) {
-    return <ResultsView results={results} goal={goal} onReset={reset} onSave={saveToGoalPlanner} onCopy={copyResults} />;
+    return (
+      <>
+        <ResultsView results={results} goal={goal} onReset={reset} onSave={saveToGoalPlanner} onCopy={copyResults} saving={savingGoal} />
+
+        {/* Confirmation modal — shown when user already has goal data */}
+        <AnimatePresence>
+          {showConfirm && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setShowConfirm(false)}
+                style={{
+                  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+                  zIndex: 500, backdropFilter: 'blur(2px)',
+                }}
+              />
+              <div style={{
+                position: 'fixed', inset: 0, zIndex: 600,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                pointerEvents: 'none',
+              }}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.94, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.94, y: 20 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  style={{
+                    pointerEvents: 'all',
+                    background: 'var(--bg-surface, #0e1624)',
+                    border: '1px solid var(--border-light, #20304a)',
+                    borderRadius: 12, padding: '28px 32px',
+                    maxWidth: 420, width: '90%',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                    position: 'relative',
+                  }}
+                >
+                  <button
+                    onClick={() => setShowConfirm(false)}
+                    style={{
+                      position: 'absolute', top: 12, right: 12,
+                      background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: 4,
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                  <h3 style={{ fontSize: 16, fontWeight: 600, color: '#fff', margin: '0 0 8px' }}>
+                    Update Goal Planner?
+                  </h3>
+                  <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6, margin: '0 0 20px' }}>
+                    You already have macro targets saved in your Goal Planner. Would you like to replace them with these new calculations?
+                  </p>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button
+                      style={{ ...outlineBtn, flex: 1 }}
+                      onClick={() => setShowConfirm(false)}
+                    >
+                      Keep current
+                    </button>
+                    <button
+                      style={{ ...tealBtn, flex: 1 }}
+                      onClick={handleConfirmUpdate}
+                      disabled={savingGoal}
+                    >
+                      {savingGoal ? 'Saving...' : 'Update targets'}
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            </>
+          )}
+        </AnimatePresence>
+      </>
+    );
   }
 
   return (
