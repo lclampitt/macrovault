@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ScanLine, BarChart2, Dumbbell, BookOpen, Flame, Info, X, ArrowUpRight, Lock } from 'lucide-react';
+import { Ruler, BarChart2, Dumbbell, BookOpen, Flame, Info, X, ArrowUpRight, Lock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import posthog from '../lib/posthog';
 import { getStreak, invalidateStreakCache } from '../lib/streak';
@@ -379,7 +379,7 @@ function DailyChecklist({ userId }) {
 function QuickLinks() {
   const navigate = useNavigate();
   const links = [
-    { label: 'Measurements', icon: ScanLine,  route: '/measurements' },
+    { label: 'Measurements', icon: Ruler,     route: '/measurements' },
     { label: 'Progress',      icon: BarChart2, route: '/progress' },
     { label: 'Workouts',      icon: Dumbbell,  route: '/workouts' },
     { label: 'Exercise Library', icon: BookOpen, route: '/exercises' },
