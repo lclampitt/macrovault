@@ -14,6 +14,7 @@ import {
   Search,
   Loader,
   Heart,
+  Check,
   ClipboardCheck,
   Copy,
 } from 'lucide-react';
@@ -1057,11 +1058,34 @@ function MealPlannerContent({ isProPlus = false }) {
   }
 
   /* ── Quick actions: Log day ──────────────── */
-  function handleLogDay(dayIdx) {
+  const [loggedDays, setLoggedDays] = useState(new Set());
+
+  // On mount / entries change — check which days already have food_logs
+  useEffect(() => {
+    if (!userId || !weekStart) return;
+    (async () => {
+      const dates = DAY_NAMES.map((_, i) => fmtDate(addDays(weekStart, i)));
+      const { data } = await supabase
+        .from('food_logs')
+        .select('logged_date')
+        .eq('user_id', userId)
+        .in('logged_date', dates);
+      if (data) {
+        const logged = new Set();
+        data.forEach((r) => {
+          const idx = dates.indexOf(r.logged_date);
+          if (idx >= 0) logged.add(idx);
+        });
+        setLoggedDays(logged);
+      }
+    })();
+  }, [userId, weekStart, entries]);
+
+  async function handleLogDay(dayIdx) {
     const dayDate = addDays(weekStart, dayIdx);
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
-    if (dayDate > todayDate) return; // disabled for future
+    if (dayDate > todayDate) return;
 
     const dayEntries = entries.filter((e) => e.day_of_week === dayIdx);
     const filledMeals = MEAL_TYPES.filter((mt) =>
@@ -1073,7 +1097,36 @@ function MealPlannerContent({ isProPlus = false }) {
       return;
     }
 
-    toast.success(`${DAY_NAMES[dayIdx]} logged to food diary`);
+    try {
+      const dateStr = fmtDate(dayDate);
+      const rows = dayEntries.map((e) => ({
+        user_id: userId,
+        logged_date: dateStr,
+        meal_name: e.meal_name,
+        calories: Number(e.calories) || 0,
+        protein_g: Number(e.protein) || 0,
+        carbs_g: Number(e.carbs) || 0,
+        fat_g: Number(e.fat) || 0,
+        notes: 'From meal planner',
+      }));
+
+      // Delete existing meal-planner entries for this day to avoid duplicates
+      await supabase
+        .from('food_logs')
+        .delete()
+        .eq('user_id', userId)
+        .eq('logged_date', dateStr)
+        .eq('notes', 'From meal planner');
+
+      const { error } = await supabase.from('food_logs').insert(rows);
+      if (error) throw error;
+
+      setLoggedDays((prev) => new Set(prev).add(dayIdx));
+      toast.success(`${DAY_NAMES[dayIdx]} logged to food diary`);
+    } catch (err) {
+      console.error('Log day error:', err);
+      toast.error('Failed to log day');
+    }
   }
 
   /* ── Collapsible ingredient helpers ─────── */
@@ -1342,18 +1395,6 @@ function MealPlannerContent({ isProPlus = false }) {
                   </div>
                   <span className="mp-slot__name">{entry.meal_name}</span>
 
-                  {/* Collapsed ingredients: first 2, truncated */}
-                  {entry.ingredients && !isExpanded && (
-                    <span className="mp-slot__ingredients">
-                      {entry.ingredients
-                        .split(',')
-                        .slice(0, 2)
-                        .map((s) => s.trim())
-                        .join(', ')}
-                      {entry.ingredients.split(',').length > 2 ? '...' : ''}
-                    </span>
-                  )}
-
                   <div className="mp-slot__macros">
                     <span className="mp-macro-chip">
                       Cal: {entry.calories}
@@ -1438,16 +1479,17 @@ function MealPlannerContent({ isProPlus = false }) {
           const todayDate = new Date();
           todayDate.setHours(0, 0, 0, 0);
           const isFuture = dayDate > todayDate;
+          const isLogged = loggedDays.has(dayIdx);
 
           return (
             <div key={`actions-${day}`} className="mp-day-actions">
               <button
-                className={`mp-day-action-btn mp-day-action-btn--teal ${isFuture ? 'mp-day-action-btn--disabled' : ''}`}
-                onClick={() => !isFuture && handleLogDay(dayIdx)}
-                disabled={isFuture}
+                className={`mp-day-action-btn ${isLogged ? 'mp-day-action-btn--logged' : 'mp-day-action-btn--teal'} ${isFuture ? 'mp-day-action-btn--disabled' : ''}`}
+                onClick={() => !isFuture && !isLogged && handleLogDay(dayIdx)}
+                disabled={isFuture || isLogged}
               >
-                <ClipboardCheck size={12} />
-                Log day
+                {isLogged ? <Check size={12} /> : <ClipboardCheck size={12} />}
+                {isLogged ? 'Logged' : 'Log day'}
               </button>
               <button
                 className="mp-day-action-btn mp-day-action-btn--muted"

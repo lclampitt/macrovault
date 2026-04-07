@@ -569,6 +569,15 @@
   color: #888;
 }
 
+.mp-day-action-btn--logged {
+  border: 1px solid #1D9E75;
+  color: #1D9E75;
+  background: rgba(29, 158, 117, 0.08);
+  flex: 1;
+  cursor: default;
+  opacity: 0.85;
+}
+
 .mp-day-action-btn--disabled,
 .mp-day-action-btn:disabled {
   opacity: 0.4;
