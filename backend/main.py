@@ -100,6 +100,22 @@ else:
     # Helpful log if the training step hasn't been run yet
     print("⚠️ bodyfat_model.joblib not found. /analyze-measurements will error until you train it.")
 
+# Load model metadata to determine feature set and whether correction is needed
+MODEL_INFO_PATH = os.path.join(BASE_DIR, "models", "model_info.json")
+model_info = {}
+if os.path.exists(MODEL_INFO_PATH):
+    try:
+        with open(MODEL_INFO_PATH, "r") as f:
+            model_info = json.load(f)
+        print(f"✅ Model info: {model_info.get('trained_on', 'unknown')}, "
+              f"features={model_info.get('features', [])}")
+    except Exception as e:
+        print(f"⚠️ Could not load model info: {e}")
+
+# If the model was retrained with expanded features (BMI, WHR, WHTR),
+# the age+gender correction is no longer needed.
+_MODEL_HAS_EXPANDED_FEATURES = "bmi" in model_info.get("features", [])
+
 
 # -------------------------------------------------
 # Pydantic schemas – define request/response shapes
@@ -555,6 +571,58 @@ def interpretation_and_plan(bodyfat: float) -> tuple[str, str, int, list[str]]:
 
 
 # -------------------------------------------------
+# BF% correction for model overestimation bias
+# (Fix 1 — remove once retrained with multi-cycle NHANES + expanded features)
+# -------------------------------------------------
+def apply_bf_correction(predicted_bf: float, age: float, gender: int) -> float:
+    """
+    Temporary age + gender correction multipliers to address systematic
+    overestimation from the single-cycle NHANES 2017-2018 model.
+
+    The current model is skewed toward older demographics with a limited
+    sample size (n=2420), causing consistent BF% overestimation of ~3-6%
+    particularly for males under 35.
+
+    This correction is automatically skipped when a retrained model with
+    expanded features (BMI, WHR, WHTR) from multi-cycle NHANES is loaded
+    (detected via _MODEL_HAS_EXPANDED_FEATURES flag).
+    """
+    corrected = predicted_bf
+
+    if gender == 0:  # male
+        if age < 25:
+            corrected -= 5.0
+        elif age < 30:
+            corrected -= 4.5
+        elif age < 35:
+            corrected -= 4.0
+        elif age < 40:
+            corrected -= 3.5
+        elif age < 50:
+            corrected -= 3.0
+        else:
+            corrected -= 2.0
+    elif gender == 1:  # female
+        if age < 25:
+            corrected -= 3.0
+        elif age < 35:
+            corrected -= 2.5
+        elif age < 45:
+            corrected -= 2.0
+        else:
+            corrected -= 1.5
+
+    # Never return unrealistically low values
+    min_bf = 4.0 if gender == 0 else 10.0
+    corrected = max(min_bf, corrected)
+
+    # Cap at realistic maximum
+    corrected = min(corrected, 50.0)
+
+    return round(corrected, 1)
+
+
+# -------------------------------------------------
 # Measurement-based analysis endpoint (dataset model)
 # -------------------------------------------------
 
@@ -577,20 +645,30 @@ async def analyze_measurements(data: MeasurementRequest):
             detail="Bodyfat model is not loaded. Run scripts/prepare_nhanes.py then train_bodyfat.py.",
         )
 
-    # Convert the Pydantic object to a 2D numpy array for scikit-learn.
-    # Feature order must match training: [gender, age, height_cm, weight_kg,
-    #                                      waist_cm, hip_cm]
+    # Build feature vector — order determined by model metadata so the
+    # endpoint automatically adapts when the model is retrained with
+    # expanded features (Fix 2).
+    base_features = {
+        "gender":    float(data.gender),
+        "age":       float(data.age),
+        "height_cm": float(data.height_cm),
+        "weight_kg": float(data.weight_kg),
+        "waist_cm":  float(data.waist_cm),
+        "hip_cm":    float(data.hip_cm),
+    }
+
+    # Compute derived features when the retrained model expects them
+    if _MODEL_HAS_EXPANDED_FEATURES:
+        base_features["bmi"]  = data.weight_kg / ((data.height_cm / 100) ** 2)
+        base_features["whr"]  = data.waist_cm / data.hip_cm
+        base_features["whtr"] = data.waist_cm / data.height_cm
+
+    feature_order = model_info.get(
+        "features",
+        ["gender", "age", "height_cm", "weight_kg", "waist_cm", "hip_cm"],
+    )
     features = np.array(
-        [
-            [
-                data.gender,
-                data.age,
-                data.height_cm,
-                data.weight_kg,
-                data.waist_cm,
-                data.hip_cm,
-            ]
-        ],
+        [[base_features[f] for f in feature_order]],
         dtype=float,
     )
 
@@ -607,6 +685,12 @@ async def analyze_measurements(data: MeasurementRequest):
 
     # Clamp prediction to a realistic range
     bodyfat = max(4.0, min(45.0, bodyfat))
+
+    # Apply age+gender correction for model overestimation (Fix 1).
+    # Automatically skipped once the retrained multi-cycle model is loaded,
+    # detected by _MODEL_HAS_EXPANDED_FEATURES (presence of "bmi" in features).
+    if not _MODEL_HAS_EXPANDED_FEATURES:
+        bodyfat = apply_bf_correction(bodyfat, data.age, data.gender)
 
     category, goal_suggestion, _cals_unused, notes = interpretation_and_plan(bodyfat)
 
