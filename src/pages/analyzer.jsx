@@ -284,11 +284,17 @@ function AnalyzerContent() {
                 </div>
                 <div className="tdee-chip">
                   <span className="tdee-chip__value" style={{
-                    color: result.deficit_or_surplus < 0 ? '#f87171' : result.deficit_or_surplus > 0 ? 'var(--accent-light)' : 'var(--accent)',
+                    color: result.deficit_or_surplus < 0 ? '#f87171' : result.deficit_or_surplus > 0 ? 'var(--accent-light)' : 'var(--text-muted)',
                   }}>
                     {result.deficit_or_surplus > 0 ? '+' : ''}{result.deficit_or_surplus?.toLocaleString()}
                   </span>
-                  <span className="tdee-chip__label">{result.deficit_or_surplus <= 0 ? 'Deficit' : 'Surplus'} (kcal/day)</span>
+                  <span className="tdee-chip__label">
+                    {result.deficit_or_surplus < 0
+                      ? 'Deficit (kcal/day)'
+                      : result.deficit_or_surplus > 0
+                        ? 'Surplus (kcal/day)'
+                        : 'Balance (maintenance)'}
+                  </span>
                 </div>
               </div>
             )}

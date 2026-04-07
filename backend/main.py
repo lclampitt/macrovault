@@ -519,56 +519,189 @@ def calculate_tdee(
 
 
 # -------------------------------------------------
-# Helper: map bodyfat to category + recommendations
+# Helper: map bodyfat to category label
 # -------------------------------------------------
-def interpretation_and_plan(bodyfat: float) -> tuple[str, str, int, list[str]]:
+def _bf_category(bf: float, gender: int) -> str:
+    """Return a human-readable BF% category label."""
+    if gender == 0:  # male
+        if bf < 12:   return "Very lean / athletic"
+        if bf < 18:   return "Fit"
+        if bf < 25:   return "Average"
+        return "Higher bodyfat"
+    else:  # female
+        if bf < 20:   return "Very lean / athletic"
+        if bf < 28:   return "Fit"
+        if bf < 35:   return "Average"
+        return "Higher bodyfat"
+
+
+def _bf_tier(bf: float, gender: int) -> str:
+    """Return lean/fit/average/higher tier based on gender-aware ranges."""
+    if gender == 0:  # male: <12 lean, 12-18 fit, 18-25 avg, 25+ higher
+        if bf < 12:   return "lean"
+        if bf < 18:   return "fit"
+        if bf < 25:   return "average"
+        return "higher"
+    else:  # female: <20 lean, 20-28 fit, 28-35 avg, 35+ higher
+        if bf < 20:   return "lean"
+        if bf < 28:   return "fit"
+        if bf < 35:   return "average"
+        return "higher"
+
+
+# -------------------------------------------------
+# Helper: goal-aware suggestion + coaching notes
+# -------------------------------------------------
+def interpretation_and_plan(
+    bodyfat: float,
+    gender: int = 0,
+    user_goal: str = "maintain",
+) -> tuple[str, str, int, list[str]]:
     """
-    Turn a numeric bodyfat % into:
+    Turn a numeric bodyfat %, the user’s gender, and their selected goal into:
       - a category label
-      - a recommended goal
-      - a default calorie target
+      - a goal-aware suggestion
+      - a default calorie target (overridden by TDEE in the endpoint)
       - high-level coaching notes
+
+    The suggestion now respects the user’s chosen goal while informing them
+    how their current BF% affects the recommendation.
     """
     bf = float(bodyfat)
+    category = _bf_category(bf, gender)
+    tier = _bf_tier(bf, gender)
+    goal = user_goal.lower()
 
-    if bf < 12:
-        category = "Very lean / athletic"
-        goal = "Maintenance or lean bulk"
-        cals = 2600
-        notes = [
-            "You’re already quite lean. Focus on performance and strength.",
-            "A small surplus or maintenance calories can help build muscle.",
-            "Keep protein high (0.8–1.0 g per lb of body weight).",
-        ]
-    elif bf < 20:
-        category = "Average to fit"
-        goal = "Mild cut or recomposition"
-        cals = 2300
-        notes = [
-            "You’re in a good spot. Decide if you want more definition or muscle.",
-            "A small deficit with 3–4 days of lifting works well.",
-            "Aim for 7–9k steps per day to support fat loss.",
-        ]
-    elif bf < 28:
-        category = "Higher bodyfat"
-        goal = "Fat loss (cutting)"
+    # ── Cutting goals ───────────────────────────────────────────────────
+    if "cut" in goal or "loss" in goal or "deficit" in goal:
+        if tier == "lean":
+            suggestion = (
+                "You’re already quite lean. A mild deficit of 200-300 kcal "
+                "with high protein will preserve muscle while cutting."
+            )
+            notes = [
+                "Keep protein at 1.0 g per lb to protect lean mass.",
+                "A small deficit is safer here — avoid aggressive cuts.",
+                "Monitor energy levels and performance closely.",
+            ]
+        elif tier == "fit":
+            suggestion = (
+                "Good foundation for a cut. A 300-500 kcal deficit with "
+                "high protein intake will show results in 8-12 weeks."
+            )
+            notes = [
+                "Prioritize 3-4 lifting sessions per week to retain muscle.",
+                "Aim for 7-9k steps per day to support fat loss.",
+                "Keep protein high (0.8-1.0 g per lb of body weight).",
+            ]
+        elif tier == "average":
+            suggestion = "Fat loss (cutting)"
+            notes = [
+                "Focus on a moderate calorie deficit you can stick to.",
+                "Combine 3-4 lifting sessions with daily walking (7-10k steps).",
+                "Try not to lose more than ~1% of bodyweight per week.",
+            ]
+        else:
+            suggestion = (
+                "Prioritize fat loss. A 500 kcal deficit is appropriate "
+                "at your current body fat level."
+            )
+            notes = [
+                "Start with simple, sustainable changes. No crash diets.",
+                "Prioritize walking and light activity to build habits.",
+                "Talk with a healthcare provider before aggressive dieting or training.",
+            ]
         cals = 2100
-        notes = [
-            "Focus on a moderate calorie deficit you can stick to.",
-            "Combine 3–4 lifting sessions with daily walking (7–10k steps).",
-            "Try not to lose more than ~1% of bodyweight per week.",
-        ]
-    else:
-        category = "Obese range (est.)"
-        goal = "Gradual fat loss"
-        cals = 1900
-        notes = [
-            "Start with simple, sustainable changes. No crash diets.",
-            "Prioritize walking and light activity to build habits.",
-            "Talk with a healthcare provider before aggressive dieting or training.",
-        ]
 
-    return category, goal, cals, notes
+    # ── Bulking goals ───────────────────────────────────────────────────
+    elif "bulk" in goal or "gain" in goal or "surplus" in goal:
+        if tier == "lean":
+            suggestion = (
+                "Great time to bulk. You have room to add mass cleanly "
+                "without excess fat gain."
+            )
+            notes = [
+                "A 300-500 kcal surplus with progressive overload is ideal.",
+                "Focus on compound lifts and steady strength progression.",
+                "Keep protein at 0.8-1.0 g per lb of body weight.",
+            ]
+        elif tier == "fit":
+            suggestion = (
+                "Lean bulk recommended. A 200-300 kcal surplus with "
+                "progressive training will add muscle efficiently."
+            )
+            notes = [
+                "Track your weight weekly — aim for 0.5-1 lb gain per week.",
+                "Prioritize compound movements and progressive overload.",
+                "Keep cardio moderate (2-3 sessions) to support recovery.",
+            ]
+        elif tier == "average":
+            suggestion = (
+                "Consider a mini cut first before bulking — getting to "
+                "15-18% BF will make your bulk cleaner and more effective."
+            )
+            notes = [
+                "A 4-6 week mini cut can set you up for a better bulk.",
+                "If you proceed with a bulk, keep the surplus small (200 kcal).",
+                "Monitor waist measurements to avoid excess fat gain.",
+            ]
+        else:
+            suggestion = (
+                "Cut before bulking. At your current BF% a surplus will "
+                "add mostly fat. Get to 18-20% first."
+            )
+            notes = [
+                "Focus on fat loss first — you’ll bulk more effectively later.",
+                "A moderate deficit with lifting will preserve muscle.",
+                "Aim for a 12-16 week cut before transitioning to a bulk.",
+            ]
+        cals = 2600
+
+    # ── Maintenance / recomp goals ──────────────────────────────────────
+    else:
+        if tier == "lean":
+            suggestion = (
+                "Maintenance — you’re in excellent shape. Focus on "
+                "performance and muscle retention."
+            )
+            notes = [
+                "You’re already quite lean. Focus on performance and strength.",
+                "A small surplus or maintenance calories can help build muscle.",
+                "Keep protein high (0.8-1.0 g per lb of body weight).",
+            ]
+        elif tier == "fit":
+            suggestion = (
+                "Maintenance or recomp. At your BF% you can slowly "
+                "improve composition while maintaining weight."
+            )
+            notes = [
+                "You’re in a good spot. Decide if you want more definition or muscle.",
+                "Maintenance calories with consistent training drives recomposition.",
+                "Aim for 7-9k steps per day to stay active.",
+            ]
+        elif tier == "average":
+            suggestion = (
+                "Mild cut or recomposition would improve your physique "
+                "more than pure maintenance."
+            )
+            notes = [
+                "A small deficit of 200-300 kcal can improve body composition.",
+                "Combine 3-4 lifting sessions with daily walking (7-10k steps).",
+                "Consider a structured recomp: slight deficit on rest days, maintenance on training days.",
+            ]
+        else:
+            suggestion = (
+                "A gradual deficit would be more beneficial than "
+                "maintenance at this BF%."
+            )
+            notes = [
+                "Start with simple, sustainable changes. No crash diets.",
+                "Prioritize walking and light activity to build habits.",
+                "Talk with a healthcare provider before aggressive dieting or training.",
+            ]
+        cals = 2300
+
+    return category, suggestion, cals, notes
 
 
 # -------------------------------------------------
@@ -697,7 +830,9 @@ async def analyze_measurements(data: MeasurementRequest):
     print(f"[BF] age={data.age} gender={data.gender} raw={raw_bf:.1f} "
           f"corrected={bodyfat:.1f} correction_active={not _MODEL_HAS_EXPANDED_FEATURES}")
 
-    category, goal_suggestion, _cals_unused, notes = interpretation_and_plan(bodyfat)
+    category, goal_suggestion, _cals_unused, notes = interpretation_and_plan(
+        bodyfat, gender=data.gender, user_goal=data.goal,
+    )
 
     # Replace hardcoded calorie bucket with proper TDEE (Mifflin-St Jeor)
     bmr, tdee, suggested_calories, deficit_or_surplus = calculate_tdee(
