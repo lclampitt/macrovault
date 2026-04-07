@@ -1054,6 +1054,71 @@
   margin: 0;
 }
 
+/* ── Y2K AI MODAL ───────────────────────── */
+.y2k-ai-modal {
+  background: linear-gradient(180deg, #0d1e3a, #080f1e);
+  border: 2px outset #4466aa;
+  border-radius: 4px;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.8);
+  overflow: hidden;
+}
+
+.y2k-ai-modal__titlebar {
+  height: 24px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 50%, #3344aa),
+    color-mix(in srgb, var(--accent) 25%, #1a2266)
+  );
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid #223388;
+}
+
+.y2k-ai-modal__titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.y2k-ai-modal__app-icon {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark, #145a44));
+  border: 1px outset var(--accent-light, #3be0a8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.y2k-ai-modal__title-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+}
+
+.y2k-ai-modal__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.y2k-ai-modal__status {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-light, #3be0a8);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  margin: 0 0 16px;
+}
+
 /* ── SNACK QUICK-ADD BUTTON ──────────────── */
 .mp-snack-btn {
   display: flex;

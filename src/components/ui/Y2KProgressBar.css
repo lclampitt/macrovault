@@ -1,0 +1,75 @@
+/* ── Y2K Progress Bar ──────────────────── */
+.y2k-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.y2k-progress__label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.y2k-progress__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-light, #3be0a8);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+.y2k-progress__pct {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-light, #3be0a8);
+}
+
+/* ── Track ────────────────────────────── */
+.y2k-progress__track {
+  height: 20px;
+  background: #040810;
+  border: 2px inset #334466;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: inset 1px 1px 4px rgba(0,0,0,0.6);
+}
+
+/* ── Fill (determinate) ───────────────── */
+.y2k-progress__fill {
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0px,
+    var(--accent) 16px,
+    var(--accent-dark, #145a44) 16px,
+    var(--accent-dark, #145a44) 20px
+  );
+  transition: width 0.3s ease;
+}
+
+/* ── Fill (indeterminate / striped) ───── */
+.y2k-progress__fill--indeterminate {
+  width: 100% !important;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0px,
+    var(--accent) 16px,
+    var(--accent-dark, #145a44) 16px,
+    var(--accent-dark, #145a44) 20px
+  );
+  background-size: 40px 100%;
+  animation: y2k-stripe 0.6s linear infinite;
+}
+
+@keyframes y2k-stripe {
+  0%   { background-position: 0 0; }
+  100% { background-position: 40px 0; }
+}
+
+/* ── Sub-label ────────────────────────── */
+.y2k-progress__sub {
+  font-size: 9px;
+  color: #4466aa;
+  font-style: italic;
+}

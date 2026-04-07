@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Sliders, CreditCard, AlertTriangle, Crown, Sun, Moon, Palette, Lock } from 'lucide-react';
-import { toast } from 'sonner';
+import { appToast as toast } from '../utils/toast';
 import { supabase } from '../supabaseClient';
 import { usePlan } from '../hooks/usePlan';
 import { useUpgrade } from '../context/UpgradeContext';

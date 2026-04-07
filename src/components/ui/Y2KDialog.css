@@ -1,0 +1,169 @@
+/* ── Y2K Dialog Overlay ───────────────── */
+.y2k-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Dialog Box ───────────────────────── */
+.y2k-dialog {
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  background: linear-gradient(180deg, #0d1e3a, #080f1e);
+  border: 2px outset #6688aa;
+  border-radius: 4px;
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+
+/* ── Title Bar ────────────────────────── */
+.y2k-dialog__titlebar {
+  height: 24px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 50%, #3344aa),
+    color-mix(in srgb, var(--accent) 25%, #1a2266)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-bottom: 1px solid #223388;
+}
+
+.y2k-dialog__titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.y2k-dialog__app-icon {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark, #145a44));
+  border: 1px outset var(--accent-light, #3be0a8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.y2k-dialog__titlebar-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.y2k-dialog__close {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ee4444, #aa2222);
+  border: 1px outset #ff6666;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.y2k-dialog__close:hover {
+  background: linear-gradient(180deg, #ff5555, #cc3333);
+}
+
+/* ── Body ─────────────────────────────── */
+.y2k-dialog__body {
+  padding: 20px 20px 16px;
+}
+
+.y2k-dialog__content-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.y2k-dialog__icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.y2k-dialog__message {
+  flex: 1;
+  font-size: 12px;
+  color: #8899cc;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* ── Button Row ───────────────────────── */
+.y2k-dialog__btn-row {
+  border-top: 1px solid #1a2a4a;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  background: linear-gradient(180deg, transparent, #060c18);
+}
+
+.y2k-dialog__btn {
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 70px;
+  padding: 5px 14px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+.y2k-dialog__btn--confirm {
+  background: linear-gradient(180deg, #3355bb, #1a2a88);
+  border: 1px outset #6688cc;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+.y2k-dialog__btn--confirm:active {
+  border: 1px inset #334466;
+  transform: translateY(1px);
+}
+
+.y2k-dialog__btn--confirm:hover {
+  background: linear-gradient(180deg, #4466cc, #2233aa);
+}
+
+.y2k-dialog__btn--cancel {
+  background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+  border: 1px outset #666;
+  color: #aaa;
+}
+
+.y2k-dialog__btn--cancel:active {
+  border: 1px inset #333;
+  transform: translateY(1px);
+}
+
+.y2k-dialog__btn--cancel:hover {
+  background: linear-gradient(180deg, #3a3a3a, #2a2a2a);
+  color: #ccc;
+}

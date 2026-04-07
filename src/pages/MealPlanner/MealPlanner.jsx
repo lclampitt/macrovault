@@ -20,11 +20,13 @@ import {
   Cookie,
   ArrowRight,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { appToast as toast } from '../../utils/toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import { useTheme } from '../../hooks/useTheme';
+import Y2KDialog from '../../components/ui/Y2KDialog';
+import Y2KProgressBar from '../../components/ui/Y2KProgressBar';
 import '../../styles/mealplanner.css';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
@@ -114,7 +116,7 @@ function SlotPanel({
   isProPlus = false,
 }) {
   const { triggerUpgrade } = useUpgrade();
-  const { isSpectrum, isRetro } = useTheme();
+  const { isSpectrum, isRetro, isY2K } = useTheme();
   const [tab, setTab] = useState(isProPlus ? 'ai' : 'manual');
   const [suggestions, setSuggestions] = useState([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -413,6 +415,11 @@ function SlotPanel({
               </div>
 
               {loadingSuggestions ? (
+                isY2K ? (
+                  <div style={{ padding: '20px 0' }}>
+                    <Y2KProgressBar label="Fetching suggestions..." progress={null} subLabel="Consulting the database..." />
+                  </div>
+                ) : (
                 <>
                   {[0, 1, 2].map((i) => (
                     <motion.div
@@ -431,6 +438,7 @@ function SlotPanel({
                     Generating suggestions...
                   </p>
                 </>
+                )
               ) : (
                 <>
                   <AnimatePresence>
@@ -761,7 +769,7 @@ function SnackSheet({ userId, onClose }) {
    ──────────────────────────────────────────────────── */
 function MealPlannerContent({ isProPlus = false }) {
   const { triggerUpgrade } = useUpgrade();
-  const { isSpectrum, isRetro } = useTheme();
+  const { isSpectrum, isRetro, isY2K } = useTheme();
   const [userId, setUserId] = useState(null);
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
   const [planId, setPlanId] = useState(null);
@@ -770,6 +778,7 @@ function MealPlannerContent({ isProPlus = false }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [aiWeekLoading, setAiWeekLoading] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [y2kClearDialog, setY2kClearDialog] = useState(false);
 
   /* ── NEW STATE: goals, expanded slot, favorites, snack sheet ── */
   const [goalData, setGoalData] = useState(null);
@@ -1382,7 +1391,7 @@ function MealPlannerContent({ isProPlus = false }) {
           {entries.length > 0 && (
             <button
               className="mp-week-nav__clear-btn"
-              onClick={handleClearWeek}
+              onClick={() => isY2K ? setY2kClearDialog(true) : handleClearWeek()}
               disabled={clearing}
             >
               <Trash2 size={14} />
@@ -1712,30 +1721,62 @@ function MealPlannerContent({ isProPlus = false }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div
-              className="mp-ai-overlay__card"
-              initial={{ opacity: 0, scale: 0.94, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 20 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <Loader size={32} className="mp-ai-overlay__spinner" />
-              <p className="mp-ai-overlay__text">
-                Generating your weekly meal plan...
-              </p>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: 'var(--text-muted)',
-                  margin: 0,
-                }}
+            {isY2K ? (
+              <motion.div
+                className="y2k-ai-modal"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 400 }}
               >
-                This may take a moment
-              </p>
-            </motion.div>
+                <div className="y2k-ai-modal__titlebar">
+                  <div className="y2k-ai-modal__titlebar-left">
+                    <div className="y2k-ai-modal__app-icon">
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
+                        <path d="M3 3v18h18" /><path d="M7 16l4-8 4 4 5-9" />
+                      </svg>
+                    </div>
+                    <span className="y2k-ai-modal__title-text">MacroVault — Generating Meals</span>
+                  </div>
+                </div>
+                <div className="y2k-ai-modal__body">
+                  <Sparkles size={28} style={{ color: 'var(--accent-light)', marginBottom: 12 }} />
+                  <p className="y2k-ai-modal__status">Generating your weekly meal plan...</p>
+                  <Y2KProgressBar label="Progress" progress={null} subLabel="Please wait..." />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                className="mp-ai-overlay__card"
+                initial={{ opacity: 0, scale: 0.94, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 20 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+              >
+                <Loader size={32} className="mp-ai-overlay__spinner" />
+                <p className="mp-ai-overlay__text">
+                  Generating your weekly meal plan...
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
+                  This may take a moment
+                </p>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Y2K Clear Week Dialog */}
+      <Y2KDialog
+        isOpen={y2kClearDialog}
+        onClose={() => setY2kClearDialog(false)}
+        onConfirm={handleClearWeek}
+        title="MacroVault — Warning"
+        message="Are you sure you want to clear all meals for this week? This action cannot be undone."
+        confirmLabel="Clear Week"
+        cancelLabel="Cancel"
+        type="warning"
+      />
     </div>
   );
 }

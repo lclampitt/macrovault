@@ -40,6 +40,8 @@ import { UpgradeProvider } from './context/UpgradeContext';
 
 // Toast
 import { Toaster } from 'sonner';
+import Y2KToastContainer from './components/ui/Y2KToast';
+import { useTheme } from './hooks/useTheme';
 
 // Onboarding
 import OnboardingWizard from './components/ui/OnboardingWizard';
@@ -142,20 +144,27 @@ function App() {
     </ProtectedRoute>
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { isY2K } = useTheme();
+
   return (
     <UpgradeProvider>
-    <Toaster
-      position="bottom-right"
-      toastOptions={{
-        style: {
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border-light)',
-          color: 'var(--text-primary)',
-          fontFamily: 'Inter, sans-serif',
-          fontSize: '13px',
-        },
-      }}
-    />
+    {isY2K ? (
+      <Y2KToastContainer />
+    ) : (
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-light)',
+            color: 'var(--text-primary)',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '13px',
+          },
+        }}
+      />
+    )}
     {/* Onboarding wizard — shown to newly signed-up users */}
     {session && !onboardingDone && !loading && (
       <OnboardingWizard

@@ -1,0 +1,197 @@
+/* ── Y2K Toast Container ──────────────── */
+.y2k-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 280px;
+  pointer-events: none;
+}
+
+.y2k-toast-container > * {
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .y2k-toast-container {
+    bottom: 80px;
+    right: 12px;
+    width: calc(100vw - 24px);
+    max-width: 280px;
+  }
+}
+
+/* ── Single Toast ─────────────────────── */
+.y2k-toast {
+  background: linear-gradient(180deg, #0d1e3a, #080f1e);
+  border: 2px outset #4466aa;
+  border-radius: 4px;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+
+/* ── Title Bar ────────────────────────── */
+.y2k-toast__titlebar {
+  height: 22px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 50%, #3344aa),
+    color-mix(in srgb, var(--accent) 25%, #1a2266)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-bottom: 1px solid #223388;
+}
+
+.y2k-toast__titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.y2k-toast__app-icon {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark, #145a44));
+  border: 1px outset var(--accent-light, #3be0a8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.y2k-toast__titlebar-text {
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.y2k-toast__close {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ee4444, #aa2222);
+  border: 1px outset #ff6666;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.y2k-toast__close:hover {
+  background: linear-gradient(180deg, #ff5555, #cc3333);
+}
+
+/* ── Body ─────────────────────────────── */
+.y2k-toast__body {
+  padding: 10px 12px 10px;
+}
+
+.y2k-toast__content-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.y2k-toast__icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.y2k-toast__icon--success {
+  border: 1px outset #2ee8a8;
+}
+.y2k-toast__icon--error {
+  border: 1px outset #ff6666;
+}
+.y2k-toast__icon--info {
+  border: 1px outset var(--accent-light, #3be0a8);
+}
+.y2k-toast__icon--warning {
+  border: 1px outset #ffee44;
+}
+
+.y2k-toast__message-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.y2k-toast__msg-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-light, #3be0a8);
+  margin-bottom: 2px;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+.y2k-toast__msg-body {
+  font-size: 10px;
+  color: #8899cc;
+  line-height: 1.4;
+}
+
+/* ── OK Button ────────────────────────── */
+.y2k-toast__btn-row {
+  margin-top: 10px;
+  border-top: 1px solid #1a2a4a;
+  padding-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.y2k-toast__ok-btn {
+  font-size: 9px;
+  font-weight: 700;
+  background: linear-gradient(180deg, #3355bb, #1a2a88);
+  border: 1px outset #6688cc;
+  border-radius: 2px;
+  padding: 3px 12px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  font-family: inherit;
+}
+
+.y2k-toast__ok-btn:active {
+  border: 1px inset #334466;
+  transform: translateY(1px);
+}
+
+.y2k-toast__ok-btn:hover {
+  background: linear-gradient(180deg, #4466cc, #2233aa);
+}
+
+/* ── Progress Bar ─────────────────────── */
+.y2k-toast__progress-track {
+  height: 3px;
+  background: #1a2a4a;
+  border-top: 1px solid #223388;
+}
+
+.y2k-toast__progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.1s linear;
+}

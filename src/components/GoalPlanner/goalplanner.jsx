@@ -2,11 +2,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Target } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { toast } from 'sonner';
+import { appToast as toast } from '../../utils/toast';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import { useTheme } from '../../hooks/useTheme';
+import Y2KDialog from '../ui/Y2KDialog';
 import '../../styles/goalplanner.css';
 
 /* Stagger container for card entrance */
@@ -286,7 +287,7 @@ function GoalPlannerGate() {
 }
 
 function GoalPlannerContent({ compact = false }) {
-  const { isSpectrum, isRetro } = useTheme();
+  const { isSpectrum, isRetro, isY2K } = useTheme();
 
   // Spotlight via query param
   const [searchParams, setSearchParams] = useSearchParams();
@@ -599,7 +600,7 @@ function GoalPlannerContent({ compact = false }) {
           </motion.div>
 
           {/* Confirm delete */}
-          {confirmDelete && (
+          {confirmDelete && !isY2K && (
             <motion.div
               className="gp-confirm"
               initial={{ opacity: 0, y: 6 }}
@@ -625,6 +626,16 @@ function GoalPlannerContent({ compact = false }) {
               </div>
             </motion.div>
           )}
+          <Y2KDialog
+            isOpen={confirmDelete && isY2K}
+            onClose={() => setConfirmDelete(false)}
+            onConfirm={handleDelete}
+            title="MacroVault — Warning"
+            message="Delete your current goal permanently? This cannot be undone."
+            confirmLabel="Delete"
+            cancelLabel="Cancel"
+            type="warning"
+          />
         </motion.div>
       )}
 
