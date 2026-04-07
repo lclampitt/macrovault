@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Zap, Shield } from 'lucide-react';
+import { useTheme } from '../hooks/useTheme';
 import '../styles/landing.css';
 import '../styles/about.css';
 
@@ -24,7 +25,7 @@ const VALUES = [
   {
     icon: Heart,
     title: 'Built for consistency',
-    desc: 'The best workout plan is one you actually stick to. Gainlytics is designed to keep you accountable, day after day.',
+    desc: 'The best workout plan is one you actually stick to. MacroVault is designed to keep you accountable, day after day.',
   },
   {
     icon: Shield,
@@ -35,6 +36,7 @@ const VALUES = [
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const { isDark } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -50,8 +52,8 @@ function Navbar() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
     >
       <Link to="/" className="lp-nav__logo">
-        <img src="/images/gainlyticslogo.png" alt="Gainlytics" className="lp-nav__logo-icon" />
-        <span className="lp-nav__logo-name">Gainlytics</span>
+        <img src="/images/macrolock.png" alt="MacroVault" className="lp-nav__logo-icon" />
+        <span className="lp-nav__logo-name">MacroVault</span>
       </Link>
 
       <div className="lp-nav__links">
@@ -69,6 +71,7 @@ function Navbar() {
 }
 
 export default function About() {
+  const { isDark } = useTheme();
   return (
     <div className="lp-page about-lp">
       <Navbar />
@@ -106,7 +109,7 @@ export default function About() {
             animate="show"
             transition={{ duration: 0.55, delay: 0.32 }}
           >
-            Gainlytics was born from a simple frustration — fitness apps were either too simple
+            MacroVault was born from a simple frustration — fitness apps were either too simple
             to be useful, or too cluttered to be enjoyable. We built something in between.
           </motion.p>
         </section>
@@ -127,13 +130,13 @@ export default function About() {
             viewport={{ once: true, amount: 0.2 }}
           >
             <motion.p className="about-mission__text" variants={fadeUp} transition={{ duration: 0.5 }}>
-              Gainlytics was built to bring <strong>clarity to fitness</strong>. No more guessing.
+              MacroVault was built to bring <strong>clarity to fitness</strong>. No more guessing.
               Our mission is to combine clean UI, data insights, and practicality to help you reach
               your goals faster.
             </motion.p>
             <motion.p className="about-mission__text" variants={fadeUp} transition={{ duration: 0.5 }}>
               Whether you're analyzing your physique, planning a goal, tracking your progress,
-              or logging workouts — Gainlytics brings everything into one seamless experience.
+              or logging workouts — MacroVault brings everything into one seamless experience.
             </motion.p>
             <motion.p className="about-mission__text" variants={fadeUp} transition={{ duration: 0.5 }}>
               Built for those who want to stay <strong>consistent</strong>, stay <strong>informed</strong>,
@@ -198,7 +201,7 @@ export default function About() {
           >
             <h2 className="about-cta__heading">Ready to start your journey?</h2>
             <p className="about-cta__sub">
-              Join Gainlytics for free — no credit card required.
+              Join MacroVault for free — no credit card required.
             </p>
             <Link to="/auth" className="lp-btn lp-btn--teal lp-btn--lg">
               Get started free
@@ -213,8 +216,8 @@ export default function About() {
           <div className="lp-footer__top">
             <div className="lp-footer__brand">
               <Link to="/" className="lp-footer__logo">
-                <img src="/images/gainlyticslogo.png" alt="Gainlytics" className="lp-footer__logo-icon" />
-                <span className="lp-footer__logo-name">Gainlytics</span>
+                <img src="/images/macrolock.png" alt="MacroVault" className="lp-footer__logo-icon" />
+                <span className="lp-footer__logo-name">MacroVault</span>
               </Link>
               <p className="lp-footer__tagline">
                 Data-driven fitness for everyone.
@@ -228,7 +231,7 @@ export default function About() {
           </div>
           <div className="lp-footer__bottom">
             <span className="lp-footer__copy">
-              © {new Date().getFullYear()} Gainlytics. All rights reserved.
+              © {new Date().getFullYear()} MacroVault. All rights reserved.
             </span>
             <div className="lp-footer__links">
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}

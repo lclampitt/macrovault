@@ -13,7 +13,7 @@ export default function Footer() {
         <div className="footer-column footer-brand">
           <div className="footer-logo-dot" />
           <div>
-            <div className="footer-logo-text">Gainlytics</div>
+            <div className="footer-logo-text">MacroVault</div>
             <p className="footer-tagline">
               Data-driven fitness insights, without the guesswork.
             </p>
@@ -44,11 +44,11 @@ export default function Footer() {
         <div className="footer-column footer-meta">
           <div className="footer-column-title">Info</div>
           <p className="footer-disclaimer">
-            Gainlytics is for educational and informational purposes only and
+            MacroVault is for educational and informational purposes only and
             is not a substitute for professional medical advice, diagnosis, or treatment.
           </p>
           <p className="footer-contact">
-            Questions? <a href="mailto:support@gainlytics.org">support@gainlytics.org</a>
+            Questions? <a href="mailto:support@macrovault.app">support@macrovault.app</a>
           </p>
         </div>
 
@@ -56,7 +56,7 @@ export default function Footer() {
 
       {/* Bottom row with copyright + credit */}
       <div className="footer-bottom">
-        <span>© {year} Gainlytics. All rights reserved.</span>
+        <span>© {year} MacroVault. All rights reserved.</span>
         <span className="footer-built-by">Built by Logan Clampitt.</span>
       </div>
     </footer>

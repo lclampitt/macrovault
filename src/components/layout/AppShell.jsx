@@ -27,7 +27,7 @@ const pageVariants = {
 
 export default function AppShell({ session, onLogout, isPro, isProPlus, children }) {
   const location = useLocation();
-  const meta = PAGE_META[location.pathname] ?? { title: 'Gainlytics' };
+  const meta = PAGE_META[location.pathname] ?? { title: 'MacroVault' };
   const userId = session?.user?.id ?? null;
   const { usage } = useUsage(userId);
 

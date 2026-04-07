@@ -49,7 +49,7 @@ function StepWelcome({ data, onChange }) {
   return (
     <div className="ob-step">
       <div>
-        <h2 className="ob-step__title">Welcome to Gainlytics</h2>
+        <h2 className="ob-step__title">Welcome to MacroVault</h2>
         <p className="ob-step__subtitle">Let's set up your profile in 3 quick steps.</p>
       </div>
 

@@ -22,12 +22,12 @@ export default function Header({ onLogout, session }) {
         <Link to="/" className="header-brand">
           <div className="header-logo-wrapper">
             <img
-              src="/images/gainlytics-logo.png"
-              alt="Gainlytics Logo"
+              src="/images/macrolock.png"
+              alt="MacroVault Logo"
               className="header-logo-img"
             />
           </div>
-          <span className="header-logo-text">Gainlytics</span>
+          <span className="header-logo-text">MacroVault</span>
         </Link>
 
         {/* Top navigation links */}

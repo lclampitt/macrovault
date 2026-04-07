@@ -16,7 +16,7 @@ import '../styles/dashboard.css';
    CONSISTENCY CALENDAR
    ============================================================ */
 function ConsistencyCalendar({ userId }) {
-  const STORAGE_KEY = 'gainlytics_consistency_calendar_v1';
+  const STORAGE_KEY = 'macrovault_consistency_calendar_v1';
   const today = new Date();
 
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());

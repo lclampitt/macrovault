@@ -83,8 +83,8 @@ function CalculatorsPage() {
 
   useEffect(() => {
     setSaved({
-      macro: JSON.parse(localStorage.getItem('gainlytics_macro_results') || 'null'),
-      orm:   JSON.parse(localStorage.getItem('gainlytics_1rm_results')   || 'null'),
+      macro: JSON.parse(localStorage.getItem('macrovault_macro_results') || 'null'),
+      orm:   JSON.parse(localStorage.getItem('macrovault_1rm_results')   || 'null'),
     });
   }, []);
 

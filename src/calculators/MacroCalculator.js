@@ -294,7 +294,7 @@ export default function MacroCalculator() {
     if (step === TOTAL_STEPS) {
       const res = computeMacros({ sex, age, heightUnit, heightFt, heightIn, heightCm, weightUnit, weight, bodyFat, activity, goal, diet });
       setResults(res);
-      localStorage.setItem('gainlytics_macro_results', JSON.stringify({
+      localStorage.setItem('macrovault_macro_results', JSON.stringify({
         calories: res.targetCals, protein_g: res.proteinG,
         carbs_g: res.carbG, fat_g: res.fatG, goal,
         calculated_at: new Date().toISOString(),

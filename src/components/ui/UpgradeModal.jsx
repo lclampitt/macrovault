@@ -37,7 +37,7 @@ const FEATURE_HEADLINES = {
   goals:    "Goal Planner is a Pro feature",
   meals:    "Meal Planner is a Pro feature",
   progress: "Progress Charts is a Pro feature",
-  default:  "Unlock everything with Gainlytics Pro",
+  default:  "Unlock everything with MacroVault Pro",
 };
 
 const PRO_PLUS_HEADLINES = {

@@ -26,7 +26,7 @@ function OneRepMaxCalculator() {
 
   useEffect(() => {
     if (oneRepMax) {
-      localStorage.setItem('gainlytics_1rm_results', JSON.stringify({
+      localStorage.setItem('macrovault_1rm_results', JSON.stringify({
         oneRepMax,
         unit,
         updatedAt: new Date().toISOString(),

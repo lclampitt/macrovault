@@ -110,7 +110,7 @@ function AuthPage() {
             <path d="M6 20V10M12 20V4M18 20v-6" />
           </svg>
         </div>
-        <span className="auth-logo__name">Gainlytics</span>
+        <span className="auth-logo__name">MacroVault</span>
       </motion.div>
 
       {/* Card */}
@@ -138,7 +138,7 @@ function AuthPage() {
                 ? "Enter your email and we'll send you a link to reset your password."
                 : isLogin
                   ? 'Welcome back! Sign in to access your analysis, goals, and progress.'
-                  : 'Start using Gainlytics to track your body analysis, goals, and workouts.'}
+                  : 'Start using MacroVault to track your body analysis, goals, and workouts.'}
             </p>
           </motion.div>
         </AnimatePresence>

@@ -107,8 +107,8 @@ function Navbar() {
     >
       {/* Logo */}
       <Link to="/" className="lp-nav__logo">
-        <img src="/images/gainlyticslogo.png" alt="Gainlytics" className="lp-nav__logo-icon" />
-        <span className="lp-nav__logo-name">Gainlytics</span>
+        <img src="/images/macrolock.png" alt="MacroVault" className="lp-nav__logo-icon" />
+        <span className="lp-nav__logo-name">MacroVault</span>
       </Link>
 
       {/* Center links */}
@@ -336,7 +336,7 @@ function Pricing() {
             <span className="lp-pricing-card__period">/mo</span>
           </div>
           <div className="lp-pricing-card__tagline">
-            Unlock the full Gainlytics experience with no limits.
+            Unlock the full MacroVault experience with no limits.
           </div>
           <div className="lp-pricing-card__divider" />
           <ul className="lp-pricing-card__features">
@@ -393,14 +393,15 @@ function Pricing() {
 
 /* ── Footer ── */
 function Footer() {
+  const { isDark } = useTheme();
   return (
     <footer className="lp-footer">
       <div className="lp-footer__inner">
         <div className="lp-footer__top">
           <div className="lp-footer__brand">
             <Link to="/" className="lp-footer__logo">
-              <img src="/images/gainlyticslogo.png" alt="Gainlytics" className="lp-footer__logo-icon" />
-              <span className="lp-footer__logo-name">Gainlytics</span>
+              <img src="/images/macrolock.png" alt="MacroVault" className="lp-footer__logo-icon" />
+              <span className="lp-footer__logo-name">MacroVault</span>
             </Link>
             <p className="lp-footer__tagline">
               Data-driven fitness for everyone.
@@ -416,7 +417,7 @@ function Footer() {
 
         <div className="lp-footer__bottom">
           <span className="lp-footer__copy">
-            © {new Date().getFullYear()} Gainlytics. All rights reserved.
+            © {new Date().getFullYear()} MacroVault. All rights reserved.
           </span>
           <div className="lp-footer__links">
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}

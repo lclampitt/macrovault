@@ -64,7 +64,7 @@ export default function ResetPassword() {
             <path d="M6 20V10M12 20V4M18 20v-6" />
           </svg>
         </div>
-        <span className="auth-logo__name">Gainlytics</span>
+        <span className="auth-logo__name">MacroVault</span>
       </motion.div>
 
       <motion.div
