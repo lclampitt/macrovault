@@ -32,15 +32,15 @@
 }
 
 .sidebar__logo-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
   object-fit: cover;
   flex-shrink: 0;
 }
 
 .sidebar__logo-name {
-  font-size: 17px;
+  font-size: 15.5px;
   font-weight: 500;
   color: var(--text-primary);
   overflow: hidden;
@@ -330,15 +330,15 @@
   }
 
   .mob-topbar__logo-icon {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--radius-sm);
     object-fit: cover;
     flex-shrink: 0;
   }
 
   .mob-topbar__logo-name {
-    font-size: 17px;
+    font-size: 15.5px;
     font-weight: 600;
     color: var(--text-primary);
     letter-spacing: -0.01em;

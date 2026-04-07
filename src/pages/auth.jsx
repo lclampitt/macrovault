@@ -105,11 +105,7 @@ function AuthPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: 'easeOut' }}
       >
-        <div className="auth-logo__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 20V10M12 20V4M18 20v-6" />
-          </svg>
-        </div>
+        <img src="/images/gainlyticslogo.png" alt="MacroVault" className="auth-logo__icon" />
         <span className="auth-logo__name">MacroVault</span>
       </motion.div>
 

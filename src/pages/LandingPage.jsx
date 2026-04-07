@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -10,14 +10,11 @@ import {
   BookOpen,
   Check,
   Zap,
-  Sun,
-  Moon,
 } from 'lucide-react';
-import { useTheme } from '../hooks/useTheme';
 import { supabase } from '../supabaseClient';
 import '../styles/landing.css';
 
-/* ── Animation variants ── */
+/* -- Animation variants -- */
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show:   { opacity: 1, y: 0 },
@@ -28,7 +25,7 @@ const stagger = {
   show: { transition: { staggerChildren: 0.1 } },
 };
 
-/* ── Feature data ── */
+/* -- Data -- */
 const FEATURES = [
   {
     icon: Ruler,
@@ -87,145 +84,192 @@ const PRO_PLUS_FEATURES = [
   'Personalized macro-fit meals',
 ];
 
-/* ── Navbar ── */
+const FEATURE_ROW = [
+  { title: 'Meal planner', desc: 'AI-powered meal suggestions and a full Monday\u2013Friday meal plan grid built around your macro targets.' },
+  { title: 'Macro calculator', desc: 'Full TDEE calculation plus a complete protein, carbs and fat breakdown based on your goals.' },
+  { title: 'Workout + progress tracking', desc: 'Log every session, track PRs and watch your body composition change over time in charts.' },
+];
+
+const STATS = [
+  { value: 'Free', label: 'to get started' },
+  { value: '96+', label: 'exercises tracked' },
+  { value: '5 min', label: 'to set up' },
+];
+
+/* -- Navbar -- */
 function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const { isDark, toggle } = useTheme();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
     <motion.nav
-      className={`lp-nav${scrolled ? ' lp-nav--scrolled' : ''}`}
+      className="lp-nav"
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ duration: 0.2 }}
     >
-      {/* Logo */}
       <Link to="/" className="lp-nav__logo">
-        <img src="/images/macrolock.png" alt="MacroVault" className="lp-nav__logo-icon" />
+        <img src="/images/gainlyticslogo.png" alt="MacroVault" className="lp-nav__logo-icon" />
         <span className="lp-nav__logo-name">MacroVault</span>
       </Link>
 
-      {/* Center links */}
       <div className="lp-nav__links">
         <a href="#features" className="lp-nav__link">Features</a>
-        <a href="#pricing"  className="lp-nav__link">Pricing</a>
-        <Link to="/about"   className="lp-nav__link">About</Link>
+        <a href="#pricing" className="lp-nav__link">Pricing</a>
+        <Link to="/about" className="lp-nav__link">About</Link>
       </div>
 
-      {/* Actions */}
       <div className="lp-nav__actions">
-        <button
-          className="lp-theme-toggle"
-          onClick={toggle}
-          title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-          aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-        >
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
-        <Link to="/auth" className="lp-btn lp-btn--ghost">Sign in</Link>
-        <Link to="/auth" className="lp-btn lp-btn--teal">Get started</Link>
+        <Link to="/auth" className="lp-nav__signin">Sign in</Link>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+          <Link to="/auth" className="lp-nav__cta">Get started</Link>
+        </motion.div>
       </div>
     </motion.nav>
   );
 }
 
-/* ── Hero ── */
+/* -- Hero -- */
 function Hero() {
   const navigate = useNavigate();
   return (
-    <section className="lp-hero lp-section" id="hero">
-      <div className="lp-hero__glow" aria-hidden="true" />
-
+    <section className="lp-hero" id="hero">
+      {/* Tag badge */}
       <motion.div
-        className="lp-hero__eyebrow"
-        variants={fadeUp}
-        initial="hidden"
-        animate="show"
-        transition={{ duration: 0.5, delay: 0.1 }}
+        className="lp-hero__tag"
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.25, delay: 0.1 }}
       >
-        <Zap size={12} />
+        <Zap size={10} />
         Track smarter. Train harder.
       </motion.div>
 
-      <motion.h1
-        className="lp-hero__heading"
-        variants={fadeUp}
-        initial="hidden"
-        animate="show"
-        transition={{ duration: 0.55, delay: 0.2 }}
-      >
-        Data-driven fitness,{' '}
-        <em>without the guesswork.</em>
-      </motion.h1>
+      {/* Headline */}
+      <h1 className="lp-hero__heading">
+        <motion.span
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.15 }}
+        >
+          Data-driven fitness,
+        </motion.span>
+        <br />
+        <motion.span
+          className="lp-hero__heading--accent"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.22 }}
+        >
+          without the guesswork.
+        </motion.span>
+      </h1>
 
+      {/* Subheading */}
       <motion.p
         className="lp-hero__sub"
-        variants={fadeUp}
-        initial="hidden"
-        animate="show"
-        transition={{ duration: 0.55, delay: 0.32 }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.28 }}
       >
         Track workouts, measure your body and hit your goals all in one place.
+        Built for people who want real data, not just motivation.
       </motion.p>
 
+      {/* CTA row */}
       <motion.div
         className="lp-hero__ctas"
-        variants={fadeUp}
-        initial="hidden"
-        animate="show"
-        transition={{ duration: 0.5, delay: 0.44 }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.35 }}
       >
-        <button
-          className="lp-btn lp-btn--teal lp-btn--lg"
+        <motion.button
+          className="lp-hero__cta-primary"
           onClick={() => navigate('/auth')}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
         >
           Start for free
-        </button>
-        <a href="#features" className="lp-btn lp-btn--outline lp-btn--lg">
-          See how it works
-        </a>
+        </motion.button>
+        <a href="#features" className="lp-hero__cta-secondary">See how it works</a>
       </motion.div>
+
+      {/* Stat strip */}
+      <div className="lp-hero__stats">
+        {STATS.map((s, i) => (
+          <React.Fragment key={s.value}>
+            {i > 0 && <div className="lp-hero__stat-divider" />}
+            <motion.div
+              className="lp-hero__stat"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.42 + i * 0.06 }}
+            >
+              <div className="lp-hero__stat-value">{s.value}</div>
+              <div className="lp-hero__stat-label">{s.label}</div>
+            </motion.div>
+          </React.Fragment>
+        ))}
+      </div>
     </section>
   );
 }
 
-/* ── Features ── */
+/* -- Feature Row -- */
+function FeatureRow() {
+  return (
+    <section className="lp-feature-row">
+      {FEATURE_ROW.map(({ title, desc }, i) => (
+        <motion.div
+          key={title}
+          className={`lp-feature-row__cell${i > 0 ? ' lp-feature-row__cell--bordered' : ''}`}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3, delay: i * 0.08 }}
+        >
+          <div className="lp-feature-row__title">{title}</div>
+          <div className="lp-feature-row__desc">{desc}</div>
+        </motion.div>
+      ))}
+    </section>
+  );
+}
+
+/* -- Features -- */
 function Features() {
   return (
-    <section className="lp-features lp-section" id="features">
-      <div className="lp-section-label">
-        <div className="lp-section-label__line" />
-        <span className="lp-section-label__text">Features</span>
-        <div className="lp-section-label__line" />
+    <section className="lp-features" id="features">
+      <div className="lp-features__header">
+        <motion.span
+          className="lp-features__label"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3 }}
+        >
+          FEATURES
+        </motion.span>
+
+        <motion.h2
+          className="lp-features__heading"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5 }}
+        >
+          Everything you need to reach your goals
+        </motion.h2>
+
+        <motion.p
+          className="lp-features__sub"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          A complete fitness toolkit for body measurements, workout logging and goal tracking.
+        </motion.p>
       </div>
-
-      <motion.h2
-        className="lp-section-heading"
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.5 }}
-      >
-        Everything you need to reach your goals
-      </motion.h2>
-
-      <motion.p
-        className="lp-section-sub"
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        A complete fitness toolkit for body measurements, workout logging and goal tracking.
-      </motion.p>
 
       <motion.div
         className="lp-features-grid"
@@ -234,16 +278,14 @@ function Features() {
         whileInView="show"
         viewport={{ once: true, amount: 0.15 }}
       >
-        {FEATURES.map(({ icon: Icon, title, desc }) => (
+        {FEATURES.map(({ icon: Icon, title, desc }, i) => (
           <motion.div
             key={title}
             className="lp-feature-card"
             variants={fadeUp}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.4, delay: i * 0.06 }}
           >
-            <div className="lp-feature-card__icon">
-              <Icon size={20} />
-            </div>
+            <div className="lp-feature-card__icon"><Icon size={20} /></div>
             <div className="lp-feature-card__title">{title}</div>
             <div className="lp-feature-card__desc">{desc}</div>
           </motion.div>
@@ -253,38 +295,44 @@ function Features() {
   );
 }
 
-/* ── Pricing ── */
+/* -- Pricing -- */
 function Pricing() {
   const navigate = useNavigate();
   return (
-    <section className="lp-pricing lp-section" id="pricing">
-      <div className="lp-section-label">
-        <div className="lp-section-label__line" />
-        <span className="lp-section-label__text">Pricing</span>
-        <div className="lp-section-label__line" />
+    <section className="lp-pricing" id="pricing">
+      <div className="lp-pricing__header">
+        <motion.span
+          className="lp-pricing__label"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3 }}
+        >
+          PRICING
+        </motion.span>
+
+        <motion.h2
+          className="lp-pricing__heading"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5 }}
+        >
+          Simple, transparent pricing
+        </motion.h2>
+
+        <motion.p
+          className="lp-pricing__sub"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          Start free, upgrade when you're ready. No hidden fees.
+        </motion.p>
       </div>
-
-      <motion.h2
-        className="lp-section-heading"
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.5 }}
-      >
-        Simple, transparent pricing
-      </motion.h2>
-
-      <motion.p
-        className="lp-section-sub"
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        Start free, upgrade when you're ready. No hidden fees.
-      </motion.p>
 
       <motion.div
         className="lp-pricing-cards"
@@ -391,16 +439,15 @@ function Pricing() {
   );
 }
 
-/* ── Footer ── */
+/* -- Footer -- */
 function Footer() {
-  const { isDark } = useTheme();
   return (
     <footer className="lp-footer">
       <div className="lp-footer__inner">
         <div className="lp-footer__top">
           <div className="lp-footer__brand">
             <Link to="/" className="lp-footer__logo">
-              <img src="/images/macrolock.png" alt="MacroVault" className="lp-footer__logo-icon" />
+              <img src="/images/gainlyticslogo.png" alt="MacroVault" className="lp-footer__logo-icon" />
               <span className="lp-footer__logo-name">MacroVault</span>
             </Link>
             <p className="lp-footer__tagline">
@@ -409,15 +456,15 @@ function Footer() {
           </div>
 
           <div className="lp-footer__links">
-            <Link to="/about"  className="lp-footer__link">About</Link>
-            <Link to="/help"   className="lp-footer__link">Contact</Link>
+            <Link to="/about" className="lp-footer__link">About</Link>
+            <Link to="/help" className="lp-footer__link">Contact</Link>
             <a href="#pricing" className="lp-footer__link">Pricing</a>
           </div>
         </div>
 
         <div className="lp-footer__bottom">
           <span className="lp-footer__copy">
-            © {new Date().getFullYear()} MacroVault. All rights reserved.
+            &copy; {new Date().getFullYear()} MacroVault. All rights reserved.
           </span>
           <div className="lp-footer__links">
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
@@ -431,7 +478,7 @@ function Footer() {
   );
 }
 
-/* ── Page ── */
+/* -- Page -- */
 export default function LandingPage() {
   const navigate = useNavigate();
 
@@ -447,6 +494,7 @@ export default function LandingPage() {
       <Navbar />
       <main>
         <Hero />
+        <FeatureRow />
         <Features />
         <Pricing />
       </main>

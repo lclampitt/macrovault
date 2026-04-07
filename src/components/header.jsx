@@ -22,7 +22,7 @@ export default function Header({ onLogout, session }) {
         <Link to="/" className="header-brand">
           <div className="header-logo-wrapper">
             <img
-              src="/images/macrolock.png"
+              src="/images/gainlyticslogo.png"
               alt="MacroVault Logo"
               className="header-logo-img"
             />

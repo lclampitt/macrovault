@@ -88,7 +88,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
     <div className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>
       {/* Logo */}
       <div className="sidebar__logo">
-        <img src="/images/macrolock.png" alt="MacroVault" className="sidebar__logo-icon" />
+        <img src="/images/gainlyticslogo.png" alt="MacroVault" className="sidebar__logo-icon" />
         <AnimatePresence>
           {!collapsed && (
             <motion.span
@@ -313,7 +313,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
       {/* ── Mobile top bar ── */}
       <div className="mob-topbar">
         <Link to="/home" className="mob-topbar__logo">
-          <img src="/images/macrolock.png" alt="MacroVault" className="mob-topbar__logo-icon" />
+          <img src="/images/gainlyticslogo.png" alt="MacroVault" className="mob-topbar__logo-icon" />
           <span className="mob-topbar__logo-name">MacroVault</span>
         </Link>
         <button
