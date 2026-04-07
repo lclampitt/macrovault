@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart2, Trash2 } from 'lucide-react';
+import { BarChart2, Trash2, TrendingUp, PlusCircle, History } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useUpgrade } from '../context/UpgradeContext';
 import ProgressCharts from '../components/ProgressCharts';
@@ -66,7 +66,7 @@ function useCountUp(target, duration = 700) {
 }
 
 /* Stat chip with count-up */
-function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive, spectrumColor }) {
+function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive, spectrumColor, isY2K, y2kLabel }) {
   const num = useCountUp(Math.abs(value ?? 0));
   const display = value == null ? '—' : `${positive === false ? '-' : positive ? '+' : ''}${num.toFixed(decimals)}${suffix}`;
   return (
@@ -76,6 +76,11 @@ function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.06, ease: 'easeOut' }}
     >
+      {isY2K && y2kLabel && (
+        <div className="pg-y2k-chip-bar">
+          <span>{y2kLabel}</span>
+        </div>
+      )}
       <span className="pg-chip__value" style={spectrumColor ? { color: spectrumColor } : undefined}>{display}</span>
       <span className="pg-chip__label">{label}</span>
     </motion.div>
@@ -83,7 +88,7 @@ function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive
 }
 
 function ProgressPageContent() {
-  const { isSpectrum, isRetro } = useTheme();
+  const { isSpectrum, isRetro, isY2K } = useTheme();
   const [session, setSession] = useState(null);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -248,15 +253,19 @@ function ProgressPageContent() {
       {/* Stat chips */}
       <div className="pg-chips">
         <StatChip label="Current weight" value={currentWeight} suffix=" lbs" decimals={1} index={0}
-          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-progress-chart)' : undefined} />
+          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-progress-chart)' : undefined}
+          isY2K={isY2K} y2kLabel="CURRENT WEIGHT:" />
         <StatChip label="Body fat %" value={currentBf} suffix="%" decimals={1} index={1}
-          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-fat)' : undefined} />
+          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-fat)' : undefined}
+          isY2K={isY2K} y2kLabel="BODY FAT %:" />
         <StatChip label="Weight change" value={weightChange} suffix=" lbs" decimals={1} index={2}
           positive={weightChange != null ? weightChange <= 0 : undefined}
-          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-workouts)' : undefined} />
+          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-workouts)' : undefined}
+          isY2K={isY2K} y2kLabel="WEIGHT CHANGE:" />
         <StatChip label="BF% change" value={bfChange} suffix="%" decimals={1} index={3}
           positive={bfChange != null ? bfChange <= 0 : undefined}
-          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-fat)' : undefined} />
+          spectrumColor={(isSpectrum || isRetro) ? 'var(--color-fat)' : undefined}
+          isY2K={isY2K} y2kLabel="BF% CHANGE:" />
       </div>
 
       {/* Chart */}
@@ -266,6 +275,12 @@ function ProgressPageContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.1, ease: 'easeOut' }}
       >
+        {isY2K && (
+          <div className="pg-y2k-titlebar">
+            <TrendingUp width={10} height={10} stroke="var(--accent-light)" strokeWidth={2} fill="none" />
+            <span>PROGRESS CHART</span>
+          </div>
+        )}
         <ProgressCharts rows={rows} />
       </motion.div>
 
@@ -276,6 +291,12 @@ function ProgressPageContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.16, ease: 'easeOut' }}
       >
+        {isY2K && (
+          <div className="pg-y2k-titlebar">
+            <PlusCircle width={10} height={10} stroke="var(--accent-light)" strokeWidth={2} fill="none" />
+            <span>ADD ENTRY</span>
+          </div>
+        )}
         <p className="pg-section-title">Add entry</p>
         <form className="pg-form-row" onSubmit={handleAdd}>
           <div className="pg-form-field">
@@ -292,7 +313,7 @@ function ProgressPageContent() {
           </div>
           <div className="pg-form-field pg-form-field--btn">
             <motion.button type="submit" className="btn btn-primary" disabled={saving} whileTap={{ scale: 0.97 }}>
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? 'Saving…' : (isY2K ? '[ Save ]' : 'Save')}
             </motion.button>
           </div>
         </form>
@@ -306,6 +327,12 @@ function ProgressPageContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.22, ease: 'easeOut' }}
       >
+        {isY2K && (
+          <div className="pg-y2k-titlebar">
+            <History width={10} height={10} stroke="var(--accent-light)" strokeWidth={2} fill="none" />
+            <span>HISTORY LOG</span>
+          </div>
+        )}
         <p className="pg-section-title">History</p>
         {rows.length === 0 ? (
           <p className="pg-muted">No entries yet.</p>

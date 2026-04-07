@@ -1,6 +1,6 @@
 // src/pages/calculators.jsx
 import React, { useState, useEffect } from 'react';
-import { ChartPie, Trophy } from 'lucide-react';
+import { ChartPie, Trophy, Calculator } from 'lucide-react';
 import { motion } from 'framer-motion';
 import '../styles/CalculatorsPage.css';
 import CalculatorCard from '../components/ui/CalculatorCard';
@@ -64,7 +64,7 @@ const tips = [
 
 function SectionLabel({ text }) {
   return (
-    <div style={{
+    <div className="calc-section-label" style={{
       fontSize: 10, fontWeight: 500, color: 'var(--text-secondary)',
       textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10,
     }}>
@@ -75,7 +75,7 @@ function SectionLabel({ text }) {
 
 function ResultChip({ value, label, source }) {
   return (
-    <div className="calc-card" style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px' }}>
+    <div className="calc-card calc-result-chip" style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px' }}>
       <div style={{ fontSize: 18, fontWeight: 500, color: 'var(--accent)', lineHeight: 1 }}>{value ?? '—'}</div>
       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>{label}</div>
       <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>{source}</div>
@@ -89,7 +89,7 @@ function formatDate(iso) {
 }
 
 function CalculatorsPage() {
-  const { isSpectrum } = useTheme();
+  const { isSpectrum, isY2K } = useTheme();
   const [saved, setSaved] = useState({ macro: null, orm: null });
 
   useEffect(() => {
@@ -128,6 +128,7 @@ function CalculatorsPage() {
             spectrumIconBg={isSpectrum ? calc.spectrumIconBg : undefined}
             spectrumIconBorder={isSpectrum ? calc.spectrumIconBorder : undefined}
             spectrumIconStroke={isSpectrum ? calc.spectrumIconStroke : undefined}
+            isY2K={isY2K}
           />
         ))}
       </div>
@@ -172,8 +173,8 @@ function CalculatorsPage() {
               </div>
             </>
           ) : (
-            <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 12, color: 'var(--text-muted)' }}>
-              Run a calculator to see your results here
+            <div className="calc-empty-msg" style={{ textAlign: 'center', padding: '20px 0', fontSize: 12, color: 'var(--text-muted)' }}>
+              {isY2K ? '[ No results yet \u2014 run a calculator above ]' : 'Run a calculator to see your results here'}
             </div>
           )}
         </motion.div>
@@ -182,7 +183,7 @@ function CalculatorsPage() {
       {/* ── Section 2: How these work ── */}
       <div>
         <SectionLabel text="How These Work" />
-        <div className="calc-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+        <div className="calc-card calc-how-container" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
           {howRows.map((row, i) => (
             <motion.div
               key={row.title}
@@ -220,7 +221,7 @@ function CalculatorsPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, delay: 0.5 + i * 0.06 }}
-              className="calc-card"
+              className="calc-card calc-tip-card"
               style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 14px' }}
             >
               <div style={{ fontSize: 11, fontWeight: 500, color: isSpectrum ? tip.spectrumColor : 'var(--accent-light)', marginBottom: 4 }}>{tip.title}</div>

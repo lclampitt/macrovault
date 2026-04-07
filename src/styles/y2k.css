@@ -1280,3 +1280,818 @@
 .wl-y2k-usage__text--warn {
   color: #FFD700;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE: CALCULATORS — Y2K OVERRIDES
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Page heading ── */
+[data-ui-mode="y2k"] .calculators-title {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  color: var(--accent-light);
+}
+
+/* ── Calculator cards — full Y2K treatment ── */
+[data-ui-mode="y2k"] .calc-card {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+/* ── Section labels ── */
+[data-ui-mode="y2k"] .calc-section-label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: var(--accent-light) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+[data-ui-mode="y2k"] .calc-section-label::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border: 1px outset var(--accent-light);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* ── Calculator card body styling ── */
+[data-ui-mode="y2k"] .calc-card .calc-card__open-btn {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  font-weight: 700;
+  color: var(--accent-light) !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  padding: 8px 0 !important;
+  transition: background 0.15s ease, border-color 0.15s ease !important;
+}
+
+[data-ui-mode="y2k"] .calc-card:hover .calc-card__open-btn {
+  background: linear-gradient(180deg, var(--accent-bg), #0d1830) !important;
+  border-color: var(--accent) !important;
+}
+
+[data-ui-mode="y2k"] .calc-card .calc-card__open-btn:active {
+  border: 1px inset #334466 !important;
+  transform: translateY(1px);
+}
+
+/* ── Last results container (inset) ── */
+[data-ui-mode="y2k"] .calc-result-chip {
+  background: #060c18 !important;
+  border: 2px inset #334466 !important;
+}
+
+/* ── Empty results message ── */
+[data-ui-mode="y2k"] .calc-empty-msg {
+  font-family: 'Courier New', Courier, monospace;
+  color: #334466 !important;
+  font-size: 11px !important;
+}
+
+/* ── How these work container ── */
+[data-ui-mode="y2k"] .calc-how-container {
+  overflow: hidden;
+}
+
+[data-ui-mode="y2k"] .calc-how-container > div:nth-child(odd) {
+  background: #0d1830;
+}
+
+[data-ui-mode="y2k"] .calc-how-container > div:nth-child(even) {
+  background: #111f38;
+}
+
+[data-ui-mode="y2k"] .calc-how-container > div {
+  border-bottom-color: #1a2a3a !important;
+}
+
+/* ── Tips cards ── */
+[data-ui-mode="y2k"] .calc-tip-card {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE: EXERCISE LIBRARY — Y2K OVERRIDES
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Page heading ── */
+[data-ui-mode="y2k"] .el-title {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* ── Count pill ── */
+[data-ui-mode="y2k"] .el-count {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  color: #4466aa;
+  background: #0a1220;
+  border: 1px inset #334466;
+  border-radius: 2px;
+  padding: 2px 8px;
+  display: inline-block;
+}
+
+/* ── Tab pills ── */
+[data-ui-mode="y2k"] .el-tab {
+  border-radius: 3px !important;
+  font-weight: 700;
+  font-size: 11px;
+  border: 1px outset #4466aa;
+  background: linear-gradient(180deg, #1a2a4a, #0d1830);
+  color: #4488cc;
+  padding: 5px 14px;
+}
+
+[data-ui-mode="y2k"] .el-tab:active {
+  border: 1px inset #334466;
+  transform: translateY(1px);
+}
+
+[data-ui-mode="y2k"] .el-tab--active {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 50%, #3344aa),
+    color-mix(in srgb, var(--accent) 25%, #1a2266)
+  ) !important;
+  border: 1px outset var(--accent-light) !important;
+  color: var(--accent-light) !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* ── Search bar ── */
+[data-ui-mode="y2k"] .el-search {
+  border: 2px inset #334466 !important;
+  border-radius: 3px !important;
+  background: #060c18 !important;
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+  font-size: 11px;
+}
+
+[data-ui-mode="y2k"] .el-search::placeholder {
+  font-family: 'Courier New', Courier, monospace;
+  color: #334466;
+  font-style: italic;
+  font-size: 11px;
+}
+
+[data-ui-mode="y2k"] .el-search-icon {
+  color: #334466;
+}
+
+/* ── Filter dropdowns ── */
+[data-ui-mode="y2k"] .el-dropdown__btn {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4488cc;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+[data-ui-mode="y2k"] .el-dropdown__btn:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent-light);
+}
+
+[data-ui-mode="y2k"] .el-dropdown__chevron {
+  color: #4466aa;
+}
+
+[data-ui-mode="y2k"] .el-dropdown__menu {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 2px outset #4466aa !important;
+  border-radius: 3px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.6);
+}
+
+[data-ui-mode="y2k"] .el-dropdown__item {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4488cc;
+  border-bottom: 1px solid #1a2a3a;
+  padding: 6px 12px;
+}
+
+[data-ui-mode="y2k"] .el-dropdown__item:hover {
+  background: var(--accent-bg);
+  color: var(--accent-light);
+}
+
+[data-ui-mode="y2k"] .el-dropdown__item--active {
+  color: var(--accent-light) !important;
+  background: var(--accent-bg);
+  font-weight: 700;
+}
+
+/* ── Exercise cards ── */
+[data-ui-mode="y2k"] .el-card {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 2px outset #4466aa !important;
+  border-radius: 4px !important;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+
+[data-ui-mode="y2k"] .el-card:hover {
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+[data-ui-mode="y2k"] .el-card__illustration {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 40%, #3344aa),
+    color-mix(in srgb, var(--accent) 20%, #1a2266)
+  ) !important;
+  border-bottom: 1px solid #1a2a4a;
+  border-radius: 0 !important;
+  height: 100px;
+  padding: 12px 14px;
+}
+
+[data-ui-mode="y2k"] .el-card__illus-bar {
+  border: 1px outset var(--accent-light);
+  border-radius: 1px;
+}
+
+[data-ui-mode="y2k"] .el-card__illus-group {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .el-card__illus-muscle {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 9px;
+}
+
+[data-ui-mode="y2k"] .el-card__name {
+  font-weight: 700;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* ── Tag chips ── */
+[data-ui-mode="y2k"] .el-tag {
+  border-radius: 2px !important;
+  border: 1px outset #334466;
+  font-weight: 700;
+  font-size: 9px;
+}
+
+[data-ui-mode="y2k"] .el-tag--gray {
+  background: linear-gradient(180deg, #0d1830, #080f1e) !important;
+  border: 1px outset #334466;
+  color: #4488cc;
+}
+
+/* ── Card footer ── */
+[data-ui-mode="y2k"] .el-card__actions {
+  border-top: 1px solid #1a2a3a;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #0d1830, #0a1220);
+}
+
+[data-ui-mode="y2k"] .el-card__view-btn {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-light) !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+[data-ui-mode="y2k"] .el-card__view-btn:active {
+  border: 1px inset #334466 !important;
+  transform: translateY(1px);
+}
+
+[data-ui-mode="y2k"] .el-card__icon-btn {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  width: 26px;
+  height: 26px;
+}
+
+[data-ui-mode="y2k"] .el-card__icon-btn--favorited {
+  background: linear-gradient(180deg, #2a0a0a, #1a0606) !important;
+  border: 1px outset #ff4444 !important;
+  color: #ff4444;
+}
+
+[data-ui-mode="y2k"] .el-card__icon-btn:active {
+  border: 1px inset #334466 !important;
+  transform: translateY(1px);
+}
+
+/* ── Load more button ── */
+[data-ui-mode="y2k"] .el-load-more__btn {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  font-weight: 700;
+  color: var(--accent-light);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+[data-ui-mode="y2k"] .el-load-more__btn:active {
+  border: 1px inset #334466 !important;
+  transform: translateY(1px);
+}
+
+/* ── Empty state ── */
+[data-ui-mode="y2k"] .el-empty {
+  font-family: 'Courier New', Courier, monospace;
+  color: #334466;
+  border: 2px inset #223355;
+  border-radius: 4px;
+  background: #060c18;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE: MEASUREMENTS (ANALYZER) — Y2K OVERRIDES
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Page heading ── */
+[data-ui-mode="y2k"] .analyzer-title {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+[data-ui-mode="y2k"] .analyzer-subtext {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: #4466aa;
+}
+
+/* ── Form card ── */
+[data-ui-mode="y2k"] .measurement-card {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+[data-ui-mode="y2k"] .measurement-intro {
+  background: linear-gradient(180deg, #0d1830, #0a1220);
+  border: 1px inset #334466;
+  border-radius: 3px;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: #4466aa;
+  font-family: 'Courier New', Courier, monospace;
+  line-height: 1.6;
+}
+
+/* ── Field labels ── */
+[data-ui-mode="y2k"] .field-label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Analyze button ── */
+[data-ui-mode="y2k"] .analyze-btn {
+  border: 2px outset var(--accent-light) !important;
+  border-radius: 3px !important;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .analyze-btn:active {
+  border: 2px inset var(--accent-dark) !important;
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ── Results ── */
+[data-ui-mode="y2k"] .analysis-results {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+[data-ui-mode="y2k"] .result-title {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .result-item {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: #6688aa;
+}
+
+[data-ui-mode="y2k"] .result-item strong {
+  color: var(--accent-light);
+}
+
+[data-ui-mode="y2k"] .tdee-chip {
+  background: #060c18 !important;
+  border: 2px inset #334466 !important;
+}
+
+[data-ui-mode="y2k"] .tdee-chip__value {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .tdee-chip__label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 9px;
+  color: #4466aa;
+}
+
+[data-ui-mode="y2k"] .about-calculator {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+[data-ui-mode="y2k"] .about-calculator h3 {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .about-calculator p {
+  color: #4466aa;
+  font-size: 11px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE: MEAL PLANNER — Y2K OVERRIDES
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Week navigation arrows ── */
+[data-ui-mode="y2k"] .mp-week-nav__arrow {
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  background: linear-gradient(180deg, #1a2a4a, #0d1830);
+  width: 28px;
+  height: 28px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  color: var(--accent-light);
+}
+
+[data-ui-mode="y2k"] .mp-week-nav__arrow:active {
+  border: 1px inset #334466 !important;
+  transform: translateY(1px);
+}
+
+/* ── Week date label ── */
+[data-ui-mode="y2k"] .mp-week-nav__label {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+}
+
+/* ── Macro summary bar ── */
+[data-ui-mode="y2k"] .mp-summary-bar {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+[data-ui-mode="y2k"] .mp-summary-bar__label {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+}
+
+/* ── Empty meal cells ── */
+[data-ui-mode="y2k"] .mp-slot--empty {
+  border: 2px inset #1a2a3a !important;
+  background: #060c18 !important;
+  box-shadow: inset 1px 1px 4px rgba(0,0,0,0.5);
+  border-radius: 3px !important;
+}
+
+[data-ui-mode="y2k"] .mp-slot--empty svg {
+  color: #1a2a3a;
+}
+
+[data-ui-mode="y2k"] .mp-slot--empty span {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  color: #1a2a3a;
+  font-weight: 700;
+}
+
+[data-ui-mode="y2k"] .mp-slot--empty:hover {
+  border: 2px inset var(--accent-dark) !important;
+  background: var(--accent-bg) !important;
+}
+
+[data-ui-mode="y2k"] .mp-slot--empty:hover svg {
+  color: var(--accent);
+}
+
+[data-ui-mode="y2k"] .mp-slot--empty:hover span {
+  color: var(--accent-light);
+}
+
+/* ── Day column headers ── */
+[data-ui-mode="y2k"] .mp-day-header__name {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-transform: uppercase;
+}
+
+[data-ui-mode="y2k"] .mp-day-header--today .mp-day-header__name {
+  color: var(--accent);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .mp-day-header__date {
+  font-family: 'Courier New', Courier, monospace;
+  color: #4466aa;
+}
+
+/* ── Daily calorie totals ── */
+[data-ui-mode="y2k"] .mp-daily-summary__cal {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+}
+
+[data-ui-mode="y2k"] .mp-daily-summary__pills {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 9px;
+  color: #4466aa;
+}
+
+/* ── Row labels (BREAKFAST, LUNCH, DINNER) ── */
+[data-ui-mode="y2k"] .mp-row-label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 9px !important;
+  font-weight: 700;
+  color: #334466 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── Log day / Swap / Copy buttons ── */
+[data-ui-mode="y2k"] .mp-day-action-btn--teal {
+  background: linear-gradient(180deg, #0a1a0a, #060c06) !important;
+  border: 1px outset #336633 !important;
+  border-radius: 3px !important;
+  font-weight: 700;
+  color: #44aa44 !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .mp-day-action-btn--logged {
+  background: linear-gradient(180deg, var(--accent-bg), #060c18) !important;
+  border: 1px outset var(--accent) !important;
+  border-radius: 3px !important;
+  font-weight: 700;
+  color: var(--accent-light) !important;
+}
+
+[data-ui-mode="y2k"] .mp-day-action-btn--muted {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+  border: 1px outset #4466aa !important;
+  border-radius: 3px !important;
+  font-weight: 700;
+  color: #4488cc !important;
+}
+
+[data-ui-mode="y2k"] .mp-day-action-btn:active {
+  border-style: inset !important;
+  transform: translateY(1px);
+}
+
+/* ── Snack button ── */
+[data-ui-mode="y2k"] .mp-snack-btn {
+  background: transparent !important;
+  border: 1px outset #334466 !important;
+  border-radius: 3px !important;
+  font-weight: 700;
+  color: #4466aa !important;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+[data-ui-mode="y2k"] .mp-snack-btn:hover {
+  border: 1px outset var(--accent) !important;
+  color: var(--accent-light) !important;
+}
+
+/* ── Filled meal slot Y2K ── */
+[data-ui-mode="y2k"] .mp-slot--filled {
+  border-radius: 3px !important;
+  border: 1px outset #334466 !important;
+}
+
+/* ── Macro bars Y2K ── */
+[data-ui-mode="y2k"] .mp-macro-bar {
+  border: 1px inset #223355;
+  border-radius: 2px;
+  background: #060c18;
+}
+
+[data-ui-mode="y2k"] .mp-macro-row__label {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: #4466aa;
+  font-size: 10px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE: PROGRESS — Y2K OVERRIDES
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Reusable Y2K titlebar for Progress page ── */
+.pg-y2k-titlebar {
+  height: 22px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 50%, #3344aa),
+    color-mix(in srgb, var(--accent) 25%, #1a2266)
+  );
+  border-bottom: 1px solid #223388;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -18px -20px 14px;
+  border-radius: 4px 4px 0 0;
+}
+
+.pg-y2k-titlebar span {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Stat chip title bars ── */
+.pg-y2k-chip-bar {
+  height: 18px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 50%, #3344aa),
+    color-mix(in srgb, var(--accent) 25%, #1a2266)
+  );
+  border-bottom: 1px solid #223388;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  margin: -14px -16px 8px;
+  border-radius: 4px 4px 0 0;
+}
+
+.pg-y2k-chip-bar span {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Stat chip values ── */
+[data-ui-mode="y2k"] .pg-chip {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+[data-ui-mode="y2k"] .pg-chip__value {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+[data-ui-mode="y2k"] .pg-chip__label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  color: #4466aa;
+}
+
+/* ── Chart container ── */
+[data-ui-mode="y2k"] .pg-chart-card {
+  background: linear-gradient(180deg, #0a1220, #060c18) !important;
+  border: 2px inset #334466 !important;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+/* ── Add entry form card ── */
+[data-ui-mode="y2k"] .pg-form-card {
+  background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
+}
+
+[data-ui-mode="y2k"] .pg-section-title {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .pg-form-label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+[data-ui-mode="y2k"] .pg-tip {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  color: #334466;
+  font-style: italic;
+}
+
+/* ── History table card ── */
+[data-ui-mode="y2k"] .pg-table-card {
+  background: #060c18 !important;
+  border: 2px inset #334466 !important;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+/* ── Table headers ── */
+[data-ui-mode="y2k"] .pg-table th {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #1a2a4a, #0d1830);
+  border-bottom: 2px solid #334466;
+}
+
+/* ── Table rows zebra stripe ── */
+[data-ui-mode="y2k"] .pg-row:nth-child(odd) {
+  background: linear-gradient(180deg, #0d1830, #0a1220);
+}
+
+[data-ui-mode="y2k"] .pg-row:nth-child(even) {
+  background: linear-gradient(180deg, #111f38, #0d1830);
+}
+
+[data-ui-mode="y2k"] .pg-row td {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: #8899cc;
+  font-weight: 600;
+  border-bottom-color: #1a2a3a;
+  padding: 8px 12px;
+  transition: background 0.15s ease, border-left 0.15s ease;
+}
+
+[data-ui-mode="y2k"] .pg-row:hover td {
+  background: linear-gradient(180deg,
+    var(--accent-bg),
+    color-mix(in srgb, var(--accent-bg) 80%, #060c18)
+  );
+}
+
+[data-ui-mode="y2k"] .pg-row:hover td:first-child {
+  border-left: 3px solid var(--accent);
+  padding-left: 9px;
+}
+
+[data-ui-mode="y2k"] .pg-row td:first-child {
+  color: #4488cc;
+}
+
+/* ── Delete button ── */
+[data-ui-mode="y2k"] .pg-del-btn {
+  background: linear-gradient(180deg, #2a0a0a, #1a0606) !important;
+  border: 1px outset #aa3333 !important;
+  border-radius: 3px !important;
+  width: 26px;
+  height: 26px;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+[data-ui-mode="y2k"] .pg-del-btn svg {
+  color: #ff6666;
+}
+
+[data-ui-mode="y2k"] .pg-del-btn:active {
+  border: 1px inset #882222 !important;
+  transform: translateY(1px);
+  box-shadow: none;
+}
