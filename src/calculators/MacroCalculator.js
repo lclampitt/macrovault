@@ -144,7 +144,7 @@ function ResultsView({ results, goal, onReset, onSave, onCopy, saving = false })
       transition={{ duration: 0.3 }}
       style={{ maxWidth: 560, margin: '0 auto' }}
     >
-      <div style={{
+      <div className="calc-card" style={{
         background: 'var(--bg-surface)', border: '1px solid var(--accent)', borderRadius: 12,
         padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 24,
       }}>
@@ -668,6 +668,7 @@ export default function MacroCalculator() {
           animate="center"
           exit="exit"
           transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="calc-card"
           style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '28px 32px' }}
         >
           {renderStep()}

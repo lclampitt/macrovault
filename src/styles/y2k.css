@@ -473,22 +473,57 @@
   box-shadow: var(--y2k-shadow-inset), 0 0 0 1px var(--accent);
 }
 
-/* ── Calculator / Analyzer — Y2K overrides ── */
+/* ══════════════════════════════════════════
+   UNIVERSAL Y2K CARD STROKE — all pages
+   ══════════════════════════════════════════ */
+
+/* ── Master rule: any box with bg-surface + border gets Y2K raised stroke ── */
 [data-ui-mode="y2k"] .measurement-card,
 [data-ui-mode="y2k"] .analysis-results,
 [data-ui-mode="y2k"] .about-calculator,
-[data-ui-mode="y2k"] .pro-gate {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius);
+[data-ui-mode="y2k"] .pro-gate,
+[data-ui-mode="y2k"] .tdee-chip,
+[data-ui-mode="y2k"] .result-item,
+[data-ui-mode="y2k"] .gp-view-card,
+[data-ui-mode="y2k"] .gp-goal-card,
+[data-ui-mode="y2k"] .gp-form-card,
+[data-ui-mode="y2k"] .gp-log-card,
+[data-ui-mode="y2k"] .gp-timeline-card,
+[data-ui-mode="y2k"] .gp-macro-chips-card,
+[data-ui-mode="y2k"] .gp-confirm,
+[data-ui-mode="y2k"] .wl-log-card,
+[data-ui-mode="y2k"] .wl-history-card,
+[data-ui-mode="y2k"] .wl-history-row,
+[data-ui-mode="y2k"] .pg-chip,
+[data-ui-mode="y2k"] .pg-chart-card,
+[data-ui-mode="y2k"] .pg-form-card,
+[data-ui-mode="y2k"] .pg-table-card,
+[data-ui-mode="y2k"] .mp-suggestion-card,
+[data-ui-mode="y2k"] .mp-saved-meal,
+[data-ui-mode="y2k"] .mp-summary-bar,
+[data-ui-mode="y2k"] .mp-snack-sheet,
+[data-ui-mode="y2k"] .el-card,
+[data-ui-mode="y2k"] .el-search,
+[data-ui-mode="y2k"] .progress-chart-card,
+[data-ui-mode="y2k"] .calc-card {
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius) !important;
   box-shadow: var(--y2k-shadow-card);
 }
 
+/* Snack sheet keeps flat bottom */
+[data-ui-mode="y2k"] .mp-snack-sheet {
+  border-radius: var(--y2k-radius) var(--y2k-radius) 0 0 !important;
+}
+
+/* ── Inputs inside cards ── */
 [data-ui-mode="y2k"] .field-input {
   border: var(--y2k-border-sunken) !important;
   border-radius: var(--y2k-radius-sm) !important;
   box-shadow: var(--y2k-shadow-inset);
 }
 
+/* ── Buttons — Y2K raised ── */
 [data-ui-mode="y2k"] .analyze-btn {
   border: var(--y2k-border-raised);
   border-radius: var(--y2k-radius-sm);
@@ -507,48 +542,6 @@
   box-shadow: none;
 }
 
-[data-ui-mode="y2k"] .tdee-chip {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius);
-  box-shadow: var(--y2k-shadow-card);
-}
-
-[data-ui-mode="y2k"] .result-item {
-  border: var(--y2k-border-sunken);
-  border-radius: var(--y2k-radius);
-}
-
-[data-ui-mode="y2k"] .bodytype-badge {
-  border-radius: var(--y2k-radius-sm);
-}
-
-/* ── Calculators hub — card overrides ── */
-[data-ui-mode="y2k"] .calculators-title,
-[data-ui-mode="y2k"] .analyzer-title {
-  font-weight: 700;
-  text-shadow: var(--y2k-text-shadow);
-}
-
-/* ── Goal Planner — Y2K overrides ── */
-[data-ui-mode="y2k"] .gp-view-card,
-[data-ui-mode="y2k"] .gp-goal-card {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius);
-  box-shadow: var(--y2k-shadow-card);
-}
-
-[data-ui-mode="y2k"] .gp-confirm {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius);
-}
-
-/* ── Meal Planner — Y2K overrides ── */
-[data-ui-mode="y2k"] .mp-suggestion-card,
-[data-ui-mode="y2k"] .mp-saved-meal {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius);
-}
-
 [data-ui-mode="y2k"] .mp-week-nav__ai-btn,
 [data-ui-mode="y2k"] .mp-week-nav__clear-btn {
   border: var(--y2k-border-raised);
@@ -563,27 +556,75 @@
   transform: translateY(1px);
 }
 
-[data-ui-mode="y2k"] .mp-summary-bar {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius);
+/* ── Result items — sunken inset ── */
+[data-ui-mode="y2k"] .result-item {
+  border: var(--y2k-border-sunken) !important;
 }
 
-[data-ui-mode="y2k"] .mp-snack-sheet {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius) var(--y2k-radius) 0 0;
+[data-ui-mode="y2k"] .bodytype-badge {
+  border-radius: var(--y2k-radius-sm);
 }
 
-/* ── Progress page — Y2K overrides ── */
-[data-ui-mode="y2k"] .progress-chart-card {
-  border: var(--y2k-border-raised);
-  border-radius: var(--y2k-radius);
+/* ── Page titles ── */
+[data-ui-mode="y2k"] .calculators-title,
+[data-ui-mode="y2k"] .analyzer-title,
+[data-ui-mode="y2k"] .pg-section-title,
+[data-ui-mode="y2k"] .wl-section-title {
+  font-weight: 700;
+  text-shadow: var(--y2k-text-shadow);
+}
+
+/* ── Goal Planner — macro chip cards ── */
+[data-ui-mode="y2k"] .gp-macro-chip {
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius) !important;
   box-shadow: var(--y2k-shadow-card);
 }
 
-/* ── Exercise Library — Y2K overrides ── */
-[data-ui-mode="y2k"] .el-card,
-[data-ui-mode="y2k"] .el-search {
-  border-radius: var(--y2k-radius);
+/* ── Workout Logger — Y2K overrides ── */
+[data-ui-mode="y2k"] .wl-log-card {
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius) !important;
+  box-shadow: var(--y2k-shadow-card);
+}
+
+[data-ui-mode="y2k"] .wl-history-row {
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius) !important;
+}
+
+[data-ui-mode="y2k"] .wl-exercise-block {
+  border: var(--y2k-border-sunken) !important;
+  border-radius: var(--y2k-radius) !important;
+}
+
+[data-ui-mode="y2k"] .wl-adder input,
+[data-ui-mode="y2k"] .wl-sets-table input {
+  border: var(--y2k-border-sunken) !important;
+  border-radius: var(--y2k-radius-sm) !important;
+}
+
+/* ── Progress page — Y2K overrides ── */
+[data-ui-mode="y2k"] .pg-chip {
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius) !important;
+  box-shadow: var(--y2k-shadow-card);
+}
+
+[data-ui-mode="y2k"] .pg-chart-card {
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius) !important;
+  box-shadow: var(--y2k-shadow-card);
+}
+
+[data-ui-mode="y2k"] .pg-table-card {
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius) !important;
+  box-shadow: var(--y2k-shadow-card);
+}
+
+[data-ui-mode="y2k"] .pg-row {
+  border-bottom: 1px solid #1a2a4a;
 }
 
 /* ── Section labels — Y2K uppercase bold ── */
