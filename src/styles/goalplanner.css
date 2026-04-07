@@ -500,3 +500,34 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* ── SPOTLIGHT EFFECT ─────────────────────────────── */
+.gp-spotlight {
+  position: relative;
+  border-radius: var(--radius-lg);
+  animation: gp-spotlight-glow 3s ease-out forwards;
+}
+
+.gp-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: calc(var(--radius-lg) + 3px);
+  border: 2px solid #1D9E75;
+  opacity: 0;
+  animation: gp-spotlight-ring 3s ease-out forwards;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes gp-spotlight-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(29, 158, 117, 0); }
+  15%  { box-shadow: 0 0 20px 4px rgba(29, 158, 117, 0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(29, 158, 117, 0); }
+}
+
+@keyframes gp-spotlight-ring {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  100% { opacity: 0; }
+}

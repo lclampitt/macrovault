@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Target } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
@@ -133,6 +134,7 @@ function NutritionLogger({ userId }) {
     const { error } = await supabase.from('food_logs').delete().eq('id', id);
     setDeletingId(null);
     if (error) { toast.error('Failed to remove entry.'); return; }
+    setEntries((prev) => prev.filter((e) => e.id !== id));
     toast.success('Entry removed');
   }
 
@@ -283,6 +285,30 @@ function GoalPlannerGate() {
 }
 
 function GoalPlannerContent({ compact = false }) {
+  // Spotlight via query param
+  const [searchParams, setSearchParams] = useSearchParams();
+  const nutritionRef = useRef(null);
+  const [spotlight, setSpotlight] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('spotlight') === 'nutrition') {
+      setSpotlight(true);
+      // Remove the param from URL so it doesn't persist on refresh
+      searchParams.delete('spotlight');
+      setSearchParams(searchParams, { replace: true });
+
+      // Auto-scroll after a brief delay to let the DOM render
+      const timer = setTimeout(() => {
+        nutritionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 400);
+
+      // Fade out spotlight after 3 seconds
+      const fadeTimer = setTimeout(() => setSpotlight(false), 3000);
+      return () => { clearTimeout(timer); clearTimeout(fadeTimer); };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Auth / data state
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -718,7 +744,9 @@ function GoalPlannerContent({ compact = false }) {
 
       {/* Nutrition Logger — always visible on full page when logged in */}
       {!loading && userId && !compact && (
-        <NutritionLogger userId={userId} />
+        <div ref={nutritionRef} className={spotlight ? 'gp-spotlight' : ''}>
+          <NutritionLogger userId={userId} />
+        </div>
       )}
     </div>
   );

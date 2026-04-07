@@ -17,8 +17,11 @@ import {
   Check,
   ClipboardCheck,
   Copy,
+  Cookie,
+  ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import '../../styles/mealplanner.css';
@@ -627,6 +630,131 @@ function SlotPanel({
 }
 
 /* ────────────────────────────────────────────────────
+   SNACK QUICK-ADD SHEET
+   ──────────────────────────────────────────────────── */
+function SnackSheet({ userId, onClose }) {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: '', calories: '', protein: '', carbs: '', fat: '' });
+  const [dateStr, setDateStr] = useState(() => fmtDate(new Date()));
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const cal = parseFloat(form.calories) || 0;
+    if (!form.name.trim()) { toast.error('Enter a snack name'); return; }
+    if (cal === 0) { toast.error('Enter at least calories'); return; }
+
+    setSubmitting(true);
+    const { error } = await supabase.from('food_logs').insert({
+      user_id: userId,
+      logged_date: dateStr,
+      meal_name: form.name.trim(),
+      calories: cal,
+      protein_g: parseFloat(form.protein) || 0,
+      carbs_g: parseFloat(form.carbs) || 0,
+      fat_g: parseFloat(form.fat) || 0,
+      notes: 'Snack',
+    });
+    setSubmitting(false);
+
+    if (error) { toast.error('Failed to log snack'); return; }
+    toast.success('Snack logged!');
+    onClose();
+  }
+
+  return (
+    <>
+      <motion.div
+        className="mp-snack-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      />
+      <motion.div
+        className="mp-snack-sheet"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+      >
+        <div className="mp-snack-sheet__handle" />
+
+        <div className="mp-snack-sheet__header">
+          <h3 className="mp-snack-sheet__title">
+            <Cookie size={16} /> Quick-add snack
+          </h3>
+          <button className="mp-panel__close" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+        <form className="mp-snack-sheet__body" onSubmit={handleSubmit}>
+          <div className="mp-form__field">
+            <label className="mp-form__label">Snack name</label>
+            <input
+              type="text"
+              className="input"
+              placeholder="e.g. Protein bar, Apple, Trail mix"
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              maxLength={80}
+              autoFocus
+            />
+          </div>
+
+          <div className="mp-form__macro-grid">
+            {[
+              { key: 'calories', label: 'Calories (kcal)' },
+              { key: 'protein', label: 'Protein (g)' },
+              { key: 'carbs', label: 'Carbs (g)' },
+              { key: 'fat', label: 'Fat (g)' },
+            ].map(({ key, label }) => (
+              <div key={key} className="mp-form__field">
+                <label className="mp-form__label">{label}</label>
+                <input
+                  type="number"
+                  className="input"
+                  min="0"
+                  step="any"
+                  placeholder="0"
+                  value={form[key]}
+                  onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mp-form__field">
+            <label className="mp-form__label">Date</label>
+            <input
+              type="date"
+              className="input"
+              value={dateStr}
+              onChange={(e) => setDateStr(e.target.value)}
+            />
+          </div>
+
+          <button type="submit" className="mp-form__submit" disabled={submitting}>
+            {submitting ? 'Logging...' : 'Log snack'}
+          </button>
+        </form>
+
+        <button
+          className="mp-snack-sheet__goto"
+          onClick={() => {
+            onClose();
+            navigate('/goalplanner?spotlight=nutrition');
+          }}
+        >
+          Go to Goal Planner <ArrowRight size={14} />
+        </button>
+      </motion.div>
+    </>
+  );
+}
+
+/* ────────────────────────────────────────────────────
    MAIN MEAL PLANNER CONTENT
    ──────────────────────────────────────────────────── */
 function MealPlannerContent({ isProPlus = false }) {
@@ -640,11 +768,12 @@ function MealPlannerContent({ isProPlus = false }) {
   const [aiWeekLoading, setAiWeekLoading] = useState(false);
   const [clearing, setClearing] = useState(false);
 
-  /* ── NEW STATE: goals, expanded slot, favorites ── */
+  /* ── NEW STATE: goals, expanded slot, favorites, snack sheet ── */
   const [goalData, setGoalData] = useState(null);
   const [expandedSlot, setExpandedSlot] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [favoriteNameMap, setFavoriteNameMap] = useState({}); // meal_name -> saved_meals id
+  const [snackOpen, setSnackOpen] = useState(false);
 
   const today = useMemo(() => new Date(), []);
 
@@ -1538,6 +1667,24 @@ function MealPlannerContent({ isProPlus = false }) {
           );
         })}
       </div>
+
+      {/* ── Snack Quick-Add Button ────────────── */}
+      <motion.button
+        className="mp-snack-btn"
+        onClick={() => setSnackOpen(true)}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <Cookie size={16} />
+        Anything else to add? Quick-log a snack
+      </motion.button>
+
+      {/* Snack Sheet */}
+      <AnimatePresence>
+        {snackOpen && userId && (
+          <SnackSheet userId={userId} onClose={() => setSnackOpen(false)} />
+        )}
+      </AnimatePresence>
 
       {/* Slot Panel */}
       <AnimatePresence>

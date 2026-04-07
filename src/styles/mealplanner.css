@@ -1054,6 +1054,112 @@
   margin: 0;
 }
 
+/* ── SNACK QUICK-ADD BUTTON ──────────────── */
+.mp-snack-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.mp-snack-btn:hover {
+  border-color: #1D9E75;
+  border-style: solid;
+  color: #5DCAA5;
+  background: rgba(29, 158, 117, 0.04);
+}
+
+/* ── SNACK SHEET (bottom sheet) ──────────── */
+.mp-snack-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 900;
+}
+
+.mp-snack-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 85vh;
+  background: var(--bg-base);
+  border-top: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+  z-index: 901;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+
+.mp-snack-sheet__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--border);
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.mp-snack-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 12px;
+}
+
+.mp-snack-sheet__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.mp-snack-sheet__body {
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mp-snack-sheet__goto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 16px 24px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.mp-snack-sheet__goto:hover {
+  border-color: #1D9E75;
+  color: #5DCAA5;
+}
+
 /* ── RESPONSIVE ──────────────────────────── */
 @media (max-width: 768px) {
   .mp-grid {

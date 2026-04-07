@@ -131,10 +131,10 @@
     left: 50%;
   }
 
-  /* Content: top pad for mob-topbar (56px) + spacing; bottom pad for bottom nav (64px) */
+  /* Content: top pad for mob-topbar (52px) + spacing; bottom pad for bottom nav (56px) */
   .app-shell__content {
     padding: 16px;
-    padding-top: 72px;
-    padding-bottom: 80px;
+    padding-top: 68px;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 }

@@ -25,11 +25,19 @@ const pageVariants = {
   exit:    { opacity: 0, y: -10, transition: { duration: 0.15 } },
 };
 
+const mobilePageVariants = {
+  initial: { opacity: 0, x: 8 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.18, ease: 'easeOut' } },
+  exit:    { opacity: 0, x: -8, transition: { duration: 0.18, ease: 'easeOut' } },
+};
+
 export default function AppShell({ session, onLogout, isPro, isProPlus, children }) {
   const location = useLocation();
   const meta = PAGE_META[location.pathname] ?? { title: 'MacroVault' };
   const userId = session?.user?.id ?? null;
   const { usage } = useUsage(userId);
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+  const activeVariants = isMobile ? mobilePageVariants : pageVariants;
 
   return (
     <div className="app-shell">
@@ -51,7 +59,7 @@ export default function AppShell({ session, onLogout, isPro, isProPlus, children
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
-              variants={pageVariants}
+              variants={activeVariants}
               initial="initial"
               animate="animate"
               exit="exit"

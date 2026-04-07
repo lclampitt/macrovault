@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabaseClient';
 import {
@@ -20,6 +20,9 @@ import {
   Settings,
   Sun,
   Moon,
+  TrendingUp,
+  LayoutGrid,
+  X,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import './Sidebar.css';
@@ -38,18 +41,35 @@ const PRO_NAV_ITEMS = [
   { to: '/progress',      label: 'Progress',         icon: BarChart2         },
 ];
 
-const BOTTOM_NAV_ITEMS = [
-  { to: '/home',      icon: Home      },
-  { to: '/measurements',  icon: Ruler     },
-  { to: '/workouts',  icon: Dumbbell  },
-  { to: '/exercises', icon: BookOpen  },
-  { to: '/settings',  icon: Settings  },
+const MOBILE_TABS = [
+  { to: '/home',         icon: Home,            label: 'Home'     },
+  { to: '/workouts',     icon: Dumbbell,        label: 'Workouts' },
+  { to: '/meal-planner', icon: UtensilsCrossed, label: 'Meals'    },
+  { to: '/progress',     icon: TrendingUp,      label: 'Progress' },
 ];
+
+const MORE_PAGES = [
+  { to: '/goalplanner',  icon: Target,     label: 'Goal Planner', proBadge: true },
+  { to: '/calculators',  icon: Calculator, label: 'Calculators' },
+  { to: '/exercises',    icon: BookOpen,   label: 'Exercise Library' },
+  { to: '/measurements', icon: Ruler,      label: 'Measurements' },
+  { to: '/settings',     icon: Settings,   label: 'Settings' },
+];
+
+const MORE_ROUTES = ['/goalplanner', '/calculators', '/exercises', '/measurements', '/settings'];
 
 export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [actionSheetOpen, setActionSheetOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isOverflowPage = MORE_ROUTES.some((r) => location.pathname.startsWith(r));
+  const isMoreActive = moreOpen || isOverflowPage;
+
+  // Close More sheet on route change
+  useEffect(() => { setMoreOpen(false); }, [location.pathname]);
   const { theme, toggle: toggleTheme, isDark } = useTheme();
 
   const userEmail = session?.user?.email ?? '';
@@ -79,7 +99,8 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
   const initials = displayName.slice(0, 2).toUpperCase();
 
   const handleLogout = async () => {
-    setSheetOpen(false);
+    setMoreOpen(false);
+    setActionSheetOpen(false);
     await onLogout();
     navigate('/auth');
   };
@@ -88,7 +109,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
     <div className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>
       {/* Logo */}
       <div className="sidebar__logo">
-        <img src="/images/gainlyticslogo.png" alt="MacroVault" className="sidebar__logo-icon" />
+        <div className="sidebar__logo-icon"><Lock size={18} /></div>
         <AnimatePresence>
           {!collapsed && (
             <motion.span
@@ -313,90 +334,131 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
       {/* ── Mobile top bar ── */}
       <div className="mob-topbar">
         <Link to="/home" className="mob-topbar__logo">
-          <img src="/images/gainlyticslogo.png" alt="MacroVault" className="mob-topbar__logo-icon" />
+          <div className="mob-topbar__logo-icon"><Lock size={16} /></div>
           <span className="mob-topbar__logo-name">MacroVault</span>
         </Link>
         <button
           className="mob-topbar__avatar"
-          onClick={() => setSheetOpen(true)}
+          onClick={() => setActionSheetOpen(true)}
           aria-label="Open user menu"
         >
           {initials}
         </button>
       </div>
 
-      {/* ── Mobile bottom nav ── */}
+      {/* ── Mobile bottom nav — 5 tabs ── */}
       <nav className="mob-bottom-nav">
-        {BOTTOM_NAV_ITEMS.map(({ to, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `mob-bottom-nav__item${isActive ? ' mob-bottom-nav__item--active' : ''}`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {isActive && <span className="mob-bottom-nav__dot" />}
-                <Icon size={22} />
-              </>
-            )}
-          </NavLink>
-        ))}
+        {MOBILE_TABS.map(({ to, icon: Icon, label }) => {
+          const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
+          return (
+            <motion.button
+              key={to}
+              className={`mob-nav-tab${isActive ? ' mob-nav-tab--active' : ''}`}
+              onClick={() => navigate(to)}
+              whileTap={{ scale: 0.9 }}
+            >
+              {isActive && <span className="mob-nav-tab__dot" />}
+              <Icon size={20} />
+              <span className="mob-nav-tab__label">{label}</span>
+            </motion.button>
+          );
+        })}
+        <motion.button
+          className={`mob-nav-tab${isMoreActive ? ' mob-nav-tab--active' : ''}`}
+          onClick={() => setMoreOpen((p) => !p)}
+          whileTap={{ scale: 0.9 }}
+        >
+          {isMoreActive && <span className="mob-nav-tab__dot" />}
+          <LayoutGrid size={20} />
+          <span className="mob-nav-tab__label">More</span>
+        </motion.button>
       </nav>
 
-      {/* ── Mobile user slide-up sheet ── */}
+      {/* ── More sheet ── */}
       <AnimatePresence>
-        {sheetOpen && (
+        {moreOpen && (
           <>
             <motion.div
-              className="mob-sheet-overlay"
+              className="mob-more-overlay"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setSheetOpen(false)}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMoreOpen(false)}
             />
             <motion.div
-              className="mob-sheet"
+              className="mob-more-sheet"
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{ type: 'spring', damping: 30, stiffness: 280 }}
             >
-              <div className="mob-sheet__handle" />
-
-              <div className="mob-sheet__user">
-                <div className="mob-sheet__avatar-circle">{initials}</div>
-                <div className="mob-sheet__user-info">
-                  <div className="mob-sheet__name">{displayName}</div>
-                  <div className="mob-sheet__email">{userEmail}</div>
-                </div>
-                {isPro ? (
-                  <span className="sidebar__pro-badge" style={{ marginLeft: 'auto', flexShrink: 0 }}>
-                    <Crown size={10} /> {isProPlus ? 'Pro+' : 'Pro'}
-                  </span>
-                ) : (
-                  <span className="sidebar__free-badge" style={{ marginLeft: 'auto' }}>Free</span>
-                )}
+              <div className="mob-more-sheet__handle" />
+              <div className="mob-more-sheet__header">
+                <span className="mob-more-sheet__title">All pages</span>
+                <button className="mob-more-sheet__close" onClick={() => setMoreOpen(false)}>
+                  <X size={16} />
+                </button>
               </div>
+              <div className="mob-more-sheet__grid">
+                {MORE_PAGES.map(({ to, icon: Icon, label, proBadge }, idx) => {
+                  const isPageActive = location.pathname.startsWith(to);
+                  return (
+                    <motion.button
+                      key={to}
+                      className={`mob-more-item${isPageActive ? ' mob-more-item--active' : ''}`}
+                      onClick={() => { setMoreOpen(false); navigate(to); }}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.04 }}
+                      whileTap={{ scale: 0.94 }}
+                    >
+                      {proBadge && !isPro && (
+                        <span className="mob-more-item__badge">Pro</span>
+                      )}
+                      <div className={`mob-more-item__icon${isPageActive ? ' mob-more-item__icon--active' : ''}`}>
+                        <Icon size={18} />
+                      </div>
+                      <span className="mob-more-item__label">{label}</span>
+                    </motion.button>
+                  );
+                })}
+                <div className="mob-more-item mob-more-item--empty" />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
-              <div className="mob-sheet__divider" />
-
-              <Link
-                to="/settings"
-                className="mob-sheet__item"
-                onClick={() => setSheetOpen(false)}
-              >
-                <Settings size={18} />
-                Settings
-              </Link>
-
+      {/* ── Mobile action sheet (sign out) ── */}
+      <AnimatePresence>
+        {actionSheetOpen && (
+          <>
+            <motion.div
+              className="mob-action-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActionSheetOpen(false)}
+            />
+            <motion.div
+              className="mob-action-sheet"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            >
               <button
-                className="mob-sheet__item mob-sheet__item--danger"
+                className="mob-action-sheet__item mob-action-sheet__item--danger"
                 onClick={handleLogout}
               >
-                <LogOut size={18} />
                 Sign out
+              </button>
+              <button
+                className="mob-action-sheet__item mob-action-sheet__item--cancel"
+                onClick={() => setActionSheetOpen(false)}
+              >
+                Cancel
               </button>
             </motion.div>
           </>
