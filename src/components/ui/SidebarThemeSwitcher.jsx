@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Palette } from 'lucide-react';
+import { X, Palette, Lock, Crown } from 'lucide-react';
 
 const QUICK_DOTS = [
   { id: 'teal',   label: 'Teal',   color: '#1D9E75' },
@@ -105,36 +105,47 @@ export default function SidebarThemeSwitcher({
             <span className="sbt-pop__title">Color theme</span>
             <button className="sbt-pop__x" onClick={() => setPopOpen(false)}><X size={12} /></button>
           </div>
-          <div className="sbt-pop__label">Colors</div>
-          <div className="sbt-pop__grid">
-            {ALL_COLORS.map((t) => (
-              <button
-                key={t.id}
-                className={`sbt-pop__item${accent === t.id ? ' sbt-pop__item--on' : ''}`}
-                onClick={() => pickPop(t.id)}
-              >
-                <span className="sbt-pop__swatch" style={{ background: t.color }} />
-                <span className="sbt-pop__name">{t.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="sbt-pop__hr" />
-          <div className="sbt-pop__label">Special</div>
-          <button
-            className={`sbt-pop__item sbt-pop__item--wide${accent === 'spectrum' ? ' sbt-pop__item--on' : ''}`}
-            onClick={() => pickPop('spectrum')}
-          >
-            <span className="sbt-pop__spectrum" />
-            <span className="sbt-pop__col">
-              <span className="sbt-pop__name">Spectrum</span>
-              <span className="sbt-pop__sub">Each macro gets a color</span>
-            </span>
-          </button>
-          <div className="sbt-pop__hr" />
-          <div className="sbt-pop__label">Interface</div>
-          <div className="sbt-pop__pills">
-            <button className={`sbt-pop__pill${uiMode === 'modern' ? ' sbt-pop__pill--on' : ''}`} onClick={() => isPro && setUiMode('modern')}>Modern</button>
-            <button className={`sbt-pop__pill${uiMode === 'y2k' ? ' sbt-pop__pill--on' : ''}`} onClick={() => isPro && setUiMode('y2k')}>Y2K</button>
+          <div className="sbt-pop__body">
+            {!isPro && (
+              <div className="sbt-pop__lock">
+                <Lock size={16} />
+                <span className="sbt-pop__lock-title">
+                  <Crown size={10} /> Upgrade to Pro
+                </span>
+                <span className="sbt-pop__lock-sub">Unlock all color themes</span>
+              </div>
+            )}
+            <div className="sbt-pop__label">Colors</div>
+            <div className="sbt-pop__grid">
+              {ALL_COLORS.map((t) => (
+                <button
+                  key={t.id}
+                  className={`sbt-pop__item${accent === t.id ? ' sbt-pop__item--on' : ''}`}
+                  onClick={() => pickPop(t.id)}
+                >
+                  <span className="sbt-pop__swatch" style={{ background: t.color }} />
+                  <span className="sbt-pop__name">{t.label}</span>
+                </button>
+              ))}
+            </div>
+            <div className="sbt-pop__hr" />
+            <div className="sbt-pop__label">Special</div>
+            <button
+              className={`sbt-pop__item sbt-pop__item--wide${accent === 'spectrum' ? ' sbt-pop__item--on' : ''}`}
+              onClick={() => pickPop('spectrum')}
+            >
+              <span className="sbt-pop__spectrum" />
+              <span className="sbt-pop__col">
+                <span className="sbt-pop__name">Spectrum</span>
+                <span className="sbt-pop__sub">Each macro gets a color</span>
+              </span>
+            </button>
+            <div className="sbt-pop__hr" />
+            <div className="sbt-pop__label">Interface</div>
+            <div className="sbt-pop__pills">
+              <button className={`sbt-pop__pill${uiMode === 'modern' ? ' sbt-pop__pill--on' : ''}`} onClick={() => isPro && setUiMode('modern')}>Modern</button>
+              <button className={`sbt-pop__pill${uiMode === 'y2k' ? ' sbt-pop__pill--on' : ''}`} onClick={() => isPro && setUiMode('y2k')}>Y2K</button>
+            </div>
           </div>
         </motion.div>
       )}

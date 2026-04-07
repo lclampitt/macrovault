@@ -362,6 +362,37 @@
   box-shadow: var(--shadow-lg);
 }
 
+.sbt-pop__body {
+  position: relative;
+}
+
+.sbt-pop__lock {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+.sbt-pop__lock-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.sbt-pop__lock-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
 .sbt-pop__head {
   display: flex;
   align-items: center;
