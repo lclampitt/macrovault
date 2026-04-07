@@ -10,12 +10,13 @@ const fadeUp = {
 };
 
 function AuthPage() {
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin]   = useState(true);
-  const [message, setMessage]   = useState('');
-  const [status, setStatus]     = useState(null); // 'error' | 'success' | null
-  const [busy, setBusy]         = useState(false);
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
+  const [isLogin, setIsLogin]       = useState(true);
+  const [isForgot, setIsForgot]     = useState(false);
+  const [message, setMessage]       = useState('');
+  const [status, setStatus]         = useState(null); // 'error' | 'success' | null
+  const [busy, setBusy]             = useState(false);
   const navigate = useNavigate();
 
   const handleAuth = async (e) => {
@@ -45,8 +46,47 @@ function AuthPage() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      setStatus('error');
+      setMessage('Please enter your email address.');
+      return;
+    }
+    setMessage('');
+    setStatus(null);
+    setBusy(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+      if (error) throw error;
+      setStatus('success');
+      setMessage('Password reset link sent! Check your email.');
+    } catch (err) {
+      setStatus('error');
+      setMessage(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const toggleMode = () => {
     setIsLogin((prev) => !prev);
+    setIsForgot(false);
+    setMessage('');
+    setStatus(null);
+  };
+
+  const goToForgot = () => {
+    setIsForgot(true);
+    setMessage('');
+    setStatus(null);
+  };
+
+  const backToLogin = () => {
+    setIsForgot(false);
     setMessage('');
     setStatus(null);
   };
@@ -83,60 +123,104 @@ function AuthPage() {
         {/* Title — animates when mode switches */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={isLogin ? 'login-head' : 'register-head'}
+            key={isForgot ? 'forgot-head' : isLogin ? 'login-head' : 'register-head'}
             variants={fadeUp}
             initial="hidden"
             animate="show"
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}
           >
-            <h2 className="auth-title">{isLogin ? 'Sign in' : 'Create account'}</h2>
+            <h2 className="auth-title">
+              {isForgot ? 'Reset password' : isLogin ? 'Sign in' : 'Create account'}
+            </h2>
             <p className="auth-subtitle">
-              {isLogin
-                ? 'Welcome back! Sign in to access your analysis, goals, and progress.'
-                : 'Start using Gainlytics to track your body analysis, goals, and workouts.'}
+              {isForgot
+                ? "Enter your email and we'll send you a link to reset your password."
+                : isLogin
+                  ? 'Welcome back! Sign in to access your analysis, goals, and progress.'
+                  : 'Start using Gainlytics to track your body analysis, goals, and workouts.'}
             </p>
           </motion.div>
         </AnimatePresence>
 
         {/* Form */}
-        <motion.form
-          className="auth-form"
-          onSubmit={handleAuth}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete={isLogin ? 'current-password' : 'new-password'}
-          />
-          <button type="submit" disabled={busy}>
-            {busy
-              ? (isLogin ? 'Signing in…' : 'Creating account…')
-              : (isLogin ? 'Sign In' : 'Register')}
-          </button>
-        </motion.form>
+        <AnimatePresence mode="wait">
+          {isForgot ? (
+            <motion.form
+              key="forgot-form"
+              className="auth-form"
+              onSubmit={handleForgotPassword}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <button type="submit" disabled={busy}>
+                {busy ? 'Sending…' : 'Send reset link'}
+              </button>
+            </motion.form>
+          ) : (
+            <motion.form
+              key="auth-form"
+              className="auth-form"
+              onSubmit={handleAuth}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
+              />
+              <button type="submit" disabled={busy}>
+                {busy
+                  ? (isLogin ? 'Signing in…' : 'Creating account…')
+                  : (isLogin ? 'Sign In' : 'Register')}
+              </button>
+            </motion.form>
+          )}
+        </AnimatePresence>
+
+        {/* Forgot password link (only on sign in) */}
+        {isLogin && !isForgot && (
+          <p className="auth-forgot" onClick={goToForgot}>
+            Forgot password?
+          </p>
+        )}
 
         {/* Mode toggle */}
-        <p className="switch-text" onClick={toggleMode}>
-          {isLogin ? (
-            <>No account? <span>Register here</span></>
-          ) : (
-            <>Already have an account? <span>Sign in</span></>
-          )}
-        </p>
+        {isForgot ? (
+          <p className="switch-text" onClick={backToLogin}>
+            <span>Back to sign in</span>
+          </p>
+        ) : (
+          <p className="switch-text" onClick={toggleMode}>
+            {isLogin ? (
+              <>No account? <span>Register here</span></>
+            ) : (
+              <>Already have an account? <span>Sign in</span></>
+            )}
+          </p>
+        )}
 
         {/* Feedback */}
         <AnimatePresence>

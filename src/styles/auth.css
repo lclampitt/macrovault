@@ -178,6 +178,19 @@
   cursor: default;
 }
 
+/* ── Forgot password ──────────────────────────────────────── */
+.auth-forgot {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.auth-forgot:hover {
+  color: var(--accent-light);
+}
+
 /* ── Switch link ───────────────────────────────────────────── */
 .switch-text {
   color: var(--text-muted);
