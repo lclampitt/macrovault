@@ -65,7 +65,7 @@ export default function SidebarThemeSwitcher({
     if (!r) return;
     setPopPos(collapsed
       ? { bottom: Math.max(8, window.innerHeight - r.bottom), left: r.right + 8 }
-      : { bottom: window.innerHeight - r.top + 8, left: 8 }
+      : { bottom: window.innerHeight - r.top + 8, left: r.left }
     );
     setPopOpen(true);
   }, [popOpen, collapsed]);

@@ -357,7 +357,8 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 12px;
-  width: 204px;
+  width: 240px;
+  min-width: 240px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -405,18 +406,21 @@
 .sbt-pop__item {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 4px;
+  gap: 6px;
+  padding: 5px 6px;
   border-radius: var(--radius-sm);
   background: none;
   border: 1px solid transparent;
   cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
   transition: background 0.15s, border-color 0.15s;
 }
 .sbt-pop__item:hover { background: var(--bg-hover); }
 .sbt-pop__item--on {
   border-color: var(--accent);
   background: var(--bg-hover);
+  padding: 4px 5px;
 }
 .sbt-pop__item--wide {
   grid-column: 1 / -1;
@@ -424,16 +428,19 @@
 }
 
 .sbt-pop__swatch {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .sbt-pop__name {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-primary);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .sbt-pop__spectrum {
@@ -448,6 +455,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 .sbt-pop__sub {
   font-size: 10px;
