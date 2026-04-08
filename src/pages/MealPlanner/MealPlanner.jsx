@@ -189,11 +189,42 @@ function SlotPanel({
       if (!res.ok) throw new Error('Failed to get suggestions');
 
       const data = await res.json();
-      const remaining = body.remaining_calories;
-      const tagged = (data.suggestions || []).map((s) => ({
-        ...s,
-        fit: s.calories <= remaining * 1.1 ? 'good' : 'ok',
-      }));
+      const remCal = body.remaining_calories;
+      const remP = body.remaining_protein;
+      const remC = body.remaining_carbs;
+      const remF = body.remaining_fat;
+      const tagged = (data.suggestions || []).map((s) => {
+        // Calculate fit based on how close macros are to remaining
+        const calRatio = remCal > 0 ? s.calories / remCal : 1;
+        const pRatio = remP > 0 ? s.protein / remP : 1;
+        const cRatio = remC > 0 ? s.carbs / remC : 1;
+        const fRatio = remF > 0 ? s.fat / remF : 1;
+
+        // Determine which macro is most off
+        const deviations = [
+          { macro: 'calories', ratio: calRatio },
+          { macro: 'protein', ratio: pRatio },
+          { macro: 'carbs', ratio: cRatio },
+          { macro: 'fat', ratio: fRatio },
+        ];
+        const worst = deviations.reduce((a, b) =>
+          Math.abs(b.ratio - 1) > Math.abs(a.ratio - 1) ? b : a
+        );
+
+        let fit = 'good';
+        let fitLabel = 'Great fit';
+        if (Math.abs(worst.ratio - 1) > 0.25) {
+          fit = 'over';
+          const dir = worst.ratio > 1 ? 'High' : 'Low';
+          fitLabel = `${dir} ${worst.macro}`;
+        } else if (Math.abs(worst.ratio - 1) > 0.12) {
+          fit = 'ok';
+          const dir = worst.ratio > 1 ? 'Slightly high' : 'Slightly low';
+          fitLabel = `${dir} ${worst.macro}`;
+        }
+
+        return { ...s, fit, fitLabel };
+      });
       setSuggestions(tagged);
     } catch (err) {
       console.error('AI suggest error:', err);
@@ -201,8 +232,8 @@ function SlotPanel({
       // Provide fallback placeholder suggestions
       setSuggestions([
         {
-          meal_name: 'Grilled Chicken Salad',
-          ingredients: 'Chicken breast, mixed greens, cherry tomatoes, cucumber, olive oil dressing',
+          meal_name: 'Mediterranean Grilled Chicken Salad',
+          ingredients: '150g chicken breast, 100g mixed greens, cherry tomatoes, cucumber, 20g feta, olive oil dressing',
           calories: 420,
           protein: 38,
           carbs: 15,
@@ -210,22 +241,40 @@ function SlotPanel({
           fit: 'good',
         },
         {
-          meal_name: 'Salmon with Quinoa',
-          ingredients: 'Atlantic salmon fillet, quinoa, steamed broccoli, lemon',
+          meal_name: 'Teriyaki Salmon Rice Bowl',
+          ingredients: '180g Atlantic salmon, 120g jasmine rice, steamed broccoli, 15ml teriyaki, sesame seeds',
           calories: 520,
           protein: 42,
-          carbs: 35,
-          fat: 24,
+          carbs: 40,
+          fat: 20,
           fit: 'good',
         },
         {
-          meal_name: 'Greek Yogurt Bowl',
-          ingredients: 'Greek yogurt, mixed berries, granola, honey, chia seeds',
+          meal_name: 'Greek Yogurt Parfait with Berries',
+          ingredients: '200g Greek yogurt, 100g mixed berries, 30g granola, 10g honey, 5g chia seeds',
           calories: 350,
           protein: 25,
           carbs: 42,
           fat: 10,
           fit: 'ok',
+        },
+        {
+          meal_name: 'Turkey and Black Bean Burrito Bowl',
+          ingredients: '130g ground turkey, 80g black beans, 100g cilantro lime rice, pico de gallo, 30g avocado',
+          calories: 480,
+          protein: 36,
+          carbs: 48,
+          fat: 14,
+          fit: 'good',
+        },
+        {
+          meal_name: 'Shrimp Stir Fry with Rice Noodles',
+          ingredients: '150g shrimp, 80g rice noodles, bell peppers, snap peas, 15ml soy sauce, sesame oil',
+          calories: 440,
+          protein: 32,
+          carbs: 46,
+          fat: 12,
+          fit: 'good',
         },
       ]);
     } finally {
@@ -422,7 +471,7 @@ function SlotPanel({
                   </div>
                 ) : (
                 <>
-                  {[0, 1, 2].map((i) => (
+                  {[0, 1, 2, 3, 4].map((i) => (
                     <motion.div
                       key={i}
                       className="mp-skeleton"
@@ -457,12 +506,19 @@ function SlotPanel({
                             className={`mp-suggestion-card__dot ${
                               s.fit === 'good'
                                 ? 'mp-suggestion-card__dot--good'
+                                : s.fit === 'over'
+                                ? 'mp-suggestion-card__dot--over'
                                 : 'mp-suggestion-card__dot--ok'
                             }`}
                           />
                           <span className="mp-suggestion-card__name">
                             {s.meal_name}
                           </span>
+                          {s.fitLabel && (
+                            <span className={`mp-suggestion-card__fit-label mp-suggestion-card__fit-label--${s.fit}`}>
+                              {s.fitLabel}
+                            </span>
+                          )}
                         </div>
                         {s.ingredients && (
                           <p className="mp-suggestion-card__ingredients">

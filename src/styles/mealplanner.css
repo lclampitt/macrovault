@@ -779,6 +779,35 @@
   background: #f59e0b;
 }
 
+.mp-suggestion-card__dot--over {
+  background: #ef4444;
+}
+
+.mp-suggestion-card__fit-label {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.mp-suggestion-card__fit-label--good {
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.12);
+}
+
+.mp-suggestion-card__fit-label--ok {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.mp-suggestion-card__fit-label--over {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
 .mp-suggestion-card__name {
   font-size: 14px;
   font-weight: 500;

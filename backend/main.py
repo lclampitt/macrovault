@@ -1169,7 +1169,7 @@ class MealSuggestRequest(BaseModel):
 
 @app.post("/meal-planner/suggest")
 async def suggest_meal(body: MealSuggestRequest):
-    """Generate 3 AI meal suggestions using Claude."""
+    """Generate 5 AI meal suggestions using Claude."""
     # Pro+ check
     plan = _get_plan(body.user_id)
     if plan != "pro_plus":
@@ -1180,37 +1180,86 @@ async def suggest_meal(body: MealSuggestRequest):
     if not anthropic_client:
         raise HTTPException(status_code=500, detail="AI service not configured.")
 
+    # Low-calorie smart detection
+    cal = body.remaining_calories
+    if cal < 300:
+        effective_type = "snack or very light meal"
+        cal_context = (
+            f"This is a very small calorie window ({cal} kcal). "
+            "Suggest satisfying light options: protein snacks, small salads, "
+            "yogurt parfaits, cottage cheese bowls, or light soups. "
+            "Do NOT suggest tiny portions of full meals."
+        )
+    elif cal < 500:
+        effective_type = f"light {body.meal_type}"
+        cal_context = (
+            f"This is a lighter meal slot ({cal} kcal). "
+            "Suggest satisfying but light options that feel complete, "
+            "not like a reduced portion."
+        )
+    else:
+        effective_type = body.meal_type
+        cal_context = ""
+
+    # Diet preference instructions
+    diet_note = ""
+    if body.diet_preference == "vegetarian":
+        diet_note = "ALL meals must be vegetarian. No meat or fish."
+    elif body.diet_preference == "vegan":
+        diet_note = "ALL meals must be vegan. No animal products."
+    elif body.diet_preference == "keto":
+        diet_note = "ALL meals must be keto-friendly. Under 20g net carbs per meal. High fat, moderate protein."
+    elif body.diet_preference == "high-protein":
+        diet_note = "Prioritize protein in every meal. Protein should be at least 40% of calories."
+
     try:
         message = anthropic_client.messages.create(
             model="claude-haiku-4-5",
-            max_tokens=1200,
-            system="You are a nutrition expert helping someone hit their daily macro targets. Return ONLY valid JSON, no markdown, no explanation.",
+            max_tokens=1800,
+            system=(
+                "You are a professional nutritionist and chef with expertise in creating "
+                "delicious, realistic meals that hit precise macro targets. You create "
+                "meals that real people actually want to eat — not bland fitness food. "
+                "You must return ONLY valid JSON. No markdown, no explanation, no preamble. Just the JSON array."
+            ),
             messages=[{
                 "role": "user",
-                "content": f"""Suggest 3 realistic {body.meal_type} options for someone on a {body.goal} goal with a {body.diet_preference} diet preference.
+                "content": f"""Generate 5 {effective_type} options for someone with these targets:
 
-Remaining macros for today:
-- Calories: {body.remaining_calories} kcal
+REMAINING MACROS TODAY:
+- Calories: {cal} kcal
 - Protein: {body.remaining_protein}g
 - Carbs: {body.remaining_carbs}g
 - Fat: {body.remaining_fat}g
 
-For each meal return:
-- meal_name: specific and descriptive
-- ingredients: a single string listing all ingredients with quantities, comma-separated (e.g. "150g grilled chicken breast, 100g mixed greens, 50g cherry tomatoes")
-- calories: integer
-- protein: number (grams)
-- carbs: number (grams)
-- fat: number (grams)
+CONTEXT:
+- Goal: {body.goal}
+- Diet preference: {body.diet_preference}
+- Time of day: {body.meal_type}
+{f"- {cal_context}" if cal_context else ""}
 
-Make suggestions realistic and specific. Quantities should be precise. Each meal should fit within the remaining macros without going significantly over.
+STRICT REQUIREMENTS:
+1. All 5 meals must be DIFFERENT cuisines or food styles — no two meals can be the same type of dish. Rotate through: Mediterranean, Asian, Mexican, American, Middle Eastern, Indian, Italian, etc.
+2. Each meal must fit within +-15% of the remaining macros. Never go more than 15% over on any single macro.
+3. Ingredients must be SPECIFIC with exact quantities (e.g. "150g grilled chicken thigh, 80g jasmine rice, 1 cup spinach, 1 tbsp olive oil, lemon juice").
+4. Meals must be REALISTIC and cookable in under 30 minutes. No obscure ingredients.
+5. Meal names must be appetizing and specific — not generic (e.g. "Teriyaki Chicken Rice Bowl with Edamame and Sesame" NOT "Chicken and Rice Bowl").
+6. NO repeated proteins across the 5 suggestions. Vary between: chicken, beef, fish, shrimp, tofu, eggs, turkey, pork, legumes, cottage cheese, Greek yogurt.
+{f"7. {diet_note}" if diet_note else ""}
 
-Return a JSON array of 3 objects only."""
+Return a JSON array of exactly 5 objects. Each object must have:
+- "meal_name": specific appetizing name (string)
+- "ingredients": comma-separated string with quantities (string)
+- "calories": integer
+- "protein": number (grams)
+- "carbs": number (grams)
+- "fat": number (grams)
+
+Return ONLY the JSON array."""
             }]
         )
 
         text = message.content[0].text.strip()
-        # Strip markdown fences if present
         if text.startswith("```"):
             text = text.split("\n", 1)[1] if "\n" in text else text[3:]
             if text.endswith("```"):
@@ -1218,7 +1267,6 @@ Return a JSON array of 3 objects only."""
             text = text.strip()
 
         meals = json.loads(text)
-        # Normalize field names: Claude may return protein_g instead of protein, or ingredients as array
         for m in meals:
             if isinstance(m.get("ingredients"), list):
                 m["ingredients"] = ", ".join(m["ingredients"])
@@ -1229,22 +1277,27 @@ Return a JSON array of 3 objects only."""
         return {"suggestions": meals}
 
     except json.JSONDecodeError:
-        # Return fallback suggestions if Claude doesn't return valid JSON
         fallbacks = {
             "breakfast": [
-                {"meal_name": "Greek Yogurt Parfait", "ingredients": "200g Greek yogurt, 30g granola, 100g mixed berries, 10g honey", "calories": 350, "protein": 25, "carbs": 45, "fat": 8},
-                {"meal_name": "Egg White Omelette", "ingredients": "4 egg whites, 30g spinach, 30g feta cheese, 1 slice whole wheat toast", "calories": 280, "protein": 28, "carbs": 20, "fat": 8},
-                {"meal_name": "Overnight Oats", "ingredients": "60g rolled oats, 200ml almond milk, 1 scoop protein powder, 1 banana", "calories": 420, "protein": 30, "carbs": 55, "fat": 10},
+                {"meal_name": "Greek Yogurt Parfait with Berries and Granola", "ingredients": "200g Greek yogurt, 30g granola, 100g mixed berries, 10g honey, 5g chia seeds", "calories": 370, "protein": 26, "carbs": 46, "fat": 9},
+                {"meal_name": "Scrambled Eggs with Avocado Toast", "ingredients": "3 eggs, 1 slice sourdough, 1/2 avocado, cherry tomatoes, pinch of chili flakes", "calories": 420, "protein": 22, "carbs": 28, "fat": 26},
+                {"meal_name": "Protein Oatmeal with Banana and Almond Butter", "ingredients": "60g rolled oats, 1 scoop whey protein, 1 banana, 15g almond butter, 200ml almond milk", "calories": 450, "protein": 32, "carbs": 55, "fat": 12},
+                {"meal_name": "Cottage Cheese Bowl with Pineapple and Granola", "ingredients": "200g cottage cheese, 80g pineapple chunks, 20g granola, 10g pumpkin seeds", "calories": 310, "protein": 28, "carbs": 32, "fat": 8},
+                {"meal_name": "Smoked Salmon Bagel with Cream Cheese", "ingredients": "1 whole wheat bagel, 60g smoked salmon, 30g cream cheese, capers, red onion, dill", "calories": 400, "protein": 24, "carbs": 38, "fat": 16},
             ],
             "lunch": [
-                {"meal_name": "Grilled Chicken Salad", "ingredients": "150g grilled chicken breast, 100g mixed greens, 50g cherry tomatoes, 30g feta, 15ml olive oil dressing", "calories": 450, "protein": 42, "carbs": 15, "fat": 22},
-                {"meal_name": "Turkey Wrap", "ingredients": "120g sliced turkey breast, 1 whole wheat tortilla, 30g hummus, 50g mixed greens, 30g avocado", "calories": 420, "protein": 35, "carbs": 35, "fat": 15},
-                {"meal_name": "Tuna Rice Bowl", "ingredients": "150g canned tuna, 150g brown rice, 50g edamame, 30g cucumber, 10ml soy sauce", "calories": 480, "protein": 40, "carbs": 50, "fat": 10},
+                {"meal_name": "Mediterranean Chicken Wrap with Tzatziki", "ingredients": "130g grilled chicken breast, 1 whole wheat tortilla, 30g tzatziki, 50g mixed greens, 20g feta, cucumber", "calories": 440, "protein": 38, "carbs": 34, "fat": 16},
+                {"meal_name": "Tuna Poke Bowl with Brown Rice", "ingredients": "140g ahi tuna, 150g brown rice, 50g edamame, 30g cucumber, 15ml soy sauce, sesame seeds", "calories": 490, "protein": 40, "carbs": 50, "fat": 12},
+                {"meal_name": "Turkey and Avocado Sandwich on Sourdough", "ingredients": "120g sliced turkey breast, 2 slices sourdough, 1/3 avocado, lettuce, tomato, mustard", "calories": 430, "protein": 34, "carbs": 36, "fat": 16},
+                {"meal_name": "Shrimp Stir Fry with Rice Noodles", "ingredients": "150g shrimp, 80g rice noodles, 100g bell peppers, snap peas, 15ml teriyaki sauce, sesame oil", "calories": 460, "protein": 32, "carbs": 52, "fat": 12},
+                {"meal_name": "Lentil Soup with Crusty Bread", "ingredients": "200g cooked lentils, 100g diced carrots and celery, 1 slice crusty bread, 10ml olive oil, cumin", "calories": 420, "protein": 22, "carbs": 58, "fat": 10},
             ],
             "dinner": [
-                {"meal_name": "Salmon with Vegetables", "ingredients": "180g Atlantic salmon fillet, 150g roasted broccoli, 150g sweet potato, 10ml olive oil", "calories": 520, "protein": 40, "carbs": 35, "fat": 22},
-                {"meal_name": "Lean Beef Stir Fry", "ingredients": "150g lean beef strips, 100g bell peppers, 80g snap peas, 150g jasmine rice, 15ml teriyaki sauce", "calories": 550, "protein": 38, "carbs": 55, "fat": 15},
-                {"meal_name": "Chicken Pasta", "ingredients": "130g grilled chicken breast, 80g whole wheat penne, 100g marinara sauce, 20g parmesan, 50g spinach", "calories": 500, "protein": 42, "carbs": 48, "fat": 12},
+                {"meal_name": "Baked Salmon with Roasted Sweet Potato and Asparagus", "ingredients": "180g salmon fillet, 150g sweet potato, 100g asparagus, 10ml olive oil, lemon", "calories": 530, "protein": 40, "carbs": 36, "fat": 24},
+                {"meal_name": "Beef Tacos with Fresh Salsa and Guacamole", "ingredients": "150g lean ground beef, 3 corn tortillas, 50g pico de gallo, 30g guacamole, lettuce, lime", "calories": 500, "protein": 36, "carbs": 40, "fat": 20},
+                {"meal_name": "Chicken Tikka Masala with Basmati Rice", "ingredients": "150g chicken breast, 100g tikka masala sauce, 120g basmati rice, 30g Greek yogurt, cilantro", "calories": 540, "protein": 42, "carbs": 52, "fat": 14},
+                {"meal_name": "Shrimp Pasta with Garlic and Cherry Tomatoes", "ingredients": "130g shrimp, 80g whole wheat penne, 100g cherry tomatoes, 2 cloves garlic, 10ml olive oil, basil", "calories": 470, "protein": 34, "carbs": 48, "fat": 14},
+                {"meal_name": "Turkey Meatballs with Zucchini Noodles", "ingredients": "150g ground turkey, 200g spiralized zucchini, 100g marinara sauce, 15g parmesan, Italian herbs", "calories": 400, "protein": 38, "carbs": 18, "fat": 18},
             ],
         }
         increment_ai_suggestion_use(body.user_id)
@@ -1278,34 +1331,62 @@ async def suggest_week(body: WeekSuggestRequest):
 
     targets = body.daily_targets or {"calories": 2000, "protein": 150, "carbs": 250, "fat": 65}
 
+    # Diet preference instructions
+    diet_note = ""
+    if body.diet_preference == "vegetarian":
+        diet_note = "ALL meals must be vegetarian. No meat or fish."
+    elif body.diet_preference == "vegan":
+        diet_note = "ALL meals must be vegan. No animal products."
+    elif body.diet_preference == "keto":
+        diet_note = "ALL meals must be keto-friendly. Under 20g net carbs per meal. High fat, moderate protein."
+    elif body.diet_preference == "high-protein":
+        diet_note = "Prioritize protein in every meal. Protein should be at least 40% of calories."
+
     try:
         message = anthropic_client.messages.create(
             model="claude-haiku-4-5",
-            max_tokens=4000,
-            system="You are a nutrition expert creating weekly meal plans. Return ONLY valid JSON, no markdown, no explanation.",
+            max_tokens=6000,
+            system=(
+                "You are a professional nutritionist and chef creating delicious weekly meal plans. "
+                "You create meals that real people actually want to eat - not bland fitness food. "
+                "You must return ONLY valid JSON. No markdown, no explanation, no preamble. Just the JSON array."
+            ),
             messages=[{
                 "role": "user",
-                "content": f"""Create a 5-day meal plan (Monday through Friday) with breakfast, lunch, and dinner for someone on a {body.goal} goal with a {body.diet_preference} diet preference.
+                "content": f"""Create a 5-day meal plan (Monday through Friday) with breakfast, lunch, and dinner.
 
-Daily targets:
+DAILY MACRO TARGETS:
 - Calories: {targets.get('calories', 2000)} kcal
 - Protein: {targets.get('protein', 150)}g
 - Carbs: {targets.get('carbs', 250)}g
 - Fat: {targets.get('fat', 65)}g
 
-Each day's 3 meals should roughly add up to the daily targets.
+CONTEXT:
+- Goal: {body.goal}
+- Diet preference: {body.diet_preference}
+{f"- {diet_note}" if diet_note else ""}
 
-Return a JSON array of 15 objects, each with:
-- day_of_week: 0 for monday, 1 for tuesday, 2 for wednesday, 3 for thursday, 4 for friday
-- meal_type: "breakfast", "lunch", or "dinner"
-- meal_name: specific and descriptive
-- ingredients: a single string listing all ingredients with quantities, comma-separated
-- calories: integer
-- protein: number (grams)
-- carbs: number (grams)
-- fat: number (grams)
+STRICT REQUIREMENTS:
+1. Each day's 3 meals MUST add up within +-10% of the daily macro targets. Plan each day as a coherent unit.
+2. NO repeated proteins across the same day. Vary between: chicken, beef, fish, shrimp, tofu, eggs, turkey, pork, legumes, cottage cheese, Greek yogurt.
+3. Each day should represent DIFFERENT cuisines. Rotate through: Mediterranean, Asian, Mexican, American, Middle Eastern, Indian, Italian, Japanese, Thai, Korean, etc.
+4. NO two days should have similar meal patterns. If Monday breakfast is oatmeal-based, Tuesday should NOT be.
+5. Meal names must be appetizing and specific (e.g. "Teriyaki Salmon Rice Bowl with Pickled Ginger" NOT "Salmon and Rice").
+6. Ingredients must be SPECIFIC with exact quantities (e.g. "150g grilled chicken thigh, 80g jasmine rice, 1 cup spinach, 1 tbsp olive oil").
+7. All meals must be realistic and cookable in under 30 minutes. No obscure ingredients.
+8. Breakfasts should be genuinely varied: eggs, oatmeal, yogurt bowls, smoothies, toast variations, pancakes, wraps — not the same style each day.
 
-Vary the meals across days. Make them realistic and easy to prepare. Return the JSON array only."""
+Return a JSON array of exactly 15 objects, each with:
+- "day_of_week": 0 for Monday, 1 for Tuesday, 2 for Wednesday, 3 for Thursday, 4 for Friday
+- "meal_type": "breakfast", "lunch", or "dinner"
+- "meal_name": specific appetizing name (string)
+- "ingredients": comma-separated string with quantities (string)
+- "calories": integer
+- "protein": number (grams)
+- "carbs": number (grams)
+- "fat": number (grams)
+
+Return ONLY the JSON array."""
             }]
         )
 
@@ -1325,29 +1406,29 @@ Vary the meals across days. Make them realistic and easy to prepare. Return the 
         return {"entries": meals}
 
     except json.JSONDecodeError:
-        # Fallback: generate a basic week plan
+        # Fallback: generate a varied week plan
         days = [0, 1, 2, 3, 4]
         fallback = []
         breakfast_opts = [
-            {"meal_name": "Greek Yogurt Parfait", "ingredients": "200g Greek yogurt, 30g granola, 100g mixed berries", "calories": 350, "protein": 25, "carbs": 45, "fat": 8},
-            {"meal_name": "Egg White Omelette", "ingredients": "4 egg whites, 30g spinach, 30g feta cheese, 1 toast", "calories": 280, "protein": 28, "carbs": 20, "fat": 8},
-            {"meal_name": "Overnight Oats", "ingredients": "60g oats, 200ml almond milk, 1 scoop protein powder, 1 banana", "calories": 420, "protein": 30, "carbs": 55, "fat": 10},
-            {"meal_name": "Protein Pancakes", "ingredients": "2 eggs, 1 banana, 30g protein powder, 15ml maple syrup", "calories": 380, "protein": 32, "carbs": 40, "fat": 10},
-            {"meal_name": "Avocado Toast with Eggs", "ingredients": "2 slices sourdough, 1/2 avocado, 2 eggs, cherry tomatoes", "calories": 420, "protein": 20, "carbs": 35, "fat": 22},
+            {"meal_name": "Greek Yogurt Parfait with Berries and Granola", "ingredients": "200g Greek yogurt, 30g granola, 100g mixed berries, 10g honey, 5g chia seeds", "calories": 370, "protein": 26, "carbs": 46, "fat": 9},
+            {"meal_name": "Spinach and Feta Egg White Omelette with Toast", "ingredients": "4 egg whites, 1 whole egg, 40g spinach, 30g feta cheese, 1 slice sourdough, 5g butter", "calories": 320, "protein": 30, "carbs": 22, "fat": 12},
+            {"meal_name": "Protein Overnight Oats with Banana and Almond Butter", "ingredients": "60g rolled oats, 200ml almond milk, 1 scoop whey protein, 1 banana, 15g almond butter", "calories": 450, "protein": 32, "carbs": 55, "fat": 12},
+            {"meal_name": "Blueberry Protein Pancakes with Maple Syrup", "ingredients": "2 eggs, 1 banana, 30g protein powder, 50g blueberries, 15ml maple syrup", "calories": 400, "protein": 32, "carbs": 42, "fat": 10},
+            {"meal_name": "Smashed Avocado Toast with Poached Eggs and Chili Flakes", "ingredients": "2 slices sourdough, 1/2 avocado, 2 poached eggs, cherry tomatoes, chili flakes", "calories": 420, "protein": 20, "carbs": 35, "fat": 22},
         ]
         lunch_opts = [
-            {"meal_name": "Grilled Chicken Salad", "ingredients": "150g chicken breast, 100g mixed greens, 50g tomatoes, 30g feta, 15ml dressing", "calories": 450, "protein": 42, "carbs": 15, "fat": 22},
-            {"meal_name": "Turkey Wrap", "ingredients": "120g turkey breast, 1 tortilla, 30g hummus, 50g greens, 30g avocado", "calories": 420, "protein": 35, "carbs": 35, "fat": 15},
-            {"meal_name": "Tuna Rice Bowl", "ingredients": "150g tuna, 150g brown rice, 50g edamame, 30g cucumber", "calories": 480, "protein": 40, "carbs": 50, "fat": 10},
-            {"meal_name": "Chicken Burrito Bowl", "ingredients": "150g chicken, 100g rice, 50g black beans, 30g salsa, 30g cheese", "calories": 520, "protein": 40, "carbs": 50, "fat": 15},
-            {"meal_name": "Salmon Poke Bowl", "ingredients": "130g salmon, 150g sushi rice, 50g cucumber, 30g avocado, 15ml soy sauce", "calories": 490, "protein": 35, "carbs": 48, "fat": 18},
+            {"meal_name": "Mediterranean Chicken Wrap with Tzatziki", "ingredients": "130g grilled chicken breast, 1 whole wheat tortilla, 30g tzatziki, 50g mixed greens, 20g feta, cucumber", "calories": 440, "protein": 38, "carbs": 34, "fat": 16},
+            {"meal_name": "Tuna Poke Bowl with Brown Rice and Edamame", "ingredients": "140g ahi tuna, 150g brown rice, 50g edamame, 30g cucumber, 15ml soy sauce, sesame seeds", "calories": 490, "protein": 40, "carbs": 50, "fat": 12},
+            {"meal_name": "Turkey and Avocado Sandwich on Sourdough", "ingredients": "120g sliced turkey breast, 2 slices sourdough, 1/3 avocado, lettuce, tomato, mustard", "calories": 430, "protein": 34, "carbs": 36, "fat": 16},
+            {"meal_name": "Mexican Chicken Burrito Bowl with Black Beans", "ingredients": "150g chicken thigh, 100g cilantro lime rice, 50g black beans, 30g pico de gallo, 30g cheese, jalape\u00f1o", "calories": 530, "protein": 42, "carbs": 50, "fat": 16},
+            {"meal_name": "Korean Beef Bibimbap with Fried Egg", "ingredients": "120g lean beef, 150g white rice, 50g spinach, 30g carrots, 1 fried egg, 15ml gochujang, sesame oil", "calories": 510, "protein": 36, "carbs": 52, "fat": 16},
         ]
         dinner_opts = [
-            {"meal_name": "Salmon with Vegetables", "ingredients": "180g salmon, 150g broccoli, 150g sweet potato", "calories": 520, "protein": 40, "carbs": 35, "fat": 22},
-            {"meal_name": "Lean Beef Stir Fry", "ingredients": "150g beef strips, 100g bell peppers, 80g snap peas, 150g rice", "calories": 550, "protein": 38, "carbs": 55, "fat": 15},
-            {"meal_name": "Chicken Pasta", "ingredients": "130g chicken, 80g penne, 100g marinara sauce, 20g parmesan", "calories": 500, "protein": 42, "carbs": 48, "fat": 12},
-            {"meal_name": "Turkey Meatballs", "ingredients": "150g ground turkey, 80g spaghetti, 100g tomato sauce, parsley", "calories": 480, "protein": 38, "carbs": 45, "fat": 14},
-            {"meal_name": "Shrimp Tacos", "ingredients": "150g shrimp, 3 corn tortillas, 50g cabbage slaw, 30g avocado, lime", "calories": 450, "protein": 35, "carbs": 40, "fat": 15},
+            {"meal_name": "Baked Salmon with Roasted Sweet Potato and Asparagus", "ingredients": "180g salmon fillet, 150g sweet potato, 100g asparagus, 10ml olive oil, lemon, garlic", "calories": 530, "protein": 40, "carbs": 36, "fat": 24},
+            {"meal_name": "Thai Basil Beef Stir Fry with Jasmine Rice", "ingredients": "150g beef strips, 100g bell peppers, 80g snap peas, 150g jasmine rice, Thai basil, fish sauce", "calories": 550, "protein": 38, "carbs": 55, "fat": 15},
+            {"meal_name": "Chicken Tikka Masala with Basmati Rice", "ingredients": "150g chicken breast, 100g tikka masala sauce, 120g basmati rice, 30g Greek yogurt, cilantro", "calories": 540, "protein": 42, "carbs": 52, "fat": 14},
+            {"meal_name": "Turkey Meatballs in Marinara with Zucchini Noodles", "ingredients": "150g ground turkey, 200g spiralized zucchini, 100g marinara sauce, 15g parmesan, Italian herbs", "calories": 400, "protein": 38, "carbs": 18, "fat": 18},
+            {"meal_name": "Garlic Shrimp Tacos with Mango Salsa", "ingredients": "150g shrimp, 3 corn tortillas, 50g mango salsa, 30g avocado, lime, cilantro, cabbage slaw", "calories": 450, "protein": 35, "carbs": 42, "fat": 14},
         ]
         for i, day in enumerate(days):
             fallback.append({**breakfast_opts[i], "day_of_week": day, "meal_type": "breakfast"})
