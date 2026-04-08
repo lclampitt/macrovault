@@ -1191,7 +1191,8 @@ function MealPlannerContent({ isProPlus = false }) {
         .single();
 
       if (error) {
-        toast.error('Failed to save meal.');
+        console.error('[SaveMeal] Supabase error:', error);
+        toast.error(`Failed to save meal: ${error.message}`);
         return;
       }
 
