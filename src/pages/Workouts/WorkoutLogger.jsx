@@ -73,8 +73,6 @@ export default function WorkoutLogger() {
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState('');
   const [exerciseBodyPartFilter, setExerciseBodyPartFilter] = useState('all');
   const [completedSets, setCompletedSets] = useState({});
-  const [restTimer, setRestTimer] = useState(null);
-  const [restTimerDuration] = useState(90);
   const [templatePreview, setTemplatePreview] = useState(null);
   const [sessionFromTemplateId, setSessionFromTemplateId] = useState(null);
   const [mobileExpanded, setMobileExpanded] = useState({});
@@ -373,16 +371,6 @@ export default function WorkoutLogger() {
     return () => clearInterval(interval);
   }, [sessionStartTime]);
 
-  // ── Rest timer countdown ──────────────────
-  useEffect(() => {
-    if (restTimer === null || restTimer <= 0) {
-      if (restTimer === 0) setRestTimer(null);
-      return;
-    }
-    const t = setTimeout(() => setRestTimer(restTimer - 1), 1000);
-    return () => clearTimeout(t);
-  }, [restTimer]);
-
   // ── iOS keyboard offset (visualViewport API) ──
   useEffect(() => {
     if (!window.visualViewport) return;
@@ -501,7 +489,6 @@ export default function WorkoutLogger() {
         delete next[key];
       } else {
         next[key] = true;
-        setRestTimer(restTimerDuration);
       }
       return next;
     });
@@ -551,7 +538,6 @@ export default function WorkoutLogger() {
       toast.success(`${name} saved! ${formatDuration(duration)}`);
       setMobileView('home');
       setSessionStartTime(null);
-      setRestTimer(null);
       fetchWorkouts();
     } catch (err) {
       toast.error(`Error: ${err.message}`);
@@ -564,7 +550,6 @@ export default function WorkoutLogger() {
     setSessionStartTime(null);
     setSessionExercises([]);
     setCompletedSets({});
-    setRestTimer(null);
   };
 
   // ── Exercise search data ──────────────────
@@ -1474,23 +1459,6 @@ export default function WorkoutLogger() {
               </button>
             </div>
 
-            {/* Rest Timer Pill */}
-            <AnimatePresence>
-              {restTimer !== null && restTimer > 0 && (
-                <motion.div
-                  className="wlm-rest-pill"
-                  initial={{ y: 80, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 80, opacity: 0 }}
-                >
-                  <Clock size={14} />
-                  <span className="wlm-rest-pill__time">Rest {formatDuration(restTimer)}</span>
-                  <button className="wlm-rest-pill__dismiss" onClick={() => setRestTimer(null)}>
-                    <X size={14} />
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         )}
 

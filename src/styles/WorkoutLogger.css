@@ -1438,49 +1438,6 @@
   color: var(--error, #ef4444);
 }
 
-/* ── REST TIMER PILL ───────────────────── */
-.wlm-rest-pill {
-  position: fixed;
-  bottom: calc(16px + var(--nav-height) + var(--keyboard-height));
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg-surface);
-  border: 1px solid var(--accent);
-  border-radius: 99px;
-  padding: 10px 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  z-index: 100;
-  font-variant-numeric: tabular-nums;
-  transition: bottom 0.25s ease;
-}
-
-.wlm-rest-pill .lucide-clock {
-  color: var(--accent-light);
-}
-
-.wlm-rest-pill__time {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent-light);
-}
-
-.wlm-rest-pill__dismiss {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-  transition: color 0.15s ease;
-}
-
-.wlm-rest-pill__dismiss:active {
-  color: var(--text-primary);
-}
-
 /* ── EXERCISE SEARCH SHEET ─────────────── */
 .wlm-search {
   width: 100%;
