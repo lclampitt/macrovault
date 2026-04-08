@@ -8,6 +8,15 @@ import { useTheme } from '../../hooks/useTheme';
 import localExercises from '../../data/exercises.json';
 import '../../styles/ExerciseLibrary.css';
 
+/* Get today's date in LOCAL timezone as YYYY-MM-DD (avoids UTC off-by-one) */
+function getLocalDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const SPECTRUM_MUSCLE_COLORS = {
   'chest':     '#EA580C',
   'back':      '#2563EB',
@@ -364,7 +373,7 @@ function AddWorkoutSheet({ exercise, userId, onClose, onToast }) {
   };
 
   const createWorkout = async (name, entry) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
     const { error } = await supabase.from('workouts').insert({
       user_id: userId,
       workout_date: today,
@@ -380,7 +389,7 @@ function AddWorkoutSheet({ exercise, userId, onClose, onToast }) {
     if (!userId) return;
     setSaving(true);
     setSaveError('');
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
     const entry = buildEntry();
 
     try {

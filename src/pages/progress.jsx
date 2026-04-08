@@ -99,7 +99,10 @@ function ProgressPageContent() {
   const [msg, setMsg] = useState('');
 
   // Form state
-  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const today = useMemo(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }, []);
   const [date, setDate] = useState(today);
   const [weightLbs, setWeightLbs] = useState('');
   const [bfPct, setBfPct] = useState('');

@@ -22,6 +22,15 @@ function formatDate(dateStr = '') {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+/* Get today's date in LOCAL timezone as YYYY-MM-DD (avoids UTC off-by-one) */
+function getLocalDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // eslint-disable-next-line no-unused-vars
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -36,7 +45,7 @@ export default function WorkoutLogger() {
   const MUSCLE_GROUPS = ['Upper Body', 'Lower Body', 'Legs', 'Full Body', 'Core', 'Cardio'];
 
   // Form state for creating/editing a workout
-  const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
+  const [workoutDate, setWorkoutDate] = useState(getLocalDateString());
   const [workoutName, setWorkoutName] = useState('');
   const [muscleGroup, setMuscleGroup] = useState('');
   const [exercises, setExercises] = useState([]);
@@ -59,7 +68,7 @@ export default function WorkoutLogger() {
   const [loadedTemplateName, setLoadedTemplateName] = useState(null);
   const [loadedTemplateId, setLoadedTemplateId] = useState(null);
   const [copyPopover, setCopyPopover] = useState(null); // workout id or null
-  const [copyDate, setCopyDate] = useState(new Date().toISOString().split('T')[0]);
+  const [copyDate, setCopyDate] = useState(getLocalDateString());
   const formRef = useRef(null);
 
   // ── Mobile state ──────────────────────────
@@ -75,6 +84,8 @@ export default function WorkoutLogger() {
   const [completedSets, setCompletedSets] = useState({});
   const [templatePreview, setTemplatePreview] = useState(null);
   const [sessionFromTemplateId, setSessionFromTemplateId] = useState(null);
+  const [sessionOriginalTemplate, setSessionOriginalTemplate] = useState(null);
+  const [templateUpdateSheet, setTemplateUpdateSheet] = useState(null); // { templateId, templateName, changes, exerciseData }
   const [mobileExpanded, setMobileExpanded] = useState({});
 
   // Scroll to top when opening the logger
@@ -140,9 +151,11 @@ export default function WorkoutLogger() {
     const name = templateName.trim() || workout.workout_name;
     const exerciseData = (workout.exercises || []).map((ex) => ({
       name: ex.name,
-      sets: ex.sets?.length || 3,
-      reps: ex.sets?.[0]?.reps || '',
-      weight: ex.sets?.[0]?.weight || '',
+      sets: (ex.sets || []).map((s, idx) => ({
+        set_number: idx + 1,
+        weight: s.weight || '',
+        reps: s.reps || '',
+      })),
     }));
 
     const { error } = await supabase.from('workout_templates').insert({
@@ -180,11 +193,9 @@ export default function WorkoutLogger() {
     setMuscleGroup(template.muscle_group || '');
     const exs = (template.exercises || []).map((ex) => ({
       name: ex.name,
-      sets: Array.from({ length: ex.sets || 3 }, () => ({
-        weight: ex.weight || '',
-        reps: ex.reps || '',
-        notes: '',
-      })),
+      sets: Array.isArray(ex.sets)
+        ? ex.sets.map((s) => ({ weight: s.weight || '', reps: s.reps || '', notes: '' }))
+        : Array.from({ length: ex.sets || 3 }, () => ({ weight: ex.weight || '', reps: ex.reps || '', notes: '' })),
     }));
     setExercises(exs);
     setLoadedTemplateName(template.name);
@@ -211,14 +222,58 @@ export default function WorkoutLogger() {
     if (!templateId) return;
     const exerciseData = exerciseList.map((ex) => ({
       name: ex.name,
-      sets: ex.sets?.length || 3,
-      reps: ex.sets?.[0]?.reps || '',
-      weight: ex.sets?.[0]?.weight || '',
+      sets: (ex.sets || []).map((s, idx) => ({
+        set_number: idx + 1,
+        weight: s.weight || '',
+        reps: s.reps || '',
+      })),
     }));
     await supabase
       .from('workout_templates')
       .update({ exercises: exerciseData, updated_at: new Date().toISOString() })
       .eq('id', templateId);
+  };
+
+  // Detect changes between finished workout and original template
+  const detectTemplateChanges = (finishedExercises, originalTemplate) => {
+    if (!originalTemplate?.exercises) return [];
+    const changes = [];
+    const templateExs = originalTemplate.exercises;
+    const finishedNames = finishedExercises.map((e) => e.name);
+    const templateNames = templateExs.map((e) => e.name);
+
+    // Exercises added
+    finishedNames.forEach((name) => {
+      if (!templateNames.includes(name)) changes.push({ type: 'added', name });
+    });
+    // Exercises removed
+    templateNames.forEach((name) => {
+      if (!finishedNames.includes(name)) changes.push({ type: 'removed', name });
+    });
+    // Weight/rep changes
+    finishedExercises.forEach((fEx) => {
+      const tEx = templateExs.find((t) => t.name === fEx.name);
+      if (!tEx) return;
+      const tSets = Array.isArray(tEx.sets) ? tEx.sets : [];
+      (fEx.sets || []).forEach((s, si) => {
+        const ts = tSets[si];
+        if (!ts) return;
+        if (String(s.weight || '') !== String(ts.weight || '') || String(s.reps || '') !== String(ts.reps || '')) {
+          changes.push({
+            type: 'changed',
+            name: fEx.name,
+            set: si + 1,
+            from: { weight: ts.weight || '—', reps: ts.reps || '—' },
+            to: { weight: s.weight || '—', reps: s.reps || '—' },
+          });
+        }
+      });
+      // Extra sets added
+      if ((fEx.sets || []).length > tSets.length) {
+        changes.push({ type: 'sets_added', name: fEx.name, count: (fEx.sets || []).length - tSets.length });
+      }
+    });
+    return changes;
   };
 
   // Copy workout to a new date
@@ -435,11 +490,9 @@ export default function WorkoutLogger() {
   const startSessionFromTemplate = (template) => {
     const exs = (template.exercises || []).map((ex) => ({
       name: ex.name,
-      sets: Array.from({ length: ex.sets || 3 }, () => ({
-        weight: ex.weight || '',
-        reps: ex.reps || '',
-        notes: '',
-      })),
+      sets: Array.isArray(ex.sets)
+        ? ex.sets.map((s) => ({ weight: s.weight || '', reps: s.reps || '', notes: '' }))
+        : Array.from({ length: ex.sets || 3 }, () => ({ weight: ex.weight || '', reps: ex.reps || '', notes: '' })),
     }));
     setSessionExercises(exs);
     setSessionName(template.name);
@@ -448,6 +501,7 @@ export default function WorkoutLogger() {
     setSessionStartTime(Date.now());
     setSessionTimer(0);
     setSessionFromTemplateId(template.id);
+    setSessionOriginalTemplate(template);
     setTemplatePreview(null);
     setMobileView('session');
   };
@@ -516,7 +570,7 @@ export default function WorkoutLogger() {
     const duration = sessionTimer;
     const workoutData = {
       user_id: userId,
-      workout_date: new Date().toISOString().split('T')[0],
+      workout_date: getLocalDateString(),
       workout_name: name,
       muscle_group: sessionMuscleGroup || null,
       exercises: sessionExercises,
@@ -530,14 +584,42 @@ export default function WorkoutLogger() {
       if (res.status === 403) { triggerUpgrade('workouts'); return; }
       if (!res.ok) throw new Error(await res.text());
       posthog.capture('workout_logged', { exercise_count: sessionExercises.length, duration_seconds: duration });
-      if (sessionFromTemplateId) {
+
+      // Template update logic
+      if (sessionFromTemplateId && sessionOriginalTemplate) {
         incrementTemplateUseCount(sessionFromTemplateId);
-        updateTemplateWeights(sessionFromTemplateId, sessionExercises);
-        fetchTemplates();
+        const templatePref = localStorage.getItem('template_auto_update') || 'ask';
+        const changes = detectTemplateChanges(sessionExercises, sessionOriginalTemplate);
+
+        if (changes.length > 0 && templatePref === 'always') {
+          updateTemplateWeights(sessionFromTemplateId, sessionExercises);
+          toast.success('Template updated automatically');
+          fetchTemplates();
+        } else if (changes.length > 0 && templatePref === 'ask') {
+          const exerciseData = sessionExercises.map((ex) => ({
+            name: ex.name,
+            sets: (ex.sets || []).map((s, idx) => ({
+              set_number: idx + 1,
+              weight: s.weight || '',
+              reps: s.reps || '',
+            })),
+          }));
+          setTemplateUpdateSheet({
+            templateId: sessionFromTemplateId,
+            templateName: sessionOriginalTemplate.name,
+            changes,
+            exerciseData,
+          });
+          fetchTemplates();
+        } else {
+          fetchTemplates();
+        }
       }
+
       toast.success(`${name} saved! ${formatDuration(duration)}`);
       setMobileView('home');
       setSessionStartTime(null);
+      setSessionOriginalTemplate(null);
       fetchWorkouts();
     } catch (err) {
       toast.error(`Error: ${err.message}`);
@@ -550,6 +632,7 @@ export default function WorkoutLogger() {
     setSessionStartTime(null);
     setSessionExercises([]);
     setCompletedSets({});
+    setSessionOriginalTemplate(null);
   };
 
   // ── Exercise search data ──────────────────
@@ -963,7 +1046,7 @@ export default function WorkoutLogger() {
                         className="wl-btn-sm wl-btn-icon wl-btn-copy"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setCopyDate(new Date().toISOString().split('T')[0]);
+                          setCopyDate(getLocalDateString());
                           setCopyPopover(copyPopover === workout.id ? null : workout.id);
                         }}
                         whileTap={{ scale: 0.97 }}
@@ -1351,8 +1434,9 @@ export default function WorkoutLogger() {
                     <div key={i} className="wlm-sheet__exercise">
                       <span className="wlm-sheet__exercise-name">{ex.name}</span>
                       <span className="wlm-sheet__exercise-detail">
-                        {ex.sets || 3} sets{ex.reps ? ` × ${ex.reps}` : ''}
-                        {ex.weight ? ` @ ${ex.weight} lbs` : ''}
+                        {Array.isArray(ex.sets) ? `${ex.sets.length} sets` : `${ex.sets || 3} sets`}
+                        {Array.isArray(ex.sets) && ex.sets[0]?.reps ? ` × ${ex.sets[0].reps}` : (ex.reps ? ` × ${ex.reps}` : '')}
+                        {Array.isArray(ex.sets) && ex.sets[0]?.weight ? ` @ ${ex.sets[0].weight} lbs` : (ex.weight ? ` @ ${ex.weight} lbs` : '')}
                       </span>
                     </div>
                   ))}
@@ -1584,6 +1668,95 @@ export default function WorkoutLogger() {
                     </button>
                   </div>
                 )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── TEMPLATE UPDATE SHEET ── */}
+        <AnimatePresence>
+          {templateUpdateSheet && (
+            <motion.div
+              className="wlm-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setTemplateUpdateSheet(null)}
+            >
+              <motion.div
+                className="wlm-tpl-update-sheet"
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="wlm-sheet__handle" />
+                <div className="wlm-tpl-update__header">
+                  <BookmarkCheck size={24} className="wlm-tpl-update__icon" />
+                  <h3 className="wlm-tpl-update__title">Update template?</h3>
+                  <p className="wlm-tpl-update__subtitle">
+                    Your workout differed from the "{templateUpdateSheet.templateName}" template. Save the new values?
+                  </p>
+                </div>
+
+                {/* Changes list */}
+                <div className="wlm-tpl-update__changes">
+                  {templateUpdateSheet.changes.slice(0, 4).map((c, i) => (
+                    <div key={i} className="wlm-tpl-update__change">
+                      {c.type === 'added' && (
+                        <span className="wlm-tpl-update__change--add">+ {c.name} added</span>
+                      )}
+                      {c.type === 'removed' && (
+                        <span className="wlm-tpl-update__change--remove">- {c.name} removed</span>
+                      )}
+                      {c.type === 'changed' && (
+                        <span className="wlm-tpl-update__change--edit">
+                          {c.name} set {c.set}: {c.from.weight}lbs×{c.from.reps} → {c.to.weight}lbs×{c.to.reps}
+                        </span>
+                      )}
+                      {c.type === 'sets_added' && (
+                        <span className="wlm-tpl-update__change--add">+ {c.count} set{c.count > 1 ? 's' : ''} added to {c.name}</span>
+                      )}
+                    </div>
+                  ))}
+                  {templateUpdateSheet.changes.length > 4 && (
+                    <span className="wlm-tpl-update__more">and {templateUpdateSheet.changes.length - 4} more changes...</span>
+                  )}
+                </div>
+
+                {/* Buttons */}
+                <motion.button
+                  className="wlm-tpl-update__btn-primary"
+                  onClick={async () => {
+                    await supabase
+                      .from('workout_templates')
+                      .update({ exercises: templateUpdateSheet.exerciseData, updated_at: new Date().toISOString() })
+                      .eq('id', templateUpdateSheet.templateId);
+                    toast.success('Template updated');
+                    fetchTemplates();
+                    setTemplateUpdateSheet(null);
+                  }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Update template
+                </motion.button>
+                <motion.button
+                  className="wlm-tpl-update__btn-secondary"
+                  onClick={() => setTemplateUpdateSheet(null)}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Keep original
+                </motion.button>
+                <button
+                  className="wlm-tpl-update__dont-ask"
+                  onClick={() => {
+                    localStorage.setItem('template_auto_update', 'never');
+                    setTemplateUpdateSheet(null);
+                  }}
+                >
+                  Don't ask again
+                </button>
               </motion.div>
             </motion.div>
           )}

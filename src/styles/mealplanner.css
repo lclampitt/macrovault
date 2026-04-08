@@ -216,7 +216,7 @@
 .mp-macro-bar {
   flex: 1;
   height: 5px;
-  background: #1e2536;
+  background: var(--bar-track, var(--bg-hover));
   border-radius: 99px;
   overflow: hidden;
 }
@@ -349,7 +349,7 @@
 
 .mp-daily-bar {
   height: 3px;
-  background: #1e2536;
+  background: var(--bar-track, var(--bg-hover));
   border-radius: 99px;
   overflow: hidden;
   margin-top: 3px;

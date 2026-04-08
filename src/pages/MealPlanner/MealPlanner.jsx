@@ -578,7 +578,7 @@ function SlotPanel({
                     <p>No meals match your search.</p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                      <Heart size={24} style={{ color: '#2a3548' }} />
+                      <Heart size={24} style={{ color: 'var(--border-light)' }} />
                       <p style={{ margin: 0 }}>
                         No saved meals yet. Heart any meal in the planner to save it here for quick re-use.
                       </p>
@@ -1434,11 +1434,11 @@ function MealPlannerContent({ isProPlus = false }) {
 
   /* ── Daily calorie color helper ──────────── */
   function getDayCalColor(dayCal) {
-    if (!goalData) return '#888';
+    if (!goalData) return 'var(--text-muted)';
     const ratio = dayCal / goalData.calories;
-    if (ratio < 0.8) return '#888';
+    if (ratio < 0.8) return 'var(--text-muted)';
     if (ratio <= 1.1) return 'var(--accent)';
-    return '#EF9F27';
+    return 'var(--warning)';
   }
 
   /* ── Mobile helpers ───────────────────────── */
@@ -1512,7 +1512,7 @@ function MealPlannerContent({ isProPlus = false }) {
             {macroBarData.map((m) => {
               const pct = m.goal > 0 ? (m.actual / m.goal) * 100 : 0;
               const isOver = pct > 100;
-              const fillColor = isOver ? '#EF9F27' : m.color;
+              const fillColor = isOver ? 'var(--warning)' : m.color;
               const fillWidth = Math.min(pct, 100);
 
               return (
@@ -1528,10 +1528,10 @@ function MealPlannerContent({ isProPlus = false }) {
                     />
                   </div>
                   <span className="mp-macro-row__value">
-                    <span style={{ color: isOver ? '#EF9F27' : '#fff', fontWeight: 500 }}>
+                    <span style={{ color: isOver ? 'var(--warning)' : 'var(--text-primary)', fontWeight: 500 }}>
                       {fmtNumber(Math.round(m.actual))}
                     </span>
-                    <span style={{ color: '#555' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>
                       {' / '}
                       {fmtNumber(Math.round(m.goal))} {m.unit}
                     </span>
@@ -1541,7 +1541,7 @@ function MealPlannerContent({ isProPlus = false }) {
             })}
           </div>
         ) : (
-          <span style={{ fontSize: 12, color: '#555' }}>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
             Set a goal to see targets
           </span>
         )}
@@ -1639,7 +1639,7 @@ function MealPlannerContent({ isProPlus = false }) {
                       <Heart
                         size={11}
                         fill={isFav ? 'var(--accent)' : 'none'}
-                        stroke={isFav ? 'var(--accent)' : '#444'}
+                        stroke={isFav ? 'var(--accent)' : 'var(--border-light)'}
                       />
                     </motion.button>
                     <button
@@ -1864,14 +1864,14 @@ function MealPlannerContent({ isProPlus = false }) {
                         <div className="mp-macro-bar">
                           <div
                             className="mp-macro-bar__fill"
-                            style={{ width: `${Math.min(pct, 100)}%`, background: isOver ? '#EF9F27' : m.color }}
+                            style={{ width: `${Math.min(pct, 100)}%`, background: isOver ? 'var(--warning)' : m.color }}
                           />
                         </div>
                         <span className="mp-macro-row__value">
-                          <span style={{ color: isOver ? '#EF9F27' : '#fff', fontWeight: 500 }}>
+                          <span style={{ color: isOver ? 'var(--warning)' : 'var(--text-primary)', fontWeight: 500 }}>
                             {fmtNumber(Math.round(m.actual))}
                           </span>
-                          <span style={{ color: '#555' }}> / {fmtNumber(Math.round(m.goal))} {m.unit}</span>
+                          <span style={{ color: 'var(--text-muted)' }}> / {fmtNumber(Math.round(m.goal))} {m.unit}</span>
                         </span>
                       </div>
                     );
@@ -2004,7 +2004,7 @@ function MealPlannerContent({ isProPlus = false }) {
                     className="mpm-macro-summary__bar-fill"
                     style={{
                       width: `${Math.min((mobileDayTotals.calories / goalData.calories) * 100, 100)}%`,
-                      background: mobileDayTotals.calories > goalData.calories ? '#EF9F27' : 'var(--accent)',
+                      background: mobileDayTotals.calories > goalData.calories ? 'var(--warning)' : 'var(--accent)',
                     }}
                   />
                 </div>
@@ -2041,8 +2041,8 @@ function MealPlannerContent({ isProPlus = false }) {
                           >
                             <Heart
                               size={14}
-                              fill={isFav ? '#DB2777' : 'none'}
-                              stroke={isFav ? '#DB2777' : 'var(--border-light, #444)'}
+                              fill={isFav ? 'var(--accent)' : 'none'}
+                              stroke={isFav ? 'var(--accent)' : 'var(--border-light)'}
                             />
                           </motion.button>
                         </div>
