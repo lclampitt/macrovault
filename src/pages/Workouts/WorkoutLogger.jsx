@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Trash2, Dumbbell } from 'lucide-react';
+import { Lock, Trash2, Dumbbell, Bookmark, BookmarkCheck, Copy, Pencil, BookmarkPlus, X, Star } from 'lucide-react';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import { usePlan } from '../../hooks/usePlan';
 import { useTheme } from '../../hooks/useTheme';
+import { appToast as toast } from '../../utils/toast';
 import '../../styles/WorkoutLogger.css';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
@@ -45,6 +46,18 @@ export default function WorkoutLogger() {
   const [expanded, setExpanded] = useState({});
   const [formOpen, setFormOpen] = useState(false);
 
+  // ── Template state ──────────────────────────
+  const [templates, setTemplates] = useState([]);
+  const [historyTab, setHistoryTab] = useState('history'); // 'history' | 'templates'
+  const [saveTemplatePopover, setSaveTemplatePopover] = useState(null); // workout id or null
+  const [templateName, setTemplateName] = useState('');
+  const [templateNameMap, setTemplateNameMap] = useState({}); // workout_name → template_id
+  const [loadedTemplateName, setLoadedTemplateName] = useState(null);
+  const [loadedTemplateId, setLoadedTemplateId] = useState(null);
+  const [copyPopover, setCopyPopover] = useState(null); // workout id or null
+  const [copyDate, setCopyDate] = useState(new Date().toISOString().split('T')[0]);
+  const formRef = useRef(null);
+
   // Scroll to top when opening the logger
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -80,6 +93,139 @@ export default function WorkoutLogger() {
 
     if (error) console.error('Fetch error:', error);
     else setWorkoutHistory(data);
+  };
+
+  // ── Template CRUD ──────────────────────────
+  const fetchTemplates = useCallback(async () => {
+    if (!userId) return;
+    const { data, error } = await supabase
+      .from('workout_templates')
+      .select('*')
+      .eq('user_id', userId)
+      .order('use_count', { ascending: false });
+
+    if (error) { console.error('Template fetch error:', error); return; }
+    setTemplates(data || []);
+    // Build name → template_id map
+    const map = {};
+    (data || []).forEach((t) => { map[t.name] = t.id; });
+    setTemplateNameMap(map);
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) fetchTemplates();
+  }, [userId, fetchTemplates]);
+
+  const saveAsTemplate = async (workout) => {
+    if (!userId) return;
+    const name = templateName.trim() || workout.workout_name;
+    const exerciseData = (workout.exercises || []).map((ex) => ({
+      name: ex.name,
+      sets: ex.sets?.length || 3,
+      reps: ex.sets?.[0]?.reps || '',
+      weight: ex.sets?.[0]?.weight || '',
+    }));
+
+    const { error } = await supabase.from('workout_templates').insert({
+      user_id: userId,
+      name,
+      muscle_group: workout.muscle_group || '',
+      exercises: exerciseData,
+    });
+
+    if (error) {
+      toast.error(`Failed to save template: ${error.message}`);
+      return;
+    }
+    toast.success(`${name} saved as template`);
+    setSaveTemplatePopover(null);
+    setTemplateName('');
+    fetchTemplates();
+  };
+
+  const deleteTemplate = async (templateId) => {
+    const { error } = await supabase.from('workout_templates').delete().eq('id', templateId);
+    if (error) { toast.error('Failed to delete template'); return; }
+    toast.success('Template deleted');
+    fetchTemplates();
+  };
+
+  const removeTemplateByName = async (workoutName) => {
+    const tid = templateNameMap[workoutName];
+    if (!tid) return;
+    await deleteTemplate(tid);
+  };
+
+  const loadTemplate = (template) => {
+    setWorkoutName(template.name);
+    setMuscleGroup(template.muscle_group || '');
+    const exs = (template.exercises || []).map((ex) => ({
+      name: ex.name,
+      sets: Array.from({ length: ex.sets || 3 }, () => ({
+        weight: ex.weight || '',
+        reps: ex.reps || '',
+        notes: '',
+      })),
+    }));
+    setExercises(exs);
+    setLoadedTemplateName(template.name);
+    setLoadedTemplateId(template.id);
+    setFormOpen(true);
+    setHistoryTab('history');
+    // Scroll to form
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
+  const incrementTemplateUseCount = async (templateId) => {
+    if (!templateId) return;
+    const tpl = templates.find((t) => t.id === templateId);
+    const currentCount = tpl?.use_count || 0;
+    await supabase
+      .from('workout_templates')
+      .update({ use_count: currentCount + 1, updated_at: new Date().toISOString() })
+      .eq('id', templateId);
+  };
+
+  const updateTemplateWeights = async (templateId, exerciseList) => {
+    if (!templateId) return;
+    const exerciseData = exerciseList.map((ex) => ({
+      name: ex.name,
+      sets: ex.sets?.length || 3,
+      reps: ex.sets?.[0]?.reps || '',
+      weight: ex.sets?.[0]?.weight || '',
+    }));
+    await supabase
+      .from('workout_templates')
+      .update({ exercises: exerciseData, updated_at: new Date().toISOString() })
+      .eq('id', templateId);
+  };
+
+  // Copy workout to a new date
+  const copyWorkoutToDate = async (workout) => {
+    if (!userId) return;
+    const workoutData = {
+      user_id: userId,
+      workout_date: copyDate,
+      workout_name: workout.workout_name,
+      muscle_group: workout.muscle_group || null,
+      exercises: workout.exercises || [],
+    };
+    try {
+      const res = await fetch(`${API_BASE}/workouts/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(workoutData),
+      });
+      if (res.status === 403) { triggerUpgrade('workouts'); return; }
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(`${workout.workout_name} logged for ${formatDate(copyDate)}`);
+      setCopyPopover(null);
+      fetchWorkouts();
+    } catch (err) {
+      toast.error(`Failed to copy workout: ${err.message}`);
+    }
   };
 
   // Delete a workout from history
@@ -179,11 +325,19 @@ export default function WorkoutLogger() {
       console.error('Save error:', error);
       setMessage(`Error saving workout: ${error.message}`);
     } else {
+      // If loaded from a template, update use_count and weights
+      if (loadedTemplateId) {
+        incrementTemplateUseCount(loadedTemplateId);
+        updateTemplateWeights(loadedTemplateId, exercises);
+        fetchTemplates();
+      }
       // Reset form and refresh history
       setWorkoutName('');
       setMuscleGroup('');
       setExercises([]);
       setFormOpen(false);
+      setLoadedTemplateName(null);
+      setLoadedTemplateId(null);
       fetchWorkouts();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -303,9 +457,43 @@ export default function WorkoutLogger() {
               transition={{ duration: 0.25, ease: 'easeInOut' }}
               style={{ overflow: 'hidden' }}
             >
-              <div className="wl-form-inner">
+              <div className="wl-form-inner" ref={formRef}>
                 {/* Y2K form section label */}
                 {isY2K && <div className="wl-y2k-form-label">NEW WORKOUT ENTRY</div>}
+
+                {/* ── Template picker row ──────────── */}
+                {!editingWorkoutId && (
+                  <div className="wl-template-picker">
+                    <span className="wl-template-picker__label">Start from template:</span>
+                    {templates.length === 0 ? (
+                      <span className="wl-template-picker__empty">No templates yet — save a workout from History first</span>
+                    ) : (
+                      <div className="wl-template-picker__chips">
+                        {templates.map((t) => (
+                          <motion.button
+                            key={t.id}
+                            className="wl-template-chip"
+                            onClick={() => loadTemplate(t)}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {t.name}
+                          </motion.button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Loaded from template banner */}
+                {loadedTemplateName && (
+                  <div className="wl-template-banner">
+                    <BookmarkCheck size={12} />
+                    <span>Loaded from <strong>{loadedTemplateName}</strong> template — edit as needed</span>
+                    <button className="wl-template-banner__dismiss" onClick={() => setLoadedTemplateName(null)}>
+                      <X size={12} />
+                    </button>
+                  </div>
+                )}
 
                 {/* Date + Name row */}
                 <div className="wl-top-row">
@@ -436,110 +624,287 @@ export default function WorkoutLogger() {
         </AnimatePresence>
       </motion.div>
 
-      {/* ── HISTORY SECTION ── */}
-      {isY2K ? (
-        <div className="wl-y2k-history-heading">
-          <div className="wl-y2k-history-heading__bar" />
-          <span className="wl-y2k-history-heading__text">Workout History</span>
-          {workoutHistory.length > 0 && (
-            <span className="wl-y2k-history-heading__count">[{workoutHistory.length}] workouts logged</span>
-          )}
-        </div>
-      ) : (
-        <p className="wl-history-title" style={isSpectrum ? { color: '#1D9E75' } : undefined}>Workout history</p>
-      )}
-
-      {workoutHistory.length === 0 && (
-        isY2K ? (
-          <div className="wl-y2k-empty">
-            <div className="wl-y2k-empty__icon">
-              <Dumbbell size={32} stroke="#334466" strokeWidth={1.5} fill="none" />
-            </div>
-            <span className="wl-y2k-empty__primary">NO WORKOUTS LOGGED</span>
-            <span className="wl-y2k-empty__secondary">Click [ + New workout ] to log your first session.</span>
-            <span className="wl-y2k-empty__deco">--- [ MacroVault Workout Tracker ] ---</span>
-          </div>
-        ) : (
-          <p className="wl-empty">No workouts logged yet.</p>
-        )
-      )}
-
-      <div className={`wl-history-list ${isY2K ? 'wl-history-list--y2k' : ''}`}>
-        {workoutHistory.map((workout, idx) => (
-          <React.Fragment key={workout.id}>
-            <motion.div
-              className={`wl-history-row ${isY2K ? (idx % 2 === 0 ? 'wl-history-row--y2k-odd' : 'wl-history-row--y2k-even') : ''}`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, delay: idx * 0.04, ease: 'easeOut' }}
-              whileHover={isY2K ? undefined : { scale: 1.01 }}
-              onClick={() => toggleExpand(workout.id)}
-            >
-              <div className="wl-history-row__left">
-                {isY2K && (
-                  <div className="wl-y2k-row-icon">
-                    <Dumbbell size={14} stroke="var(--accent-light)" strokeWidth={1.5} fill="none" />
-                  </div>
-                )}
-                <div className="wl-history-row__text">
-                  <span className="wl-history-name" style={isSpectrum ? { color: '#5DCAA5' } : undefined}>{workout.workout_name}</span>
-                  <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
-                </div>
-              </div>
-              <div className="wl-history-row__right">
-                {(workout.exercises || []).length > 0 && (
-                  <span className={`wl-exercise-count ${isY2K ? 'wl-exercise-count--y2k' : ''}`}>
-                    {isY2K ? `[${workout.exercises.length}] exercise${workout.exercises.length !== 1 ? 's' : ''}` : `${workout.exercises.length} exercise${workout.exercises.length !== 1 ? 's' : ''}`}
-                  </span>
-                )}
-                <motion.button
-                  className={`btn btn-primary wl-btn-sm ${isY2K ? 'wl-btn-sm--y2k-edit' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); editWorkout(workout); }}
-                  whileTap={{ scale: 0.97 }}
-                  style={isSpectrum ? { border: '1px solid #1D9E75', color: '#5DCAA5' } : undefined}
-                >
-                  {isY2K ? '[ Edit ]' : 'Edit'}
-                </motion.button>
-                <motion.button
-                  className={`btn btn-destructive wl-btn-sm wl-btn-icon ${isY2K ? 'wl-btn-sm--y2k-delete' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); deleteWorkout(workout.id); }}
-                  whileTap={{ scale: 0.97 }}
-                  title="Delete workout"
-                >
-                  <Trash2 size={14} />
-                </motion.button>
-              </div>
-            </motion.div>
-            <AnimatePresence>
-              {expanded[workout.id] && (
-                <motion.div
-                  className="wl-exercise-detail"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  {workout.exercises?.map((ex, exIdx) => (
-                    <div key={exIdx} className="history-exercise">
-                      <h4>{ex.name}</h4>
-                      <table>
-                        <thead><tr><th>Set</th><th>Weight</th><th>Reps</th><th>Notes</th></tr></thead>
-                        <tbody>
-                          {ex.sets.map((set, j) => (
-                            <tr key={j}>
-                              <td>{j + 1}</td><td>{set.weight}</td><td>{set.reps}</td><td>{set.notes}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </React.Fragment>
-        ))}
+      {/* ── TABS: HISTORY / TEMPLATES ── */}
+      <div className="wl-tabs">
+        <button
+          className={`wl-tabs__tab ${historyTab === 'history' ? 'wl-tabs__tab--active' : ''}`}
+          onClick={() => setHistoryTab('history')}
+        >
+          History
+        </button>
+        <button
+          className={`wl-tabs__tab ${historyTab === 'templates' ? 'wl-tabs__tab--active' : ''}`}
+          onClick={() => setHistoryTab('templates')}
+        >
+          Templates
+        </button>
       </div>
+
+      {/* ── HISTORY TAB ── */}
+      {historyTab === 'history' && (
+        <>
+          {workoutHistory.length === 0 && (
+            isY2K ? (
+              <div className="wl-y2k-empty">
+                <div className="wl-y2k-empty__icon">
+                  <Dumbbell size={32} stroke="#334466" strokeWidth={1.5} fill="none" />
+                </div>
+                <span className="wl-y2k-empty__primary">NO WORKOUTS LOGGED</span>
+                <span className="wl-y2k-empty__secondary">Click [ + New workout ] to log your first session.</span>
+                <span className="wl-y2k-empty__deco">--- [ MacroVault Workout Tracker ] ---</span>
+              </div>
+            ) : (
+              <p className="wl-empty">No workouts logged yet.</p>
+            )
+          )}
+
+          <div className={`wl-history-list ${isY2K ? 'wl-history-list--y2k' : ''}`}>
+            {workoutHistory.map((workout, idx) => {
+              const isSavedAsTemplate = !!templateNameMap[workout.workout_name];
+
+              return (
+                <React.Fragment key={workout.id}>
+                  <motion.div
+                    className={`wl-history-row ${isY2K ? (idx % 2 === 0 ? 'wl-history-row--y2k-odd' : 'wl-history-row--y2k-even') : ''}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: idx * 0.04, ease: 'easeOut' }}
+                    whileHover={isY2K ? undefined : { scale: 1.01 }}
+                    onClick={() => toggleExpand(workout.id)}
+                  >
+                    <div className="wl-history-row__left">
+                      {isY2K && (
+                        <div className="wl-y2k-row-icon">
+                          <Dumbbell size={14} stroke="var(--accent-light)" strokeWidth={1.5} fill="none" />
+                        </div>
+                      )}
+                      <div className="wl-history-row__text">
+                        <span className="wl-history-name" style={isSpectrum ? { color: '#5DCAA5' } : undefined}>{workout.workout_name}</span>
+                        <span className="wl-history-date">{formatDate(workout.workout_date)}</span>
+                      </div>
+                    </div>
+                    <div className="wl-history-row__right">
+                      {(workout.exercises || []).length > 0 && (
+                        <span className={`wl-exercise-count ${isY2K ? 'wl-exercise-count--y2k' : ''}`}>
+                          {isY2K ? `[${workout.exercises.length}] exercise${workout.exercises.length !== 1 ? 's' : ''}` : `${workout.exercises.length} exercise${workout.exercises.length !== 1 ? 's' : ''}`}
+                        </span>
+                      )}
+                      <motion.button
+                        className={`btn btn-primary wl-btn-sm ${isY2K ? 'wl-btn-sm--y2k-edit' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); editWorkout(workout); }}
+                        whileTap={{ scale: 0.97 }}
+                        style={isSpectrum ? { border: '1px solid #1D9E75', color: '#5DCAA5' } : undefined}
+                      >
+                        {isY2K ? '[ Edit ]' : 'Edit'}
+                      </motion.button>
+
+                      {/* Save / unsave template */}
+                      <motion.button
+                        className={`wl-btn-sm wl-btn-icon wl-btn-template ${isSavedAsTemplate ? 'wl-btn-template--saved' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (isSavedAsTemplate) {
+                            removeTemplateByName(workout.workout_name);
+                          } else {
+                            setTemplateName(workout.workout_name);
+                            setSaveTemplatePopover(saveTemplatePopover === workout.id ? null : workout.id);
+                          }
+                        }}
+                        whileTap={{ scale: 0.97 }}
+                        title={isSavedAsTemplate ? 'Saved as template' : 'Save as template'}
+                      >
+                        {isSavedAsTemplate ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                      </motion.button>
+
+                      {/* Copy to today */}
+                      <motion.button
+                        className="wl-btn-sm wl-btn-icon wl-btn-copy"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCopyDate(new Date().toISOString().split('T')[0]);
+                          setCopyPopover(copyPopover === workout.id ? null : workout.id);
+                        }}
+                        whileTap={{ scale: 0.97 }}
+                        title="Log again today"
+                      >
+                        <Copy size={14} />
+                      </motion.button>
+
+                      <motion.button
+                        className={`btn btn-destructive wl-btn-sm wl-btn-icon ${isY2K ? 'wl-btn-sm--y2k-delete' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); deleteWorkout(workout.id); }}
+                        whileTap={{ scale: 0.97 }}
+                        title="Delete workout"
+                      >
+                        <Trash2 size={14} />
+                      </motion.button>
+                    </div>
+                  </motion.div>
+
+                  {/* Save template popover */}
+                  <AnimatePresence>
+                    {saveTemplatePopover === workout.id && (
+                      <motion.div
+                        className="wl-popover"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="wl-popover__inner">
+                          <label className="wl-popover__label">Template name</label>
+                          <input
+                            type="text"
+                            className="input wl-popover__input"
+                            value={templateName}
+                            onChange={(e) => setTemplateName(e.target.value)}
+                            placeholder={workout.workout_name}
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); saveAsTemplate(workout); } }}
+                          />
+                          <div className="wl-popover__btns">
+                            <button className="wl-popover__btn wl-popover__btn--save" onClick={(e) => { e.stopPropagation(); saveAsTemplate(workout); }}>
+                              Save template
+                            </button>
+                            <button className="wl-popover__btn wl-popover__btn--cancel" onClick={(e) => { e.stopPropagation(); setSaveTemplatePopover(null); }}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Copy popover */}
+                  <AnimatePresence>
+                    {copyPopover === workout.id && (
+                      <motion.div
+                        className="wl-popover"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="wl-popover__inner">
+                          <p className="wl-popover__title">Log <strong>{workout.workout_name}</strong> again?</p>
+                          <label className="wl-popover__label">Date</label>
+                          <input
+                            type="date"
+                            className="input wl-popover__input"
+                            value={copyDate}
+                            onChange={(e) => setCopyDate(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <div className="wl-popover__btns">
+                            <button className="wl-popover__btn wl-popover__btn--save" onClick={(e) => { e.stopPropagation(); copyWorkoutToDate(workout); }}>
+                              Yes, log it
+                            </button>
+                            <button className="wl-popover__btn wl-popover__btn--cancel" onClick={(e) => { e.stopPropagation(); setCopyPopover(null); }}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Expanded exercise detail */}
+                  <AnimatePresence>
+                    {expanded[workout.id] && (
+                      <motion.div
+                        className="wl-exercise-detail"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        {workout.exercises?.map((ex, exIdx) => (
+                          <div key={exIdx} className="history-exercise">
+                            <h4>{ex.name}</h4>
+                            <table>
+                              <thead><tr><th>Set</th><th>Weight</th><th>Reps</th><th>Notes</th></tr></thead>
+                              <tbody>
+                                {ex.sets.map((set, j) => (
+                                  <tr key={j}>
+                                    <td>{j + 1}</td><td>{set.weight}</td><td>{set.reps}</td><td>{set.notes}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* ── TEMPLATES TAB ── */}
+      {historyTab === 'templates' && (
+        <>
+          {templates.length === 0 ? (
+            <div className="wl-templates-empty">
+              <BookmarkPlus size={32} style={{ color: 'var(--border-light, #444)' }} />
+              <h4 className="wl-templates-empty__title">No templates yet</h4>
+              <p className="wl-templates-empty__desc">
+                Save any workout from your history as a template to reuse it in one tap.
+              </p>
+              <p className="wl-templates-empty__hint">
+                Click the <Bookmark size={12} style={{ verticalAlign: '-2px' }} /> bookmark icon on any workout in History to save it as a template.
+              </p>
+            </div>
+          ) : (
+            <div className="wl-template-list">
+              {templates.map((tpl, idx) => (
+                <motion.div
+                  key={tpl.id}
+                  className="wl-tpl-row"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: idx * 0.04 }}
+                >
+                  <div className="wl-tpl-row__icon">
+                    <Dumbbell size={18} />
+                  </div>
+                  <div className="wl-tpl-row__info">
+                    <span className="wl-tpl-row__name">{tpl.name}</span>
+                    <span className="wl-tpl-row__meta">
+                      {(tpl.exercises || []).length} exercise{(tpl.exercises || []).length !== 1 ? 's' : ''}
+                      {tpl.muscle_group ? ` · ${tpl.muscle_group}` : ''}
+                      {tpl.use_count > 0 ? ` · Used ${tpl.use_count} time${tpl.use_count !== 1 ? 's' : ''}` : ''}
+                    </span>
+                    {tpl.use_count > 5 && (
+                      <span className="wl-tpl-row__badge"><Star size={10} /> Most used</span>
+                    )}
+                  </div>
+                  <div className="wl-tpl-row__actions">
+                    <motion.button
+                      className="wl-tpl-row__use-btn"
+                      onClick={() => loadTemplate(tpl)}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      Use template
+                    </motion.button>
+                    <motion.button
+                      className="wl-tpl-row__action-btn"
+                      onClick={() => deleteTemplate(tpl.id)}
+                      whileTap={{ scale: 0.97 }}
+                      title="Delete template"
+                    >
+                      <Trash2 size={14} />
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
