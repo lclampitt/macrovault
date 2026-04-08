@@ -1103,43 +1103,17 @@
   position: relative;
 }
 
-/* On mobile: session becomes a fixed overlay filling the space
-   between the topbar (52px) and bottom nav (56px + safe-area).
-   Header stays at top, body scrolls independently. */
-@media (max-width: 767px) {
-  .wlm-session {
-    position: fixed;
-    top: 52px;
-    left: 0;
-    right: 0;
-    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-    min-height: 0;
-    background: var(--bg-base);
-    z-index: 30;
-    overflow: hidden;
-  }
-}
-
 .wlm-session__header {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 0 14px;
   border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  position: sticky;
+  top: 0;
   background: var(--bg-base);
   z-index: 10;
-  flex-shrink: 0;
-  transition: box-shadow 0.2s ease;
-}
-
-@media (max-width: 767px) {
-  .wlm-session__header {
-    padding: 10px 16px 14px;
-  }
-}
-
-.wlm-session__header--scrolled {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .wlm-session__timer {
@@ -1202,15 +1176,8 @@
   gap: 6px;
   overflow-x: auto;
   padding-bottom: 12px;
-  flex-shrink: 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-}
-
-@media (max-width: 767px) {
-  .wlm-session__mg-row {
-    padding: 0 16px 12px;
-  }
 }
 
 .wlm-session__mg-row::-webkit-scrollbar { display: none; }
@@ -1235,21 +1202,14 @@
   color: var(--accent-light);
 }
 
-/* Session body — scrollable exercise area */
+/* Session body */
 .wlm-session__body {
   display: flex;
   flex-direction: column;
   gap: 12px;
   flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 24px;
-}
-
-@media (max-width: 767px) {
-  .wlm-session__body {
-    padding: 0 16px 24px;
-  }
+  padding-bottom: calc(24px + var(--nav-height) + var(--keyboard-height));
+  transition: padding-bottom 0.25s ease;
 }
 
 .wlm-session__empty {

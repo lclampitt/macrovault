@@ -76,7 +76,6 @@ export default function WorkoutLogger() {
   const [templatePreview, setTemplatePreview] = useState(null);
   const [sessionFromTemplateId, setSessionFromTemplateId] = useState(null);
   const [mobileExpanded, setMobileExpanded] = useState({});
-  const [headerScrolled, setHeaderScrolled] = useState(false);
 
   // Scroll to top when opening the logger
   useEffect(() => {
@@ -1339,8 +1338,8 @@ export default function WorkoutLogger() {
         {/* ── ACTIVE SESSION ── */}
         {mobileView === 'session' && (
           <div className="wlm-session">
-            {/* Session header bar — stays fixed at top, body scrolls beneath */}
-            <div className={`wlm-session__header ${headerScrolled ? 'wlm-session__header--scrolled' : ''}`}>
+            {/* Session header bar */}
+            <div className="wlm-session__header">
               <div className="wlm-session__timer">
                 <Clock size={14} />
                 <span>{formatDuration(sessionTimer)}</span>
@@ -1375,12 +1374,8 @@ export default function WorkoutLogger() {
               ))}
             </div>
 
-            {/* Exercise blocks — this is the scroll container */}
-            <div
-              className="wlm-session__body"
-              onClick={dismissKeyboard}
-              onScroll={(e) => setHeaderScrolled(e.target.scrollTop > 0)}
-            >
+            {/* Exercise blocks */}
+            <div className="wlm-session__body" onClick={dismissKeyboard}>
               {sessionExercises.length === 0 && (
                 <div className="wlm-session__empty">
                   <Dumbbell size={28} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
