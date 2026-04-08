@@ -68,7 +68,8 @@ function useCountUp(target, duration = 700) {
 /* Stat chip with count-up */
 function StatChip({ label, value, suffix = '', decimals = 1, index = 0, positive, spectrumColor, isY2K, y2kLabel }) {
   const num = useCountUp(Math.abs(value ?? 0));
-  const display = value == null ? '—' : `${positive === false ? '-' : positive ? '+' : ''}${num.toFixed(decimals)}${suffix}`;
+  const sign = value == null ? '' : value > 0 ? '+' : value < 0 ? '-' : '';
+  const display = value == null ? '—' : `${sign}${num.toFixed(decimals)}${suffix}`;
   return (
     <motion.div
       className="pg-chip"
