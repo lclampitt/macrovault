@@ -303,12 +303,12 @@ def can_log_workout(user_id: str) -> bool:
         return True
     result = supabase_admin.table("workouts").select("id").eq("user_id", user_id).execute()
     count = len(result.data) if result.data else 0
-    return count < 10
+    return count < 7
 
 def get_usage_summary(user_id: str) -> dict:
     """Return a full usage summary for the given user."""
     if not supabase_admin:
-        return {"analyzerUsed": 0, "analyzerLimit": 3, "workoutCount": 0, "workoutLimit": 10, "aiSuggestionsUsed": 0, "aiSuggestionsLimit": 300, "plan": "free"}
+        return {"analyzerUsed": 0, "analyzerLimit": 3, "workoutCount": 0, "workoutLimit": 7, "aiSuggestionsUsed": 0, "aiSuggestionsLimit": 300, "plan": "free"}
     profile_res = supabase_admin.table("profiles") \
         .select("subscription_tier,analyzer_uses_this_month,analyzer_month,ai_suggestions_this_month,ai_suggestions_month") \
         .eq("id", user_id).maybe_single().execute()
@@ -326,7 +326,7 @@ def get_usage_summary(user_id: str) -> dict:
         "analyzerUsed":       analyzer_used,
         "analyzerLimit":      None if is_paid else 3,
         "workoutCount":       workout_count,
-        "workoutLimit":       None if is_paid else 10,
+        "workoutLimit":       None if is_paid else 7,
         "aiSuggestionsUsed":  ai_used,
         "aiSuggestionsLimit": 300,
         "plan":               plan,

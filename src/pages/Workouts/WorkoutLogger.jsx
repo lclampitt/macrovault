@@ -597,7 +597,9 @@ export default function WorkoutLogger() {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const atLimit = !isPro && workoutHistory.length >= 10;
+  const WORKOUT_LIMIT = 7;
+  const atLimit = !isPro && workoutHistory.length >= WORKOUT_LIMIT;
+  const nearLimit = !isPro && workoutHistory.length >= 5 && workoutHistory.length < WORKOUT_LIMIT;
 
   return (
     <div className="wl">
@@ -612,17 +614,17 @@ export default function WorkoutLogger() {
             <div
               className="wl-y2k-usage__bar-fill"
               style={{
-                width: `${Math.min((workoutHistory.length / 10) * 100, 100)}%`,
-                background: workoutHistory.length >= 8
+                width: `${Math.min((workoutHistory.length / WORKOUT_LIMIT) * 100, 100)}%`,
+                background: nearLimit || atLimit
                   ? 'linear-gradient(180deg, #FFD700, #CC9900)'
                   : `linear-gradient(180deg, var(--accent-light), var(--accent))`,
               }}
             />
           </div>
-          <span className={`wl-y2k-usage__text ${workoutHistory.length >= 8 ? 'wl-y2k-usage__text--warn' : ''}`}>
-            {workoutHistory.length >= 8
-              ? `WARNING: [${workoutHistory.length}] / 10 logs used. Upgrade to Pro for unlimited.`
-              : `[${workoutHistory.length}] / 10 free workout logs used`}
+          <span className={`wl-y2k-usage__text ${nearLimit || atLimit ? 'wl-y2k-usage__text--warn' : ''}`}>
+            {nearLimit || atLimit
+              ? `WARNING: [${workoutHistory.length}] / ${WORKOUT_LIMIT} logs used. Upgrade to Pro for unlimited.`
+              : `[${workoutHistory.length}] / ${WORKOUT_LIMIT} free workout logs used`}
           </span>
         </div>
       )}
@@ -649,10 +651,10 @@ export default function WorkoutLogger() {
             {!isPro && !isY2K && workoutHistory.length > 0 && (
               <p style={{
                 fontSize: 11,
-                color: workoutHistory.length >= 8 ? '#EF9F27' : 'var(--text-muted)',
+                color: nearLimit || atLimit ? '#EF9F27' : 'var(--text-muted)',
                 margin: '2px 0 0',
               }}>
-                {workoutHistory.length} / 10 free workout logs used
+                {workoutHistory.length} / {WORKOUT_LIMIT} free workout logs used
               </p>
             )}
           </div>
@@ -674,7 +676,7 @@ export default function WorkoutLogger() {
             <Lock size={16} style={{ color: 'var(--accent-light)', flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
-                You've reached 10 workout logs on the free plan.
+                You've reached {WORKOUT_LIMIT} workout logs on the free plan.
               </p>
               <button
                 onClick={() => triggerUpgrade('workouts')}
@@ -1154,34 +1156,68 @@ export default function WorkoutLogger() {
         {mobileView === 'home' && (
           <div className="wlm-home">
             {/* Quick Start */}
-            <motion.button
-              className="wlm-quick-start"
-              onClick={startBlankSession}
-              whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <div className="wlm-quick-start__icon"><Play size={20} /></div>
-              <div className="wlm-quick-start__text">
-                <span className="wlm-quick-start__title">Quick Start</span>
-                <span className="wlm-quick-start__sub">Start an empty workout</span>
-              </div>
-              <ChevronRight size={18} className="wlm-quick-start__arrow" />
-            </motion.button>
+            {atLimit ? (
+              <motion.button
+                className="wlm-quick-start wlm-quick-start--locked"
+                onClick={() => triggerUpgrade('workouts')}
+                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="wlm-quick-start__icon wlm-quick-start__icon--locked"><Lock size={20} /></div>
+                <div className="wlm-quick-start__text">
+                  <span className="wlm-quick-start__title">Upgrade to Pro</span>
+                  <span className="wlm-quick-start__sub">Unlock unlimited workout logging</span>
+                </div>
+                <ChevronRight size={18} className="wlm-quick-start__arrow" />
+              </motion.button>
+            ) : (
+              <motion.button
+                className="wlm-quick-start"
+                onClick={startBlankSession}
+                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="wlm-quick-start__icon"><Play size={20} /></div>
+                <div className="wlm-quick-start__text">
+                  <span className="wlm-quick-start__title">Quick Start</span>
+                  <span className="wlm-quick-start__sub">Start an empty workout</span>
+                </div>
+                <ChevronRight size={18} className="wlm-quick-start__arrow" />
+              </motion.button>
+            )}
 
-            {/* Free tier usage */}
+            {/* Free tier usage counter */}
             {!isPro && workoutHistory.length > 0 && (
-              <div className="wlm-usage-bar">
-                <div className="wlm-usage-bar__track">
+              <div className={`wlm-usage-banner${nearLimit ? ' wlm-usage-banner--warn' : ''}${atLimit ? ' wlm-usage-banner--locked' : ''}`}>
+                <div className="wlm-usage-banner__top">
+                  <span className="wlm-usage-banner__count">
+                    {atLimit ? (
+                      <><Lock size={12} /> Limit reached</>
+                    ) : (
+                      <>{workoutHistory.length} / {WORKOUT_LIMIT} free workouts</>
+                    )}
+                  </span>
+                  {(nearLimit || atLimit) && (
+                    <button className="wlm-usage-banner__upgrade" onClick={() => triggerUpgrade('workouts')}>
+                      Upgrade
+                    </button>
+                  )}
+                </div>
+                <div className="wlm-usage-banner__track">
                   <div
-                    className="wlm-usage-bar__fill"
-                    style={{ width: `${Math.min((workoutHistory.length / 10) * 100, 100)}%` }}
+                    className={`wlm-usage-banner__fill${nearLimit ? ' wlm-usage-banner__fill--warn' : ''}${atLimit ? ' wlm-usage-banner__fill--locked' : ''}`}
+                    style={{ width: `${Math.min((workoutHistory.length / WORKOUT_LIMIT) * 100, 100)}%` }}
                   />
                 </div>
-                <span className="wlm-usage-bar__text">
-                  {workoutHistory.length} / 10 free workouts
-                </span>
+                {atLimit && (
+                  <p className="wlm-usage-banner__msg">
+                    Upgrade to Pro for unlimited workout logging
+                  </p>
+                )}
               </div>
             )}
 

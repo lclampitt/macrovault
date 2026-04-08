@@ -25,6 +25,7 @@ import {
   X,
   Palette,
   Check,
+  Plus,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import SidebarThemeSwitcher from '../ui/SidebarThemeSwitcher';
@@ -33,33 +34,39 @@ import './Sidebar.css';
 const FREE_NAV_ITEMS = [
   { to: '/home',          label: 'Home',             icon: Home             },
   { to: '/calculators',   label: 'Calculators',      icon: Calculator       },
-  { to: '/workouts',      label: 'Workouts',         icon: Dumbbell         },
   { to: '/exercises',     label: 'Exercise Library',  icon: BookOpen         },
   { to: '/measurements',  label: 'Measurements',     icon: Ruler            },
 ];
 
 const PRO_NAV_ITEMS = [
+  { to: '/workouts',      label: 'Workouts',         icon: Dumbbell,         tryFree: true },
   { to: '/goalplanner',   label: 'Goal Planner',     icon: Target            },
   { to: '/meal-planner',  label: 'Meal Planner',     icon: UtensilsCrossed   },
   { to: '/progress',      label: 'Progress',         icon: BarChart2         },
 ];
 
-const MOBILE_TABS = [
+const MOBILE_TABS_LEFT = [
   { to: '/home',         icon: Home,            label: 'Home'     },
   { to: '/meal-planner', icon: UtensilsCrossed, label: 'Meals'    },
-  { to: '/workouts',     icon: Dumbbell,        label: 'Workouts' },
+];
+
+const MOBILE_TABS_RIGHT = [
   { to: '/progress',     icon: TrendingUp,      label: 'Progress' },
 ];
 
-const MORE_PAGES = [
+const MORE_PRO_PAGES = [
+  { to: '/workouts',     icon: Dumbbell,   label: 'Workouts',     proBadge: false },
   { to: '/goalplanner',  icon: Target,     label: 'Goal Planner', proBadge: true },
+];
+
+const MORE_FREE_PAGES = [
   { to: '/calculators',  icon: Calculator, label: 'Calculators' },
   { to: '/exercises',    icon: BookOpen,   label: 'Exercise Library' },
   { to: '/measurements', icon: Ruler,      label: 'Measurements' },
   { to: '/settings',     icon: Settings,   label: 'Settings' },
 ];
 
-const MORE_ROUTES = ['/goalplanner', '/calculators', '/exercises', '/measurements', '/settings'];
+const MORE_ROUTES = ['/workouts', '/goalplanner', '/calculators', '/exercises', '/measurements', '/settings'];
 
 const QUICK_THEMES = [
   { id: 'teal',       label: 'Teal',       color: '#1D9E75' },
@@ -103,7 +110,7 @@ const getNavColor = (route, accent) => {
 
 const getMobileDotColor = (route, accent) => {
   if (accent === 'spectrum') {
-    const map = { '/home': '#1D9E75', '/workouts': '#1D9E75', '/meal-planner': '#EA580C', '/progress': '#EF9F27' };
+    const map = { '/home': '#1D9E75', '/meal-planner': '#EA580C', '/progress': '#EF9F27' };
     return map[route] || null;
   }
   if (accent === 'xp-aqua') return '#39FF14';
@@ -297,7 +304,11 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
                       )}
                     </AnimatePresence>
                     {!isPro && !collapsed && (
-                      <Lock size={12} style={{ color: 'var(--text-muted)', flexShrink: 0, marginLeft: 'auto' }} title="Pro feature" />
+                      item.tryFree ? (
+                        <span className="sidebar__try-free-badge">Try free</span>
+                      ) : (
+                        <Lock size={12} style={{ color: 'var(--text-muted)', flexShrink: 0, marginLeft: 'auto' }} title="Pro feature" />
+                      )
                     )}
                   </>
                 );
@@ -491,9 +502,36 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
         </div>
       </div>
 
-      {/* ── Mobile bottom nav — 5 tabs ── */}
+      {/* ── Mobile bottom nav — tabs + center Log button ── */}
       <nav className="mob-bottom-nav">
-        {MOBILE_TABS.map(({ to, icon: Icon, label }) => {
+        {MOBILE_TABS_LEFT.map(({ to, icon: Icon, label }) => {
+          const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
+          const customDotColor = getMobileDotColor(to, accent);
+          return (
+            <motion.button
+              key={to}
+              className={`mob-nav-tab${isActive ? ' mob-nav-tab--active' : ''}`}
+              onClick={() => navigate(to)}
+              whileTap={{ scale: 0.9 }}
+            >
+              {isActive && <span className="mob-nav-tab__dot" style={customDotColor ? { background: customDotColor } : undefined} />}
+              <Icon size={20} />
+              <span className="mob-nav-tab__label">{label}</span>
+            </motion.button>
+          );
+        })}
+
+        {/* Center Log action button */}
+        <motion.button
+          className={`mob-nav-log-btn${location.pathname.startsWith('/workouts') ? ' mob-nav-log-btn--active' : ''}`}
+          onClick={() => navigate('/workouts')}
+          whileTap={{ scale: 0.9 }}
+        >
+          <Plus size={22} strokeWidth={2.5} />
+          <span className="mob-nav-log-btn__label">Log</span>
+        </motion.button>
+
+        {MOBILE_TABS_RIGHT.map(({ to, icon: Icon, label }) => {
           const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
           const customDotColor = getMobileDotColor(to, accent);
           return (
@@ -546,8 +584,12 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
                   <X size={16} />
                 </button>
               </div>
+              {/* Pro section */}
+              <div className="mob-more-sheet__section-label">
+                <Crown size={10} /> Pro
+              </div>
               <div className="mob-more-sheet__grid">
-                {MORE_PAGES.map(({ to, icon: Icon, label, proBadge }, idx) => {
+                {MORE_PRO_PAGES.map(({ to, icon: Icon, label, proBadge }, idx) => {
                   const isPageActive = location.pathname.startsWith(to);
                   return (
                     <motion.button
@@ -562,6 +604,9 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
                       {proBadge && !isPro && (
                         <span className="mob-more-item__badge">Pro</span>
                       )}
+                      {to === '/workouts' && !isPro && (
+                        <span className="mob-more-item__badge mob-more-item__badge--try">Try free</span>
+                      )}
                       <div className={`mob-more-item__icon${isPageActive ? ' mob-more-item__icon--active' : ''}`}>
                         <Icon size={18} />
                       </div>
@@ -570,6 +615,32 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
                   );
                 })}
                 <div className="mob-more-item mob-more-item--empty" />
+              </div>
+
+              {/* General section */}
+              <div className="mob-more-sheet__section-label mob-more-sheet__section-label--general">
+                General
+              </div>
+              <div className="mob-more-sheet__grid">
+                {MORE_FREE_PAGES.map(({ to, icon: Icon, label }, idx) => {
+                  const isPageActive = location.pathname.startsWith(to);
+                  return (
+                    <motion.button
+                      key={to}
+                      className={`mob-more-item${isPageActive ? ' mob-more-item--active' : ''}`}
+                      onClick={() => { setMoreOpen(false); navigate(to); }}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: (idx + MORE_PRO_PAGES.length) * 0.04 }}
+                      whileTap={{ scale: 0.94 }}
+                    >
+                      <div className={`mob-more-item__icon${isPageActive ? ' mob-more-item__icon--active' : ''}`}>
+                        <Icon size={18} />
+                      </div>
+                      <span className="mob-more-item__label">{label}</span>
+                    </motion.button>
+                  );
+                })}
               </div>
               {/* Theme indicator row */}
               <button

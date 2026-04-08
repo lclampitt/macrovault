@@ -771,32 +771,110 @@
   flex-shrink: 0;
 }
 
-/* Usage bar */
-.wlm-usage-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Locked Quick Start */
+.wlm-quick-start--locked {
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.06);
 }
 
-.wlm-usage-bar__track {
-  flex: 1;
+.wlm-quick-start--locked:active {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.wlm-quick-start__icon--locked {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+/* Usage banner */
+.wlm-usage-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.wlm-usage-banner--warn {
+  border-color: #EF9F27;
+  background: rgba(239, 159, 39, 0.06);
+}
+
+.wlm-usage-banner--locked {
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.06);
+}
+
+.wlm-usage-banner__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wlm-usage-banner__count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.wlm-usage-banner--warn .wlm-usage-banner__count {
+  color: #EF9F27;
+}
+
+.wlm-usage-banner--locked .wlm-usage-banner__count {
+  color: #f87171;
+}
+
+.wlm-usage-banner__upgrade {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-light);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  padding: 4px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.wlm-usage-banner__upgrade:active {
+  background: rgba(var(--accent-rgb), 0.2);
+}
+
+.wlm-usage-banner__track {
+  width: 100%;
   height: 4px;
   border-radius: 2px;
   background: var(--border);
   overflow: hidden;
 }
 
-.wlm-usage-bar__fill {
+.wlm-usage-banner__fill {
   height: 100%;
   border-radius: 2px;
   background: var(--accent);
   transition: width 0.3s ease;
 }
 
-.wlm-usage-bar__text {
+.wlm-usage-banner__fill--warn {
+  background: #EF9F27;
+}
+
+.wlm-usage-banner__fill--locked {
+  background: #f87171;
+}
+
+.wlm-usage-banner__msg {
   font-size: 11px;
   color: var(--text-muted);
-  white-space: nowrap;
+  margin: 0;
+  text-align: center;
 }
 
 /* Section */

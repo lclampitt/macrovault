@@ -196,6 +196,20 @@
   margin-top: 1px;
 }
 
+/* "Try free" badge on Pro nav items */
+.sidebar__try-free-badge {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--accent-light);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  padding: 1px 6px;
+  border-radius: 20px;
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .sidebar__logout {
   color: var(--text-muted);
   padding: 4px;
@@ -672,6 +686,46 @@
     margin-bottom: 1px;
   }
 
+  /* ── Center Log action button ── */
+  .mob-nav-log-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    background: none;
+    border: none;
+    font-family: inherit;
+    position: relative;
+    flex: 1;
+    margin-top: -12px;
+  }
+
+  .mob-nav-log-btn svg {
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .mob-nav-log-btn--active svg {
+    box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.55);
+    transform: scale(1.05);
+  }
+
+  .mob-nav-log-btn__label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+
   /* ── More sheet overlay ── */
   .mob-more-overlay {
     display: block;
@@ -815,11 +869,35 @@
     padding: 1px 5px;
   }
 
+  .mob-more-item__badge--try {
+    background: rgba(var(--accent-rgb), 0.15);
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+
   .mob-more-item--empty {
     border: 1px dashed #1e2536;
     background: transparent;
     opacity: 0.4;
     cursor: default;
+  }
+
+  /* ── More sheet section labels ── */
+  .mob-more-sheet__section-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 14px 20px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+  }
+
+  .mob-more-sheet__section-label--general {
+    color: #666;
+    padding-top: 4px;
   }
 
   /* ── Action sheet (sign out) ── */
