@@ -1453,15 +1453,6 @@ export default function WorkoutLogger() {
                 <Plus size={18} /> Add Exercise
               </motion.button>
 
-              {/* Bottom Finish button */}
-              <motion.button
-                className="wlm-finish-btn-bottom"
-                onClick={finishSession}
-                whileTap={{ scale: 0.97 }}
-              >
-                Finish Workout
-              </motion.button>
-
               {/* Discard button */}
               <button className="wlm-discard-btn" onClick={discardSession}>
                 Discard Workout

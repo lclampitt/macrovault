@@ -1116,6 +1116,16 @@
   z-index: 10;
 }
 
+/* On mobile the fixed topbar (52px) overlaps the scroll container —
+   offset sticky so the header pins right below it, full-bleed */
+@media (max-width: 767px) {
+  .wlm-session__header {
+    top: 52px;
+    margin: 0 -16px 12px;
+    padding: 10px 16px 14px;
+  }
+}
+
 .wlm-session__timer {
   display: flex;
   align-items: center;
@@ -1416,25 +1426,6 @@
 .wlm-add-exercise-btn:active {
   border-color: var(--accent);
   background: rgba(var(--accent-rgb), 0.05);
-}
-
-/* Bottom finish button */
-.wlm-finish-btn-bottom {
-  width: 100%;
-  padding: 14px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 15px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.wlm-finish-btn-bottom:active {
-  background: var(--accent-dark, var(--accent));
 }
 
 /* Discard button */
