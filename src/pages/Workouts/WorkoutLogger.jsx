@@ -86,6 +86,9 @@ export default function WorkoutLogger() {
   const [sessionFromTemplateId, setSessionFromTemplateId] = useState(null);
   const [sessionOriginalTemplate, setSessionOriginalTemplate] = useState(null);
   const [templateUpdateSheet, setTemplateUpdateSheet] = useState(null); // { templateId, templateName, changes, exerciseData }
+  const [saveNewTplMode, setSaveNewTplMode] = useState(false);
+  const [saveNewTplName, setSaveNewTplName] = useState('');
+  const [saveNewTplError, setSaveNewTplError] = useState('');
   const [mobileExpanded, setMobileExpanded] = useState({});
 
   // Scroll to top when opening the logger
@@ -1736,14 +1739,89 @@ export default function WorkoutLogger() {
                     toast.success('Template updated');
                     fetchTemplates();
                     setTemplateUpdateSheet(null);
+                    setSaveNewTplMode(false);
                   }}
                   whileTap={{ scale: 0.97 }}
                 >
                   Update template
                 </motion.button>
+
+                {/* Save as new template */}
+                <AnimatePresence mode="wait">
+                  {!saveNewTplMode ? (
+                    <motion.button
+                      key="save-new-btn"
+                      className="wlm-tpl-update__btn-new"
+                      onClick={() => {
+                        setSaveNewTplName(templateUpdateSheet.templateName || '');
+                        setSaveNewTplError('');
+                        setSaveNewTplMode(true);
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <BookmarkPlus size={16} /> Save as new template
+                    </motion.button>
+                  ) : (
+                    <motion.div
+                      key="save-new-input"
+                      className="wlm-tpl-update__new-row"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="wlm-tpl-update__new-input-row">
+                        <input
+                          type="text"
+                          className="wlm-tpl-update__new-input"
+                          value={saveNewTplName}
+                          onChange={(e) => setSaveNewTplName(e.target.value)}
+                          placeholder="Template name..."
+                          autoFocus
+                        />
+                        <motion.button
+                          className="wlm-tpl-update__new-save"
+                          onClick={async () => {
+                            const name = saveNewTplName.trim();
+                            if (!name) { setSaveNewTplError('Name cannot be empty'); return; }
+                            setSaveNewTplError('');
+                            const { error } = await supabase.from('workout_templates').insert({
+                              user_id: userId,
+                              name,
+                              muscle_group: sessionMuscleGroup || '',
+                              exercises: templateUpdateSheet.exerciseData,
+                            });
+                            if (error) { setSaveNewTplError("Couldn't save template, please try again"); return; }
+                            toast.success(`${name} saved as new template`);
+                            fetchTemplates();
+                            setTemplateUpdateSheet(null);
+                            setSaveNewTplMode(false);
+                          }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          Save
+                        </motion.button>
+                      </div>
+                      {saveNewTplError && (
+                        <span className="wlm-tpl-update__new-error">{saveNewTplError}</span>
+                      )}
+                      <button
+                        className="wlm-tpl-update__new-cancel"
+                        onClick={() => { setSaveNewTplMode(false); setSaveNewTplError(''); }}
+                      >
+                        Cancel
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <motion.button
                   className="wlm-tpl-update__btn-secondary"
-                  onClick={() => setTemplateUpdateSheet(null)}
+                  onClick={() => { setTemplateUpdateSheet(null); setSaveNewTplMode(false); }}
                   whileTap={{ scale: 0.97 }}
                 >
                   Keep original
@@ -1753,6 +1831,7 @@ export default function WorkoutLogger() {
                   onClick={() => {
                     localStorage.setItem('template_auto_update', 'never');
                     setTemplateUpdateSheet(null);
+                    setSaveNewTplMode(false);
                   }}
                 >
                   Don't ask again

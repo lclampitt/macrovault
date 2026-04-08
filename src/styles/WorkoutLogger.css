@@ -1744,9 +1744,9 @@
   background: var(--bg-surface);
   border-radius: 20px 20px 0 0;
   border-top: 1px solid var(--accent);
-  padding: 0 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  padding: 0 20px calc(20px + 56px + env(safe-area-inset-bottom, 0px));
   z-index: 200;
-  max-height: 80vh;
+  max-height: calc(90vh - 56px - env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1863,5 +1863,98 @@
   border: none;
   cursor: pointer;
   padding: 12px 0 4px;
+  font-family: inherit;
+}
+
+/* Save as new template button */
+.wlm-tpl-update__btn-new {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--accent-light);
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.wlm-tpl-update__btn-new:active {
+  background: rgba(var(--accent-rgb), 0.08);
+}
+
+/* Save as new — inline input row */
+.wlm-tpl-update__new-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.wlm-tpl-update__new-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.wlm-tpl-update__new-input {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 16px;
+  color: var(--text-primary);
+  font-family: inherit;
+  outline: none;
+  min-width: 0;
+}
+
+.wlm-tpl-update__new-input::placeholder {
+  color: var(--text-muted);
+}
+
+.wlm-tpl-update__new-save {
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.wlm-tpl-update__new-save:active {
+  background: var(--accent-dark, var(--accent));
+}
+
+.wlm-tpl-update__new-error {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 6px;
+  padding: 0 2px;
+}
+
+.wlm-tpl-update__new-cancel {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0 0;
   font-family: inherit;
 }
