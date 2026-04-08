@@ -119,6 +119,12 @@
   gap: 8px;
 }
 
+.mp-week-nav__remaining {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .mp-week-nav__ai-btn {
   display: inline-flex;
   align-items: center;

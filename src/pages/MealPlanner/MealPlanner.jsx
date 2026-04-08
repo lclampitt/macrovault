@@ -25,6 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import { useTheme } from '../../hooks/useTheme';
+import { useUsage } from '../../hooks/useUsage';
 import Y2KDialog from '../../components/ui/Y2KDialog';
 import Y2KProgressBar from '../../components/ui/Y2KProgressBar';
 import '../../styles/mealplanner.css';
@@ -771,6 +772,7 @@ function MealPlannerContent({ isProPlus = false }) {
   const { triggerUpgrade } = useUpgrade();
   const { isSpectrum, isRetro, isY2K } = useTheme();
   const [userId, setUserId] = useState(null);
+  const { usage, refetchUsage } = useUsage(userId);
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
   const [planId, setPlanId] = useState(null);
   const [entries, setEntries] = useState([]);
@@ -1133,6 +1135,7 @@ function MealPlannerContent({ isProPlus = false }) {
         .order('day_of_week', { ascending: true });
       setEntries(ent || []);
       toast.success('AI meal plan generated!');
+      refetchUsage();
     } catch (err) {
       console.error('AI week error:', err);
       toast.error(
@@ -1381,6 +1384,11 @@ function MealPlannerContent({ isProPlus = false }) {
           </button>
         </div>
         <div className="mp-week-nav__right">
+          {isProPlus && usage && (
+            <span className="mp-week-nav__remaining">
+              {Math.max(0, (usage.aiSuggestionsLimit || 300) - (usage.aiSuggestionsUsed || 0))} requests remaining
+            </span>
+          )}
           <button
             className="mp-week-nav__ai-btn"
             onClick={isProPlus ? handleAiWeek : () => triggerUpgrade('ai_week', 'pro_plus')}
