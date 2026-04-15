@@ -431,20 +431,31 @@ function SlotPanel({
     const timer = setTimeout(async () => {
       try {
         const fields =
-          'code,product_name,brands,serving_size,nutriments';
-        const v2 = `https://world.openfoodfacts.org/api/v2/search?search_terms=${encodeURIComponent(query)}&page_size=20&fields=${fields}`;
+          'code,product_name,brands,serving_size,nutriments,countries_tags,lang';
+        // Scope to US products + English locale so results match what the
+        // user actually sees on shelves in the US.
+        const v2 = `https://us.openfoodfacts.org/api/v2/search?search_terms=${encodeURIComponent(query)}&countries_tags_en=United%20States&lc=en&page_size=30&fields=${fields}`;
         let data;
         try {
           const res = await fetch(v2);
           data = await res.json();
         } catch {
-          const legacy = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=true&page_size=20`;
+          const legacy = `https://us.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&tagtype_0=countries&tag_contains_0=contains&tag_0=united-states&lc=en&json=true&page_size=30`;
           const res2 = await fetch(legacy);
           data = await res2.json();
         }
         if (cancelled) return;
         const products = (data.products || [])
-          .filter((p) => p.product_name && p.nutriments)
+          .filter((p) => {
+            if (!p.product_name || !p.nutriments) return false;
+            // Drop products that are only sold outside the US.
+            const tags = Array.isArray(p.countries_tags) ? p.countries_tags : [];
+            const inUS = tags.length === 0 || tags.includes('en:united-states');
+            // Prefer English-language entries (lang is a 2-letter code).
+            const lang = (p.lang || '').toLowerCase();
+            const englishOrBlank = !lang || lang === 'en';
+            return inUS && englishOrBlank;
+          })
           .map(formatOffProduct)
           .filter((p) => p.per100.calories > 0)
           .slice(0, 15);
