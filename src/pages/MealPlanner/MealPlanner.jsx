@@ -28,6 +28,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useUsage } from '../../hooks/useUsage';
 import Y2KDialog from '../../components/ui/Y2KDialog';
 import Y2KProgressBar from '../../components/ui/Y2KProgressBar';
+import FoodSearch from '../../components/FoodSearch/FoodSearch';
 import '../../styles/mealplanner.css';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
@@ -603,16 +604,16 @@ function SlotPanel({
               {/* Remaining macros */}
               <div className="mp-remaining-macros">
                 <div className="mp-remaining-chip">
-                  Cal: <span>{Math.max(2000 - dayTotals.calories, 0)}</span>
+                  Cal: <span>{Math.round(Math.max(2000 - dayTotals.calories, 0))}</span>
                 </div>
                 <div className="mp-remaining-chip">
-                  P: <span>{Math.max(150 - dayTotals.protein, 0)}g</span>
+                  P: <span>{Math.round(Math.max(150 - dayTotals.protein, 0))}g</span>
                 </div>
                 <div className="mp-remaining-chip">
-                  C: <span>{Math.max(250 - dayTotals.carbs, 0)}g</span>
+                  C: <span>{Math.round(Math.max(250 - dayTotals.carbs, 0))}g</span>
                 </div>
                 <div className="mp-remaining-chip">
-                  F: <span>{Math.max(65 - dayTotals.fat, 0)}g</span>
+                  F: <span>{Math.round(Math.max(65 - dayTotals.fat, 0))}g</span>
                 </div>
               </div>
 
@@ -678,10 +679,10 @@ function SlotPanel({
                           </p>
                         )}
                         <div className="mp-suggestion-card__macros">
-                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-calories-light)', background: 'var(--color-calories-bg)' } : undefined}>Cal: {s.calories}</span>
-                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-protein-light)', background: 'var(--color-protein-bg)' } : undefined}>P: {s.protein}g</span>
-                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-carbs-light)', background: 'var(--color-carbs-bg)' } : undefined}>C: {s.carbs}g</span>
-                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-fat-light)', background: 'var(--color-fat-bg)' } : undefined}>F: {s.fat}g</span>
+                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-calories-light)', background: 'var(--color-calories-bg)' } : undefined}>Cal: {Math.round(Number(s.calories) || 0)}</span>
+                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-protein-light)', background: 'var(--color-protein-bg)' } : undefined}>P: {Math.round(Number(s.protein) || 0)}g</span>
+                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-carbs-light)', background: 'var(--color-carbs-bg)' } : undefined}>C: {Math.round(Number(s.carbs) || 0)}g</span>
+                          <span className="mp-macro-chip" style={(isSpectrum || isRetro) ? { color: 'var(--color-fat-light)', background: 'var(--color-fat-bg)' } : undefined}>F: {Math.round(Number(s.fat) || 0)}g</span>
                         </div>
                         <button
                           className="mp-suggestion-card__add-btn"
@@ -1004,9 +1005,11 @@ function SlotPanel({
    ──────────────────────────────────────────────────── */
 function SnackSheet({ userId, onClose }) {
   const navigate = useNavigate();
+  const [snackTab, setSnackTab] = useState('manual'); // 'manual' | 'food'
   const [form, setForm] = useState({ name: '', calories: '', protein: '', carbs: '', fat: '' });
   const [dateStr, setDateStr] = useState(() => fmtDate(new Date()));
   const [submitting, setSubmitting] = useState(false);
+  const [addingFood, setAddingFood] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -1027,6 +1030,24 @@ function SnackSheet({ userId, onClose }) {
     });
     setSubmitting(false);
 
+    if (error) { toast.error('Failed to log snack'); return; }
+    toast.success('Snack logged!');
+    onClose();
+  }
+
+  async function handleAddFromSearch(food) {
+    setAddingFood(true);
+    const { error } = await supabase.from('food_logs').insert({
+      user_id: userId,
+      logged_date: dateStr,
+      meal_name: food.meal_name,
+      calories: Number(food.calories) || 0,
+      protein_g: Number(food.protein) || 0,
+      carbs_g: Number(food.carbs) || 0,
+      fat_g: Number(food.fat) || 0,
+      notes: 'Snack',
+    });
+    setAddingFood(false);
     if (error) { toast.error('Failed to log snack'); return; }
     toast.success('Snack logged!');
     onClose();
@@ -1059,56 +1080,94 @@ function SnackSheet({ userId, onClose }) {
           </button>
         </div>
 
-        <form className="mp-snack-sheet__body" onSubmit={handleSubmit}>
-          <div className="mp-form__field">
-            <label className="mp-form__label">Snack name</label>
-            <input
-              type="text"
-              className="input"
-              placeholder="e.g. Protein bar, Apple, Trail mix"
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              maxLength={80}
-              autoFocus
-            />
-          </div>
-
-          <div className="mp-form__macro-grid">
+        <div className="mp-snack-sheet__body">
+          {/* Tabs — Manual Entry / Food Search */}
+          <div className="fs-tabs">
             {[
-              { key: 'calories', label: 'Calories (kcal)' },
-              { key: 'protein', label: 'Protein (g)' },
-              { key: 'carbs', label: 'Carbs (g)' },
-              { key: 'fat', label: 'Fat (g)' },
+              { key: 'manual', label: 'Manual Entry' },
+              { key: 'food', label: 'Food Search' },
             ].map(({ key, label }) => (
-              <div key={key} className="mp-form__field">
-                <label className="mp-form__label">{label}</label>
-                <input
-                  type="number"
-                  className="input"
-                  min="0"
-                  step="any"
-                  placeholder="0"
-                  value={form[key]}
-                  onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                />
-              </div>
+              <button
+                key={key}
+                type="button"
+                className={`fs-tabs__tab ${snackTab === key ? 'fs-tabs__tab--active' : ''}`}
+                onClick={() => setSnackTab(key)}
+              >
+                {label}
+              </button>
             ))}
           </div>
 
-          <div className="mp-form__field">
-            <label className="mp-form__label">Date</label>
-            <input
-              type="date"
-              className="input"
-              value={dateStr}
-              onChange={(e) => setDateStr(e.target.value)}
-            />
-          </div>
+          {snackTab === 'manual' ? (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div className="mp-form__field">
+                <label className="mp-form__label">Snack name</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. Protein bar, Apple, Trail mix"
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  maxLength={80}
+                  autoFocus
+                />
+              </div>
 
-          <button type="submit" className="mp-form__submit" disabled={submitting}>
-            {submitting ? 'Logging...' : 'Log snack'}
-          </button>
-        </form>
+              <div className="mp-form__macro-grid">
+                {[
+                  { key: 'calories', label: 'Calories (kcal)' },
+                  { key: 'protein', label: 'Protein (g)' },
+                  { key: 'carbs', label: 'Carbs (g)' },
+                  { key: 'fat', label: 'Fat (g)' },
+                ].map(({ key, label }) => (
+                  <div key={key} className="mp-form__field">
+                    <label className="mp-form__label">{label}</label>
+                    <input
+                      type="number"
+                      className="input"
+                      min="0"
+                      step="any"
+                      placeholder="0"
+                      value={form[key]}
+                      onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="mp-form__field">
+                <label className="mp-form__label">Date</label>
+                <input
+                  type="date"
+                  className="input"
+                  value={dateStr}
+                  onChange={(e) => setDateStr(e.target.value)}
+                />
+              </div>
+
+              <button type="submit" className="mp-form__submit" disabled={submitting}>
+                {submitting ? 'Logging...' : 'Log snack'}
+              </button>
+            </form>
+          ) : (
+            <>
+              <div className="mp-form__field">
+                <label className="mp-form__label">Date</label>
+                <input
+                  type="date"
+                  className="input"
+                  value={dateStr}
+                  onChange={(e) => setDateStr(e.target.value)}
+                />
+              </div>
+              <FoodSearch
+                onAdd={handleAddFromSearch}
+                submitLabel="Log snack"
+                adding={addingFood}
+              />
+            </>
+          )}
+        </div>
 
         <button
           className="mp-snack-sheet__goto"
@@ -1405,6 +1464,10 @@ function MealPlannerContent({ isProPlus = false }) {
 
   /* ── Delete single entry ─────────────────── */
   async function handleDeleteEntry(entryId) {
+    // Capture the entry before deletion so we can also clean up any
+    // corresponding food_log row if this meal was scheduled for today.
+    const target = entries.find((e) => e.id === entryId);
+
     const { error } = await supabase
       .from('meal_plan_entries')
       .delete()
@@ -1413,6 +1476,22 @@ function MealPlannerContent({ isProPlus = false }) {
     if (error) {
       toast.error('Failed to remove meal.');
       return;
+    }
+
+    // If the deleted meal was scheduled for today, unlog it from food_logs
+    // so the dashboard "Today's Meal Plan" Log state stays in sync.
+    if (target && userId && weekStart) {
+      const entryDate = addDays(weekStart, target.day_of_week);
+      const todayStr = fmtDate(new Date());
+      if (fmtDate(entryDate) === todayStr && target.meal_name) {
+        await supabase
+          .from('food_logs')
+          .delete()
+          .eq('user_id', userId)
+          .eq('logged_date', todayStr)
+          .eq('meal_name', target.meal_name)
+          .eq('notes', 'From meal planner');
+      }
     }
 
     setEntries((prev) => prev.filter((e) => e.id !== entryId));

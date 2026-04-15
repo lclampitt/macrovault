@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -125,69 +125,124 @@ function TodayMealPlan({ userId, onLogged }) {
   const [meals, setMeals] = useState(null); // null = loading, [] = empty
   const [logged, setLogged] = useState(new Set()); // set of meal_types already logged
   const [logging, setLogging] = useState(null); // meal_type currently being logged
+  const [planId, setPlanId] = useState(null);
 
-  // Fetch today's planned meals
+  // Reusable fetch — also used by realtime subscription + focus refetch
+  const fetchTodayMeals = useCallback(async () => {
+    if (!userId) return;
+    const today = new Date();
+    const dow = today.getDay();
+    const dayIdx = dow === 0 ? -1 : dow === 6 ? -1 : dow - 1;
+
+    if (dayIdx < 0) { setMeals([]); return; }
+
+    const { data: plans } = await supabase
+      .from('meal_plans')
+      .select('id, week_start')
+      .eq('user_id', userId)
+      .order('week_start', { ascending: false })
+      .limit(5);
+
+    if (!plans?.length) { setMeals([]); setPlanId(null); return; }
+
+    const todayStr = fmtDate(today);
+    const plan = plans.find((p) => {
+      const ws = p.week_start;
+      const wsDate = new Date(ws + 'T00:00:00');
+      const weDate = new Date(wsDate);
+      weDate.setDate(weDate.getDate() + 4);
+      const weStr = fmtDate(weDate);
+      return todayStr >= ws && todayStr <= weStr;
+    });
+
+    if (!plan) { setMeals([]); setPlanId(null); return; }
+
+    setPlanId(plan.id);
+
+    const { data: entries } = await supabase
+      .from('meal_plan_entries')
+      .select('meal_type, meal_name, calories, protein, carbs, fat')
+      .eq('plan_id', plan.id)
+      .eq('day_of_week', dayIdx);
+
+    // Normalize meal_type to lowercase so downstream comparisons are
+    // reliable regardless of how the row was originally inserted.
+    const normalized = (entries || []).map((e) => ({
+      ...e,
+      meal_type: (e.meal_type || '').toLowerCase(),
+    }));
+
+    setMeals(normalized);
+
+    // Check which meals are already logged today
+    if (normalized.length) {
+      const { data: logs } = await supabase
+        .from('food_logs')
+        .select('meal_name')
+        .eq('user_id', userId)
+        .eq('logged_date', todayStr)
+        .eq('notes', 'From meal planner');
+
+      const loggedNames = new Set((logs || []).map((l) => l.meal_name));
+      const alreadyLogged = new Set();
+      normalized.forEach((e) => { if (loggedNames.has(e.meal_name)) alreadyLogged.add(e.meal_type); });
+      setLogged(alreadyLogged);
+    } else {
+      setLogged(new Set());
+    }
+  }, [userId]);
+
+  // Initial load
   useEffect(() => {
     if (!userId) return;
-    let cancelled = false;
+    fetchTodayMeals();
+  }, [userId, fetchTodayMeals]);
 
-    (async () => {
-      const today = new Date();
-      const dow = today.getDay();
-      const dayIdx = dow === 0 ? -1 : dow === 6 ? -1 : dow - 1;
+  // Realtime subscription on meal_plan_entries — refetch on any change
+  // meal_plan_entries has no user_id column (linked via plan_id), so we
+  // filter by the current plan_id once we know it.
+  useEffect(() => {
+    if (!userId || !planId) return;
+    const channel = supabase
+      .channel(`meal_plan_entries_dashboard_${planId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'meal_plan_entries', filter: `plan_id=eq.${planId}` },
+        () => { fetchTodayMeals(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userId, planId, fetchTodayMeals]);
 
-      if (dayIdx < 0) { if (!cancelled) setMeals([]); return; }
+  // Also subscribe to meal_plans for this user so if a new plan is created
+  // (e.g. a new week), we pick it up.
+  useEffect(() => {
+    if (!userId) return;
+    const channel = supabase
+      .channel(`meal_plans_dashboard_${userId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'meal_plans', filter: `user_id=eq.${userId}` },
+        () => { fetchTodayMeals(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userId, fetchTodayMeals]);
 
-      const { data: plans } = await supabase
-        .from('meal_plans')
-        .select('id, week_start')
-        .eq('user_id', userId)
-        .order('week_start', { ascending: false })
-        .limit(5);
-
-      if (cancelled) return;
-      if (!plans?.length) { setMeals([]); return; }
-
-      const todayStr = fmtDate(today);
-      const plan = plans.find((p) => {
-        const ws = p.week_start;
-        const wsDate = new Date(ws + 'T00:00:00');
-        const weDate = new Date(wsDate);
-        weDate.setDate(weDate.getDate() + 4);
-        const weStr = fmtDate(weDate);
-        return todayStr >= ws && todayStr <= weStr;
-      });
-
-      if (!plan) { if (!cancelled) setMeals([]); return; }
-
-      const { data: entries } = await supabase
-        .from('meal_plan_entries')
-        .select('meal_type, meal_name, calories, protein, carbs, fat')
-        .eq('plan_id', plan.id)
-        .eq('day_of_week', dayIdx);
-
-      if (!cancelled) setMeals(entries || []);
-
-      // Check which meals are already logged today
-      if (entries?.length) {
-        const { data: logs } = await supabase
-          .from('food_logs')
-          .select('meal_name')
-          .eq('user_id', userId)
-          .eq('logged_date', todayStr)
-          .eq('notes', 'From meal planner');
-
-        if (!cancelled && logs?.length) {
-          const loggedNames = new Set(logs.map((l) => l.meal_name));
-          const alreadyLogged = new Set();
-          entries.forEach((e) => { if (loggedNames.has(e.meal_name)) alreadyLogged.add(e.meal_type); });
-          setLogged(alreadyLogged);
-        }
-      }
-    })();
-
-    return () => { cancelled = true; };
-  }, [userId]);
+  // Safety net: refetch when the tab becomes visible again. Handles the
+  // common case of navigating to meal planner and coming back.
+  useEffect(() => {
+    if (!userId) return;
+    function onVisible() {
+      if (document.visibilityState === 'visible') fetchTodayMeals();
+    }
+    window.addEventListener('focus', fetchTodayMeals);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', fetchTodayMeals);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [userId, fetchTodayMeals]);
 
   const handleLog = async (entry) => {
     if (logged.has(entry.meal_type) || logging) return;
@@ -239,6 +294,9 @@ function TodayMealPlan({ userId, onLogged }) {
 
       <div className="hd-meal-row">
         {MEAL_TYPES.map((type) => {
+          // meal_type is normalized to lowercase in fetchTodayMeals, so
+          // this strict equality is safe regardless of how the row was
+          // stored in the database.
           const entry = meals.find((m) => m.meal_type === type);
           const isLogged = logged.has(type);
           const isLogging = logging === type;

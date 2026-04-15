@@ -1,0 +1,312 @@
+/* ─────────────────────────────────────────────
+   Shared FoodSearch component styles.
+   Used by the MealPlanner SnackSheet and
+   the Goal Planner nutrition logger.
+   ───────────────────────────────────────────── */
+
+.fs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── SEARCH INPUT ─────────────────────────── */
+.fs-search {
+  position: relative;
+}
+
+.fs-search__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.fs-search .fs-search__input {
+  padding-left: 36px;
+}
+
+/* ── LOADING / EMPTY ──────────────────────── */
+.fs__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.fs__spinner {
+  color: var(--accent);
+  animation: fs-spin 1s linear infinite;
+}
+
+@keyframes fs-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.fs__empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+
+/* ── RESULTS LIST ─────────────────────────── */
+.fs-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.fs-result {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.fs-result:hover {
+  background: var(--bg-hover, var(--bg-surface));
+  border-color: var(--accent);
+}
+
+.fs-result__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.fs-result__brand {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fs-result__name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.fs-result__serving {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.fs-result__macros {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.fs-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--bg-elevated, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ── DETAIL VIEW ──────────────────────────── */
+.fs-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fs-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color var(--transition-fast);
+}
+
+.fs-detail__back:hover {
+  color: var(--accent);
+}
+
+.fs-detail__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fs-detail__brand {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fs-detail__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.fs-detail__subtext {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.fs-detail__inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.fs-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fs-field__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fs-detail__macros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 12px;
+}
+
+.fs-detail__macro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.fs-detail__macro-val {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.1;
+}
+
+.fs-detail__macro-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── SUBMIT BUTTON ────────────────────────── */
+.fs-submit {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.fs-submit:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.fs-submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.fs-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Reusable tab bar ─────────────────────── */
+.fs-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+
+.fs-tabs__tab {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  text-align: center;
+}
+
+.fs-tabs__tab:hover {
+  color: var(--text-secondary);
+}
+
+.fs-tabs__tab--active {
+  background: var(--accent);
+  color: #fff;
+}

@@ -8,6 +8,7 @@ import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import { useTheme } from '../../hooks/useTheme';
 import Y2KDialog from '../ui/Y2KDialog';
+import FoodSearch from '../FoodSearch/FoodSearch';
 import '../../styles/goalplanner.css';
 
 /* Stagger container for card entrance */
@@ -86,6 +87,8 @@ function NutritionLogger({ userId }) {
   const [form,        setForm]        = useState({ calories: '', protein: '', carbs: '', fat: '', meal_name: '' });
   const [submitting,  setSubmitting]  = useState(false);
   const [deletingId,  setDeletingId]  = useState(null);
+  const [logTab,      setLogTab]      = useState('manual'); // 'manual' | 'food'
+  const [addingFood,  setAddingFood]  = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -140,6 +143,22 @@ function NutritionLogger({ userId }) {
     toast.success('Entry removed');
   }
 
+  async function handleAddFromSearch(food) {
+    setAddingFood(true);
+    const { error } = await supabase.from('food_logs').insert({
+      user_id:     userId,
+      logged_date: today,
+      meal_name:   food.meal_name,
+      calories:    Number(food.calories) || 0,
+      protein_g:   Number(food.protein)  || 0,
+      carbs_g:     Number(food.carbs)    || 0,
+      fat_g:       Number(food.fat)      || 0,
+    });
+    setAddingFood(false);
+    if (error) { toast.error('Failed to log food.'); return; }
+    toast.success('Entry logged');
+  }
+
   const totals = useMemo(() => entries.reduce((acc, e) => ({
     calories: acc.calories + (Number(e.calories)  || 0),
     protein:  acc.protein  + (Number(e.protein_g) || 0),
@@ -152,45 +171,71 @@ function NutritionLogger({ userId }) {
       {/* Card 1 — Log form */}
       <div className="gp-log-card">
         <p className="gp-section-label">Log today's nutrition</p>
-        <form onSubmit={handleAdd} className="gp-log-form">
-          <div className="gp-macro-grid">
-            {[
-              { key: 'calories', label: 'Calories (kcal)' },
-              { key: 'protein',  label: 'Protein (g)' },
-              { key: 'carbs',    label: 'Carbs (g)' },
-              { key: 'fat',      label: 'Fat (g)' },
-            ].map(({ key, label }) => (
-              <div key={key} className="gp-field">
-                <label className="gp-field__label">{label}</label>
-                <input
-                  type="number"
-                  className="input gp-log-input"
-                  min="0"
-                  step="any"
-                  placeholder="0"
-                  value={form[key]}
-                  onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                />
-              </div>
-            ))}
-          </div>
-          <input
-            type="text"
-            className="input gp-log-input gp-log-meal-input"
-            placeholder="e.g. Breakfast, Lunch, Snack"
-            value={form.meal_name}
-            onChange={(e) => setForm((f) => ({ ...f, meal_name: e.target.value }))}
-            maxLength={80}
+
+        {/* Tabs — Manual Entry / Food Search */}
+        <div className="fs-tabs">
+          {[
+            { key: 'manual', label: 'Manual Entry' },
+            { key: 'food', label: 'Food Search' },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              className={`fs-tabs__tab ${logTab === key ? 'fs-tabs__tab--active' : ''}`}
+              onClick={() => setLogTab(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {logTab === 'manual' ? (
+          <form onSubmit={handleAdd} className="gp-log-form">
+            <div className="gp-macro-grid">
+              {[
+                { key: 'calories', label: 'Calories (kcal)' },
+                { key: 'protein',  label: 'Protein (g)' },
+                { key: 'carbs',    label: 'Carbs (g)' },
+                { key: 'fat',      label: 'Fat (g)' },
+              ].map(({ key, label }) => (
+                <div key={key} className="gp-field">
+                  <label className="gp-field__label">{label}</label>
+                  <input
+                    type="number"
+                    className="input gp-log-input"
+                    min="0"
+                    step="any"
+                    placeholder="0"
+                    value={form[key]}
+                    onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                  />
+                </div>
+              ))}
+            </div>
+            <input
+              type="text"
+              className="input gp-log-input gp-log-meal-input"
+              placeholder="e.g. Breakfast, Lunch, Snack"
+              value={form.meal_name}
+              onChange={(e) => setForm((f) => ({ ...f, meal_name: e.target.value }))}
+              maxLength={80}
+            />
+            <motion.button
+              type="submit"
+              className="btn gp-log-btn"
+              disabled={submitting}
+              whileTap={{ scale: 0.97 }}
+            >
+              {submitting ? 'Logging…' : 'Add entry'}
+            </motion.button>
+          </form>
+        ) : (
+          <FoodSearch
+            onAdd={handleAddFromSearch}
+            submitLabel="Log entry"
+            adding={addingFood}
           />
-          <motion.button
-            type="submit"
-            className="btn gp-log-btn"
-            disabled={submitting}
-            whileTap={{ scale: 0.97 }}
-          >
-            {submitting ? 'Logging…' : 'Add entry'}
-          </motion.button>
-        </form>
+        )}
       </div>
 
       {/* Card 2 — Today's log */}
