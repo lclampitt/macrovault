@@ -399,87 +399,102 @@
 }
 
 /* ── Mobile: compact nutrition logger cards ──────── */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .gp-log-card {
-    padding: 14px 16px;
-    gap: 10px;
-    border-radius: var(--radius-md);
+    padding: 12px 14px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
   }
 
   .gp-log-card .gp-section-label {
-    font-size: 11px;
+    font-size: 10px !important;
+    letter-spacing: 0.05em;
   }
 
   .gp-log-card .fs-tabs {
-    padding: 3px;
-    margin-bottom: 0;
+    padding: 2px !important;
+    margin-bottom: 0 !important;
+    border-radius: 8px !important;
   }
 
   .gp-log-card .fs-tabs__tab {
-    padding: 6px 10px;
-    font-size: 11px;
+    padding: 5px 8px !important;
+    font-size: 10px !important;
+    border-radius: 6px !important;
+  }
+
+  .gp-log-card .gp-log-form {
+    gap: 0 !important;
   }
 
   .gp-log-card .gp-macro-grid {
-    gap: 8px 10px;
+    gap: 6px 8px !important;
+  }
+
+  .gp-log-card .gp-field {
+    gap: 2px !important;
   }
 
   .gp-log-card .gp-field__label {
-    font-size: 11px;
+    font-size: 10px !important;
   }
 
-  .gp-log-input {
-    padding: 8px 10px;
-    font-size: 13px;
-    min-height: 36px;
+  .gp-log-card .gp-log-input {
+    padding: 6px 9px !important;
+    font-size: 12px !important;
+    min-height: 32px !important;
+    border-radius: 6px !important;
   }
 
-  .gp-log-meal-input {
-    margin-top: 6px;
+  .gp-log-card .gp-log-meal-input {
+    margin-top: 6px !important;
   }
 
-  .gp-log-btn {
-    margin-top: 8px;
-    padding: 7px 14px;
-    font-size: 12px;
+  .gp-log-card .gp-log-btn {
+    margin-top: 8px !important;
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+    align-self: flex-start !important;
   }
 
   /* Today's log list card */
-  .gp-log-entries {
-    gap: 6px;
-    min-height: 40px;
+  .gp-log-card .gp-log-entries {
+    gap: 5px !important;
+    min-height: 32px !important;
   }
 
-  .gp-log-entry {
-    padding: 7px 10px;
-    gap: 8px;
+  .gp-log-card .gp-log-entry {
+    padding: 6px 9px !important;
+    gap: 8px !important;
+    border-radius: 6px !important;
   }
 
-  .gp-log-entry__label {
-    font-size: 12px;
+  .gp-log-card .gp-log-entry__label {
+    font-size: 11px !important;
   }
 
-  .gp-log-entry__time,
-  .gp-log-entry__macros {
-    font-size: 10px;
+  .gp-log-card .gp-log-entry__time,
+  .gp-log-card .gp-log-entry__macros {
+    font-size: 9px !important;
   }
 
-  .gp-log-entry__cal {
-    font-size: 12px;
+  .gp-log-card .gp-log-entry__cal {
+    font-size: 11px !important;
   }
 
-  .gp-log-empty {
-    font-size: 12px;
-    padding: 14px 0;
+  .gp-log-card .gp-log-empty {
+    font-size: 11px !important;
+    padding: 12px 0 !important;
   }
 
-  .gp-log-totals {
-    padding-top: 9px;
-    font-size: 12px;
+  .gp-log-card .gp-log-totals {
+    padding-top: 8px !important;
+    font-size: 11px !important;
   }
 
-  .gp-log-totals__label {
-    font-size: 10px;
+  .gp-log-card .gp-log-totals__label {
+    font-size: 9px !important;
   }
 }
 
