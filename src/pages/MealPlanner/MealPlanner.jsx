@@ -187,6 +187,15 @@ function SlotPanel({
   const dayDate = addDays(weekStart, DAY_NAMES.indexOf(slot.day));
   const dayLabel = `${slot.day}, ${fmtShort(dayDate)}`;
 
+  /* Lock body scroll while panel is open so only the panel scrolls */
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   // Remaining macros for the day
   const dayEntries = entries.filter(
     (e) => e.day_of_week === DAY_NAMES.indexOf(slot.day)

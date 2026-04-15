@@ -611,6 +611,8 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mp-panel__header {
@@ -1470,8 +1472,19 @@
   .mp-desktop { display: none !important; }
   .mp-mobile  { display: flex; flex-direction: column; }
 
+  .mp-panel__overlay {
+    z-index: 1500;
+  }
+
   .mp-panel {
     width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    z-index: 1501;
+    border-left: none;
+    padding-top: env(safe-area-inset-top);
   }
 
   .mp-panel__header {
