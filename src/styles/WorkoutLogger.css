@@ -1311,19 +1311,57 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  /* While framer-motion reorders the card, hint the compositor and
+     make sure the card visually sits above siblings during drag. */
+  user-select: none;
+}
+
+.wlm-session__ex-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .wlm-ex-block__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   padding: 12px 14px 0;
 }
 
+.wlm-ex-block__drag {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: grab;
+  padding: 4px;
+  margin-left: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.wlm-ex-block__drag:active {
+  cursor: grabbing;
+  color: var(--accent-light);
+  background: var(--bg-base);
+}
+
 .wlm-ex-block__name {
+  flex: 1;
+  min-width: 0;
   font-size: 15px;
   font-weight: 600;
   color: var(--accent-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .wlm-ex-block__remove {
@@ -1548,6 +1586,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 16px 20px 12px;
   flex-shrink: 0;
 }
@@ -1557,6 +1596,7 @@
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
+  flex: 1;
 }
 
 .wlm-search__header button {
@@ -1566,6 +1606,45 @@
   cursor: pointer;
   padding: 4px;
   display: flex;
+}
+
+/* Mobile-only back arrow on exercise search sheet (hidden on desktop) */
+.wlm-search__back {
+  display: none !important;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 6px;
+  margin: -6px 0 -6px -6px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.wlm-search__back:hover,
+.wlm-search__back:active {
+  color: var(--accent-light);
+  background: var(--bg-surface);
+}
+
+@media (max-width: 767px) {
+  .wlm-search__back {
+    display: inline-flex !important;
+    flex-shrink: 0;
+  }
+  .wlm-search__header .wlm-search__close {
+    display: none !important;
+  }
+  .wlm-search__header h3 {
+    text-align: left;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .wlm-search__input-row {

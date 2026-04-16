@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
 import {
   Lock, Trash2, Dumbbell, Bookmark, BookmarkCheck, Copy,
-  BookmarkPlus, X, Star, Play, Clock, Search, Check, Plus, ChevronRight,
+  BookmarkPlus, X, Star, Play, Clock, Search, Check, Plus, ChevronRight, ChevronLeft,
+  GripVertical,
 } from 'lucide-react';
 import posthog from '../../lib/posthog';
 import { supabase } from '../../supabaseClient';
@@ -12,6 +13,115 @@ import { useTheme } from '../../hooks/useTheme';
 import { appToast as toast } from '../../utils/toast';
 import exerciseDB from '../../data/exercises.json';
 import '../../styles/WorkoutLogger.css';
+
+/* Unique id generator for session exercises. Used to give each row a
+   stable identity so drag-to-reorder can remap per-exercise state
+   (completedSets) without relying on mutable array indexes. */
+let _exUidCounter = 0;
+const newExId = () => `ex-${Date.now()}-${++_exUidCounter}`;
+
+/**
+ * One exercise card rendered as a Framer Motion Reorder.Item. Drag is
+ * gated to the grip handle via `dragListener={false}` + useDragControls
+ * so tapping the weight/reps inputs never starts a drag.
+ */
+function ReorderableExerciseBlock({
+  ex,
+  exIdx,
+  completedSets,
+  updateSessionSet,
+  toggleSetComplete,
+  addSetToSession,
+  removeSessionExercise,
+  handleInputFocus,
+  handleInputKeyDown,
+}) {
+  const controls = useDragControls();
+  return (
+    <Reorder.Item
+      value={ex}
+      dragListener={false}
+      dragControls={controls}
+      as="div"
+      className="wlm-ex-block"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="wlm-ex-block__header">
+        <button
+          type="button"
+          className="wlm-ex-block__drag"
+          aria-label="Drag to reorder"
+          onPointerDown={(e) => controls.start(e)}
+          /* Touch-action none prevents iOS scrolling while the user
+             long-presses the handle. */
+          style={{ touchAction: 'none' }}
+        >
+          <GripVertical size={16} />
+        </button>
+        <span className="wlm-ex-block__name">{ex.name}</span>
+        <button
+          type="button"
+          className="wlm-ex-block__remove"
+          onClick={() => removeSessionExercise(exIdx)}
+        >
+          <Trash2 size={14} />
+        </button>
+      </div>
+      <div className="wlm-ex-block__table">
+        <div className="wlm-ex-block__thead">
+          <span className="wlm-ex-col wlm-ex-col--set">SET</span>
+          <span className="wlm-ex-col wlm-ex-col--weight">LBS</span>
+          <span className="wlm-ex-col wlm-ex-col--reps">REPS</span>
+          <span className="wlm-ex-col wlm-ex-col--check" />
+        </div>
+        {ex.sets.map((set, setIdx) => {
+          const isDone = !!completedSets[`${exIdx}-${setIdx}`];
+          return (
+            <div key={setIdx} className={`wlm-ex-row ${isDone ? 'wlm-ex-row--done' : ''}`}>
+              <span className="wlm-ex-col wlm-ex-col--set">{setIdx + 1}</span>
+              <input
+                type="number"
+                inputMode="decimal"
+                className="wlm-ex-input"
+                value={set.weight}
+                onChange={(e) => updateSessionSet(exIdx, setIdx, 'weight', e.target.value)}
+                onFocus={handleInputFocus}
+                onKeyDown={handleInputKeyDown}
+                placeholder="—"
+              />
+              <input
+                type="number"
+                inputMode="numeric"
+                className="wlm-ex-input"
+                value={set.reps}
+                onChange={(e) => updateSessionSet(exIdx, setIdx, 'reps', e.target.value)}
+                onFocus={handleInputFocus}
+                onKeyDown={handleInputKeyDown}
+                placeholder="—"
+              />
+              <button
+                type="button"
+                className={`wlm-check-btn ${isDone ? 'wlm-check-btn--done' : ''}`}
+                onClick={() => toggleSetComplete(exIdx, setIdx)}
+              >
+                <Check size={16} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <button
+        type="button"
+        className="wlm-ex-block__add-set"
+        onClick={() => addSetToSession(exIdx)}
+      >
+        + Add Set
+      </button>
+    </Reorder.Item>
+  );
+}
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
@@ -88,6 +198,8 @@ export default function WorkoutLogger() {
   const [templateUpdateSheet, setTemplateUpdateSheet] = useState(null); // { templateId, templateName, changes, exerciseData }
   const [saveNewTplMode, setSaveNewTplMode] = useState(false);
   const [saveNewTplName, setSaveNewTplName] = useState('');
+  const [isFinishing, setIsFinishing] = useState(false);
+  const finishInFlight = useRef(false);
   const [saveNewTplError, setSaveNewTplError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [workoutDetailSheet, setWorkoutDetailSheet] = useState(null);
@@ -461,6 +573,20 @@ export default function WorkoutLogger() {
     }
   }, []);
 
+  /* Lock page scroll while the exercise-search sheet is open so the
+     sheet opens at the top (not scrolled to wherever the session was
+     scrolled). We also scroll the window to 0 so iOS reveals the
+     fresh sheet's search bar instead of the page's prior position. */
+  useEffect(() => {
+    if (!exerciseSearchOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [exerciseSearchOpen]);
+
   // ── Blur input on Enter (numeric keyboard "Done") ──
   const handleInputKeyDown = useCallback((e) => {
     if (e.key === 'Enter' || e.key === 'Done') {
@@ -493,6 +619,7 @@ export default function WorkoutLogger() {
 
   const startSessionFromTemplate = (template) => {
     const exs = (template.exercises || []).map((ex) => ({
+      _id: newExId(),
       name: ex.name,
       sets: Array.isArray(ex.sets)
         ? ex.sets.map((s) => ({ weight: s.weight || '', reps: s.reps || '', notes: '' }))
@@ -513,10 +640,29 @@ export default function WorkoutLogger() {
   const addExerciseToSession = (exercise) => {
     setSessionExercises((prev) => [
       ...prev,
-      { name: exercise.name, sets: [{ weight: '', reps: '', notes: '' }] },
+      { _id: newExId(), name: exercise.name, sets: [{ weight: '', reps: '', notes: '' }] },
     ]);
     setExerciseSearchOpen(false);
     setExerciseSearchQuery('');
+  };
+
+  /* Drag-to-reorder handler. Because completedSets is keyed by the
+     old exercise index (`${exIdx}-${setIdx}`), we remap those keys to
+     the new indexes using each row's stable `_id`. */
+  const handleReorderExercises = (newOrder) => {
+    const newIndexById = new Map(newOrder.map((ex, i) => [ex._id, i]));
+    setCompletedSets((prev) => {
+      const remapped = {};
+      Object.entries(prev).forEach(([key, val]) => {
+        const [ei, si] = key.split('-').map(Number);
+        const oldEx = sessionExercises[ei];
+        if (!oldEx) return;
+        const newEi = newIndexById.get(oldEx._id);
+        if (newEi != null) remapped[`${newEi}-${si}`] = val;
+      });
+      return remapped;
+    });
+    setSessionExercises(newOrder);
   };
 
   const addSetToSession = (exIdx) => {
@@ -566,9 +712,21 @@ export default function WorkoutLogger() {
   };
 
   const finishSession = async () => {
+    /* iOS quirk: when an input is focused (weight/reps), tapping the
+       Finish button blurs the input, dismisses the keyboard, and the
+       resulting reflow can cancel the synthetic click. We also guard
+       via a ref+state so double-taps and the simultaneous
+       onTouchEnd+onClick wiring can't submit twice. */
+    if (finishInFlight.current) return;
     if (sessionExercises.length === 0) {
       toast.error('Add at least one exercise before finishing.');
       return;
+    }
+    finishInFlight.current = true;
+    setIsFinishing(true);
+    // Blur any focused input so iOS dismisses the keyboard predictably
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
     }
     const name = sessionName.trim() || 'Quick Workout';
     const duration = sessionTimer;
@@ -585,7 +743,7 @@ export default function WorkoutLogger() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(workoutData),
       });
-      if (res.status === 403) { triggerUpgrade('workouts'); return; }
+      if (res.status === 403) { triggerUpgrade('workouts'); finishInFlight.current = false; setIsFinishing(false); return; }
       if (!res.ok) throw new Error(await res.text());
       posthog.capture('workout_logged', { exercise_count: sessionExercises.length, duration_seconds: duration });
 
@@ -627,6 +785,9 @@ export default function WorkoutLogger() {
       fetchWorkouts();
     } catch (err) {
       toast.error(`Error: ${err.message}`);
+    } finally {
+      finishInFlight.current = false;
+      setIsFinishing(false);
     }
   };
 
@@ -1567,11 +1728,14 @@ export default function WorkoutLogger() {
                 placeholder="Workout name…"
               />
               <motion.button
+                type="button"
                 className="wlm-session__finish-btn"
                 onClick={finishSession}
+                onTouchEnd={(e) => { e.preventDefault(); finishSession(); }}
+                disabled={isFinishing}
                 whileTap={{ scale: 0.97 }}
               >
-                Finish
+                {isFinishing ? 'Saving…' : 'Finish'}
               </motion.button>
             </div>
 
@@ -1596,67 +1760,28 @@ export default function WorkoutLogger() {
                   <p>Tap "Add Exercise" to get started</p>
                 </div>
               )}
-              {sessionExercises.map((ex, exIdx) => (
-                <motion.div
-                  key={exIdx}
-                  className="wlm-ex-block"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="wlm-ex-block__header">
-                    <span className="wlm-ex-block__name">{ex.name}</span>
-                    <button className="wlm-ex-block__remove" onClick={() => removeSessionExercise(exIdx)}>
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                  <div className="wlm-ex-block__table">
-                    <div className="wlm-ex-block__thead">
-                      <span className="wlm-ex-col wlm-ex-col--set">SET</span>
-                      <span className="wlm-ex-col wlm-ex-col--weight">LBS</span>
-                      <span className="wlm-ex-col wlm-ex-col--reps">REPS</span>
-                      <span className="wlm-ex-col wlm-ex-col--check" />
-                    </div>
-                    {ex.sets.map((set, setIdx) => {
-                      const isDone = !!completedSets[`${exIdx}-${setIdx}`];
-                      return (
-                        <div key={setIdx} className={`wlm-ex-row ${isDone ? 'wlm-ex-row--done' : ''}`}>
-                          <span className="wlm-ex-col wlm-ex-col--set">{setIdx + 1}</span>
-                          <input
-                            type="number"
-                            inputMode="decimal"
-                            className="wlm-ex-input"
-                            value={set.weight}
-                            onChange={(e) => updateSessionSet(exIdx, setIdx, 'weight', e.target.value)}
-                            onFocus={handleInputFocus}
-                            onKeyDown={handleInputKeyDown}
-                            placeholder="—"
-                          />
-                          <input
-                            type="number"
-                            inputMode="numeric"
-                            className="wlm-ex-input"
-                            value={set.reps}
-                            onChange={(e) => updateSessionSet(exIdx, setIdx, 'reps', e.target.value)}
-                            onFocus={handleInputFocus}
-                            onKeyDown={handleInputKeyDown}
-                            placeholder="—"
-                          />
-                          <button
-                            className={`wlm-check-btn ${isDone ? 'wlm-check-btn--done' : ''}`}
-                            onClick={() => toggleSetComplete(exIdx, setIdx)}
-                          >
-                            <Check size={16} />
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <button className="wlm-ex-block__add-set" onClick={() => addSetToSession(exIdx)}>
-                    + Add Set
-                  </button>
-                </motion.div>
-              ))}
+              <Reorder.Group
+                axis="y"
+                values={sessionExercises}
+                onReorder={handleReorderExercises}
+                as="div"
+                className="wlm-session__ex-list"
+              >
+                {sessionExercises.map((ex, exIdx) => (
+                  <ReorderableExerciseBlock
+                    key={ex._id}
+                    ex={ex}
+                    exIdx={exIdx}
+                    completedSets={completedSets}
+                    updateSessionSet={updateSessionSet}
+                    toggleSetComplete={toggleSetComplete}
+                    addSetToSession={addSetToSession}
+                    removeSessionExercise={removeSessionExercise}
+                    handleInputFocus={handleInputFocus}
+                    handleInputKeyDown={handleInputKeyDown}
+                  />
+                ))}
+              </Reorder.Group>
 
               {/* Add Exercise button */}
               <motion.button
@@ -1667,13 +1792,19 @@ export default function WorkoutLogger() {
                 <Plus size={18} /> Add Exercise
               </motion.button>
 
-              {/* Bottom Finish button */}
+              {/* Bottom Finish button — fires on touchend (before iOS's
+                  focus-blur reflow can cancel the subsequent click) and
+                  also on click for mouse/keyboard users. finishSession
+                  is idempotent via the finishInFlight ref guard. */}
               <motion.button
+                type="button"
                 className="wlm-finish-btn-bottom"
                 onClick={finishSession}
+                onTouchEnd={(e) => { e.preventDefault(); finishSession(); }}
+                disabled={isFinishing}
                 whileTap={{ scale: 0.97 }}
               >
-                Finish Workout
+                {isFinishing ? 'Saving…' : 'Finish Workout'}
               </motion.button>
 
               {/* Discard button */}
@@ -1702,8 +1833,16 @@ export default function WorkoutLogger() {
                 transition={{ type: 'spring', damping: 28, stiffness: 320 }}
               >
                 <div className="wlm-search__header">
+                  <button
+                    type="button"
+                    className="wlm-search__back"
+                    onClick={() => setExerciseSearchOpen(false)}
+                    aria-label="Back"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
                   <h3>Add Exercise</h3>
-                  <button onClick={() => setExerciseSearchOpen(false)}><X size={20} /></button>
+                  <button className="wlm-search__close" onClick={() => setExerciseSearchOpen(false)}><X size={20} /></button>
                 </div>
                 <div className="wlm-search__input-row">
                   <Search size={16} />
