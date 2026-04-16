@@ -425,7 +425,11 @@
 
 .hd-donut-center {
   position: absolute;
-  top: 50%;
+  /* Gauge geometry: viewBox "10 0 220 120", cx=120, cy=110. The arc
+     pivots at cy (91.6% of height), so centering at 50% lands the
+     text too high above the arc. Anchor near cy and nudge up slightly
+     so the label sits nicely inside the half-circle opening. */
+  top: 78%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
