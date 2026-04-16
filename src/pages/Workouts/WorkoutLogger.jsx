@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
 import {
   Lock, Trash2, Dumbbell, Bookmark, BookmarkCheck, Copy,
@@ -1816,11 +1817,16 @@ export default function WorkoutLogger() {
           </div>
         )}
 
-        {/* ── EXERCISE SEARCH SHEET ── */}
+        {/* ── EXERCISE SEARCH SHEET ──
+            Portaled to document.body so the fixed-position overlay
+            escapes the app shell's transform/containing-block and
+            actually covers the mobile topbar. Same pattern used for
+            the meal planner slot panel. */}
+        {createPortal(
         <AnimatePresence>
           {exerciseSearchOpen && (
             <motion.div
-              className="wlm-overlay"
+              className="wlm-overlay wlm-overlay--search"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -1904,7 +1910,8 @@ export default function WorkoutLogger() {
               </motion.div>
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body)}
 
         {/* ── TEMPLATE UPDATE SHEET ── */}
         <AnimatePresence>

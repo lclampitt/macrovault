@@ -1573,13 +1573,37 @@
   color: var(--error, #ef4444);
 }
 
-/* ── EXERCISE SEARCH SHEET ─────────────── */
+/* ── EXERCISE SEARCH SHEET ───────────────
+   Rendered in a react-dom portal on document.body, so the overlay
+   truly covers the whole viewport (including the mobile topbar)
+   instead of being trapped inside the app shell's containing block. */
+.wlm-overlay--search {
+  z-index: 1500;
+  align-items: stretch;
+}
+
 .wlm-search {
   width: 100%;
   height: 100%;
   background: var(--bg-base);
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .wlm-overlay--search {
+    z-index: 1500;
+  }
+  .wlm-search {
+    /* Fill the viewport edge-to-edge on mobile and pad the header
+       past the iOS status bar so the back arrow is always visible. */
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 .wlm-search__header {
