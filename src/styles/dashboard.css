@@ -387,30 +387,40 @@
   gap: 12px;
 }
 
-.hd-donut-chart {
+/* ── Half-circle gauge ───────────────────────────────────────
+   viewBox is "10 0 220 120" so the gauge fills its wrapper edge
+   to edge. Segments draw in left-to-right via stroke-dasharray
+   with a staggered delay (set inline by React as a CSS var). */
+.hd-gauge {
   position: relative;
-  width: 130px;
-  height: 130px;
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 220 / 120;
 }
 
-/* Let the lifted active slice extend slightly outside the 130×130
-   viewport without being clipped by the SVG's default overflow. */
-.hd-donut-chart svg {
+.hd-gauge__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
   overflow: visible;
 }
 
-/* The active slice wrapper: Recharts swaps this <g> in on hover via
-   activeShape. Since the element mounts fresh (nothing to transition
-   from), we use a keyframe to ease the outward translate along the
-   slice's angular midpoint — dx/dy are provided as CSS vars from the
-   React component so each slice lifts in its own direction. */
-.hd-donut-active-slice {
-  animation: hd-donut-slice-lift 180ms cubic-bezier(0.4, 0, 0.2, 1) both;
+.hd-gauge__segment {
+  stroke-dasharray: var(--dash-length);
+  stroke-dashoffset: var(--dash-length);
+  animation: hd-gauge-draw 600ms cubic-bezier(0.4, 0, 0.2, 1) var(--draw-delay, 0ms) forwards;
+  opacity: 1;
+  transition: opacity 150ms ease;
+  cursor: pointer;
 }
 
-@keyframes hd-donut-slice-lift {
-  from { transform: translate(0, 0); }
-  to   { transform: translate(var(--slice-dx, 0), var(--slice-dy, 0)); }
+.hd-gauge__segment--dim {
+  opacity: 0.75;
+}
+
+@keyframes hd-gauge-draw {
+  from { stroke-dashoffset: var(--dash-length); }
+  to   { stroke-dashoffset: 0; }
 }
 
 .hd-donut-center {
@@ -441,8 +451,8 @@
 
 .hd-donut-center__val {
   display: block;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 600;
   color: var(--text-primary);
   line-height: 1;
 }
@@ -451,7 +461,7 @@
   display: block;
   font-size: 10px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 /* Macro legend */

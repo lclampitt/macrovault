@@ -5,9 +5,6 @@ import {
   TrendingUp, CalendarDays, ChevronLeft, ChevronRight,
   UtensilsCrossed, Dumbbell, Check, PieChart as PieChartIcon,
 } from 'lucide-react';
-import {
-  ResponsiveContainer, PieChart, Pie, Cell, Sector,
-} from 'recharts';
 import posthog from '../lib/posthog';
 import { getStreak, invalidateStreakCache } from '../lib/streak';
 import { usePlan } from '../hooks/usePlan';
@@ -425,7 +422,7 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
     { name: 'Remaining', value: remaining || 1, color: 'rgba(255,255,255,0.07)', isRemaining: true, remainingKcal: remaining },
   ].filter((s) => s.value > 0);
 
-  const handlePieEnter = (_, index) => {
+  const handleSegmentEnter = (index) => {
     setActiveIdx(index);
     const d = donutData[index];
     setDonutTip({
@@ -438,18 +435,18 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
     });
   };
 
-  const handlePieLeave = () => {
+  const handleGaugeLeave = () => {
     setActiveIdx(null);
     setDonutTip(null);
   };
 
-  const handleDonutMouseMove = (e) => {
+  const handleGaugeMouseMove = (e) => {
     setDonutTip((prev) => prev ? { ...prev, x: e.clientX + 12, y: e.clientY - 12 } : null);
   };
 
   const centerLabel = range === 'today' ? 'kcal today' : 'kcal avg/day';
 
-  /* Hovered-slice data drives the center cross-fade */
+  /* Hovered-segment data drives the center cross-fade */
   const activeSlice = activeIdx != null ? donutData[activeIdx] : null;
   const activeCenterVal = activeSlice
     ? (activeSlice.isRemaining ? `${activeSlice.remainingKcal}` : `${activeSlice.grams}g`)
@@ -461,30 +458,42 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
     ? (activeSlice.isRemaining ? 'var(--warning, #EF9F27)' : activeSlice.color)
     : undefined;
 
-  /* Active-slice renderer:
-     - Restores the outward-lift hover that existed before the polish
-       edits. The slice translates outward along its angular midpoint
-       (cos/sin midAngle; sin is negated for SVG's y-down axis).
-     - Recharts swaps this element in on hover via activeShape, so we
-       can't use CSS `transition` (there's no prior state). Instead we
-       run a 180ms cubic-bezier keyframe that eases the translate from
-       0 to (dx, dy) as the element mounts — the lift now arrives with
-       a curve instead of popping instantly. */
-  const SLICE_LIFT_PX = 6;
-  const RADIAN = Math.PI / 180;
-  const renderActiveSlice = (props) => {
-    const midAngle = (props.startAngle + props.endAngle) / 2;
-    const dx = Math.cos(midAngle * RADIAN) * SLICE_LIFT_PX;
-    const dy = -Math.sin(midAngle * RADIAN) * SLICE_LIFT_PX;
-    return (
-      <g
-        className="hd-donut-active-slice"
-        style={{ '--slice-dx': `${dx}px`, '--slice-dy': `${dy}px` }}
-      >
-        <Sector {...props} />
-      </g>
-    );
-  };
+  /* ── Half-circle gauge geometry ──────────────────────────────
+     We draw a 180° arc from (cx-r, cy) on the left, over the top,
+     to (cx+r, cy) on the right. Each macro takes an angular slice
+     proportional to its share of total kcal, with small gaps in
+     between. Stroke-dasharray/offset drives the draw-on animation;
+     keying the inner <g> on `range` remounts the paths so the
+     animation replays on tab switch. */
+  const GAUGE_CX = 120;
+  const GAUGE_CY = 110;
+  const GAUGE_R = 90;
+  const GAUGE_STROKE = 20;
+  const GAUGE_GAP_DEG = 2.5;
+
+  const segments = useMemo(() => {
+    const total = donutData.reduce((s, d) => s + d.value, 0);
+    if (total <= 0) return [];
+    const gapCount = Math.max(donutData.length - 1, 0);
+    const availableAngle = Math.max(180 - gapCount * GAUGE_GAP_DEG, 0);
+    let cursor = 180; // start at the left end (x = cx - r)
+    return donutData.map((d) => {
+      const span = (d.value / total) * availableAngle;
+      const startDeg = cursor;
+      const endDeg = cursor - span;
+      cursor = endDeg - GAUGE_GAP_DEG;
+      const sRad = (startDeg * Math.PI) / 180;
+      const eRad = (endDeg * Math.PI) / 180;
+      const sx = GAUGE_CX + GAUGE_R * Math.cos(sRad);
+      const sy = GAUGE_CY - GAUGE_R * Math.sin(sRad);
+      const ex = GAUGE_CX + GAUGE_R * Math.cos(eRad);
+      const ey = GAUGE_CY - GAUGE_R * Math.sin(eRad);
+      const largeArc = span > 180 ? 1 : 0;
+      const pathD = `M ${sx.toFixed(3)} ${sy.toFixed(3)} A ${GAUGE_R} ${GAUGE_R} 0 ${largeArc} 1 ${ex.toFixed(3)} ${ey.toFixed(3)}`;
+      const length = GAUGE_R * (span * Math.PI) / 180;
+      return { ...d, d: pathD, length };
+    });
+  }, [donutData]);
 
   return (
     <motion.div className="hd-card" variants={itemVariants}>
@@ -514,30 +523,35 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
           </button>
         </div>
       </div>
-      <div className="hd-donut-wrap" onMouseMove={handleDonutMouseMove} onMouseLeave={handlePieLeave}>
-        <div className="hd-donut-chart">
-          <ResponsiveContainer width={130} height={130}>
-            <PieChart>
-              <Pie
-                data={donutData}
-                dataKey="value"
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={60}
-                strokeWidth={0}
-                paddingAngle={1}
-                activeIndex={activeIdx}
-                activeShape={renderActiveSlice}
-                onMouseEnter={handlePieEnter}
-                onMouseLeave={handlePieLeave}
-              >
-                {donutData.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
+      <div className="hd-donut-wrap" onMouseMove={handleGaugeMouseMove} onMouseLeave={handleGaugeLeave}>
+        <div className="hd-gauge">
+          <svg
+            className="hd-gauge__svg"
+            viewBox="10 0 220 120"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            <g key={range}>
+              {segments.map((seg, i) => (
+                <path
+                  key={seg.name}
+                  d={seg.d}
+                  stroke={seg.color}
+                  strokeWidth={GAUGE_STROKE}
+                  strokeLinecap="butt"
+                  fill="none"
+                  className={`hd-gauge__segment ${
+                    activeIdx != null && activeIdx !== i ? 'hd-gauge__segment--dim' : ''
+                  }`}
+                  style={{
+                    '--dash-length': seg.length.toFixed(3),
+                    '--draw-delay': `${i * 60}ms`,
+                  }}
+                  onMouseEnter={() => handleSegmentEnter(i)}
+                />
+              ))}
+            </g>
+          </svg>
           <div className="hd-donut-center">
             <div
               className={`hd-donut-center__layer ${
