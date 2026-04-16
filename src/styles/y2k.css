@@ -505,6 +505,8 @@
 [data-ui-mode="y2k"] .el-card,
 [data-ui-mode="y2k"] .el-search,
 [data-ui-mode="y2k"] .progress-chart-card,
+[data-ui-mode="y2k"] .hd-stat,
+[data-ui-mode="y2k"] .hd-card,
 [data-ui-mode="y2k"] .calc-card {
   border: var(--y2k-border-raised) !important;
   border-radius: var(--y2k-radius) !important;
@@ -2098,6 +2100,7 @@
 
 /* ══════════════════════════════════════════════════════════════
    PAGE: HOME / DASHBOARD — Y2K OVERRIDES
+   (mirrors PROGRESS page pattern exactly so home matches)
    ══════════════════════════════════════════════════════════════ */
 
 /* ── Reusable Y2K titlebar for Dashboard cards ── */
@@ -2113,7 +2116,7 @@
   align-items: center;
   gap: 6px;
   margin: -16px -16px 14px;
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--y2k-radius) var(--y2k-radius) 0 0;
 }
 
 .hd-y2k-titlebar span {
@@ -2122,11 +2125,11 @@
   color: var(--accent-light);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  text-shadow: var(--y2k-text-shadow);
   font-family: 'Courier New', Courier, monospace;
 }
 
-/* ── Stat card title bars ── */
+/* ── Stat chip title bars ── */
 .hd-y2k-chip-bar {
   height: 18px;
   background: linear-gradient(180deg,
@@ -2138,7 +2141,7 @@
   display: flex;
   align-items: center;
   margin: -12px -14px 8px;
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--y2k-radius) var(--y2k-radius) 0 0;
 }
 
 .hd-y2k-chip-bar span {
@@ -2147,52 +2150,50 @@
   color: var(--accent-light);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  text-shadow: var(--y2k-text-shadow);
   font-family: 'Courier New', Courier, monospace;
 }
 
 /* ── Greeting + date ── */
 [data-ui-mode="y2k"] .hd__greeting {
   font-family: 'Courier New', Courier, monospace !important;
-  font-weight: 700;
-  color: var(--accent-light);
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  font-weight: 700 !important;
+  color: var(--accent-light) !important;
+  text-shadow: var(--y2k-text-shadow);
   letter-spacing: 0.04em;
 }
 
 [data-ui-mode="y2k"] .hd__date {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #4466aa;
+  color: color-mix(in srgb, var(--accent-light) 50%, #4466aa) !important;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 11px;
+  font-size: 11px !important;
 }
 
-/* ── Stat cards ── */
+/* ── Stat cards — mirror pg-chip ──
+   Base raised border comes from the master rule (line 497-512).
+   Here we just add the gradient background + text colors. */
 [data-ui-mode="y2k"] .hd-stat {
   background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
-  border: 2px inset #334466 !important;
-  border-radius: 4px !important;
-  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
-  overflow: hidden;
 }
 
 [data-ui-mode="y2k"] .hd-stat__label span:last-child {
-  font-family: 'Courier New', Courier, monospace;
-  color: #4466aa;
-  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace !important;
+  color: color-mix(in srgb, var(--accent-light) 40%, #4466aa) !important;
+  font-weight: 700 !important;
 }
 
 [data-ui-mode="y2k"] .hd-stat__dot {
   background: var(--accent-light) !important;
-  box-shadow: 0 0 4px var(--accent-light);
+  box-shadow: 0 0 4px var(--accent-glow, var(--accent-light));
 }
 
 [data-ui-mode="y2k"] .hd-stat__value {
   font-family: 'Courier New', Courier, monospace !important;
   font-weight: 700 !important;
   color: var(--accent-light) !important;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-shadow: var(--y2k-text-shadow);
 }
 
 [data-ui-mode="y2k"] .hd-stat__delta {
@@ -2202,20 +2203,20 @@
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
-/* ── Main card wrapper (Macro split, Meal plan, Consistency) ── */
+/* ── Main cards — mirror pg-chart-card ──
+   Master rule gives raised border; this deeper override replaces it
+   with an inset navy container (same as progress chart/table cards). */
 [data-ui-mode="y2k"] .hd-card {
   background: linear-gradient(180deg, #0a1220, #060c18) !important;
-  border: 2px inset #334466 !important;
-  border-radius: 4px !important;
-  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5);
-  overflow: hidden;
+  border: var(--y2k-border-sunken) !important;
+  box-shadow: var(--y2k-shadow-inset);
 }
 
 [data-ui-mode="y2k"] .hd-card__title {
   font-family: 'Courier New', Courier, monospace !important;
   font-weight: 700 !important;
   color: var(--accent-light) !important;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  text-shadow: var(--y2k-text-shadow);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-size: 12px !important;
@@ -2223,63 +2224,76 @@
 
 [data-ui-mode="y2k"] .hd-link-btn {
   font-family: 'Courier New', Courier, monospace !important;
-  font-weight: 700;
+  font-weight: 700 !important;
   color: var(--accent-light) !important;
   background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
-  border: 1px outset #4466aa !important;
+  border: var(--y2k-border-raised) !important;
   padding: 3px 8px !important;
-  border-radius: 3px !important;
+  border-radius: var(--y2k-radius-sm) !important;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
   font-size: 10px !important;
   text-transform: uppercase;
+  box-shadow: var(--y2k-shadow-btn);
 }
 
 [data-ui-mode="y2k"] .hd-link-btn:active {
-  border: 1px inset #4466aa !important;
+  border: var(--y2k-border-sunken) !important;
   transform: translateY(1px);
+  box-shadow: none;
 }
 
 /* ── Pills (time range + action buttons) ── */
 [data-ui-mode="y2k"] .hd-pill {
   font-family: 'Courier New', Courier, monospace !important;
-  font-weight: 700;
+  font-weight: 700 !important;
   background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
-  border: 1px outset #4466aa !important;
-  color: #8899cc !important;
-  border-radius: 3px !important;
+  border: var(--y2k-border-raised) !important;
+  color: color-mix(in srgb, var(--accent-light) 60%, #8899cc) !important;
+  border-radius: var(--y2k-radius-sm) !important;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
   font-size: 10px !important;
   text-transform: uppercase;
+  box-shadow: var(--y2k-shadow-btn);
 }
 
 [data-ui-mode="y2k"] .hd-pill--active {
-  background: linear-gradient(180deg, #2a3a6a, #1a2a4a) !important;
-  border: 1px inset #4466aa !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 45%, #2a3a6a),
+    color-mix(in srgb, var(--accent) 20%, #1a2a4a)
+  ) !important;
+  border: var(--y2k-border-sunken) !important;
   color: var(--accent-light) !important;
+  box-shadow: var(--y2k-shadow-inset);
 }
 
 [data-ui-mode="y2k"] .hd-pill--accent {
-  background: linear-gradient(180deg, #3344aa, #1a2266) !important;
-  border: 1px outset #5566cc !important;
-  color: var(--accent-light) !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-light) 60%, var(--accent)),
+    var(--accent-dark)
+  ) !important;
+  border: var(--y2k-border-raised) !important;
+  color: #fff !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
 }
 
 /* ── Meal cells ── */
 [data-ui-mode="y2k"] .hd-meal-cell {
   background: linear-gradient(180deg, #0d1830, #060c18) !important;
-  border: 1px inset #334466 !important;
-  border-radius: 3px !important;
+  border: var(--y2k-border-sunken) !important;
+  border-radius: var(--y2k-radius-sm) !important;
+  box-shadow: var(--y2k-shadow-inset);
 }
 
 [data-ui-mode="y2k"] .hd-meal-cell--empty {
   background: linear-gradient(180deg, #0a1220, #060c18) !important;
-  border: 1px dashed #334466 !important;
+  border: 1px dashed color-mix(in srgb, var(--accent-light) 30%, #334466) !important;
+  box-shadow: none;
 }
 
 [data-ui-mode="y2k"] .hd-meal-label {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #4466aa !important;
-  font-weight: 700;
+  color: color-mix(in srgb, var(--accent-light) 50%, #4466aa) !important;
+  font-weight: 700 !important;
   font-size: 9px !important;
   letter-spacing: 0.1em;
 }
@@ -2287,37 +2301,47 @@
 [data-ui-mode="y2k"] .hd-meal-name {
   font-family: 'Courier New', Courier, monospace !important;
   color: var(--accent-light) !important;
-  font-weight: 700;
+  font-weight: 700 !important;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
 [data-ui-mode="y2k"] .hd-meal-macro {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #8899cc !important;
+  color: color-mix(in srgb, var(--accent-light) 55%, #8899cc) !important;
   font-size: 10px !important;
 }
 
 [data-ui-mode="y2k"] .hd-meal-log-btn {
   font-family: 'Courier New', Courier, monospace !important;
-  font-weight: 700;
-  background: linear-gradient(180deg, #2a3a6a, #1a2a4a) !important;
-  border: 1px outset #4466aa !important;
-  color: var(--accent-light) !important;
-  border-radius: 3px !important;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  font-weight: 700 !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-light) 60%, var(--accent)),
+    var(--accent-dark)
+  ) !important;
+  border: var(--y2k-border-raised) !important;
+  color: #fff !important;
+  border-radius: var(--y2k-radius-sm) !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
   font-size: 10px !important;
   text-transform: uppercase;
+  box-shadow: var(--y2k-shadow-btn);
+}
+
+[data-ui-mode="y2k"] .hd-meal-log-btn:active {
+  border: var(--y2k-border-sunken) !important;
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 [data-ui-mode="y2k"] .hd-meal-log-btn--logged {
   background: linear-gradient(180deg, #1a4a2a, #0d2a1a) !important;
-  border: 1px inset #336644 !important;
+  border: var(--y2k-border-sunken) !important;
   color: #66cc88 !important;
 }
 
 [data-ui-mode="y2k"] .hd-meal-add__icon {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #4466aa !important;
+  color: color-mix(in srgb, var(--accent-light) 50%, #4466aa) !important;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
@@ -2326,12 +2350,12 @@
   font-family: 'Courier New', Courier, monospace !important;
   font-weight: 700 !important;
   color: var(--accent-light) !important;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-shadow: var(--y2k-text-shadow);
 }
 
 [data-ui-mode="y2k"] .hd-donut-center__label {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #4466aa !important;
+  color: color-mix(in srgb, var(--accent-light) 50%, #4466aa) !important;
   text-transform: uppercase;
   font-size: 9px !important;
   letter-spacing: 0.08em;
@@ -2340,8 +2364,8 @@
 /* ── Macro legend ── */
 [data-ui-mode="y2k"] .hd-macro-legend__left {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #8899cc !important;
-  font-weight: 700;
+  color: color-mix(in srgb, var(--accent-light) 60%, #8899cc) !important;
+  font-weight: 700 !important;
   font-size: 11px !important;
   text-transform: uppercase;
 }
@@ -2354,19 +2378,19 @@
 
 [data-ui-mode="y2k"] .hd-macro-legend__sub {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #4466aa !important;
+  color: color-mix(in srgb, var(--accent-light) 45%, #4466aa) !important;
   font-size: 10px !important;
 }
 
 [data-ui-mode="y2k"] .hd-macro-legend__divider {
-  border-color: #334466 !important;
+  border-color: color-mix(in srgb, var(--accent-light) 30%, #334466) !important;
 }
 
 /* ── Consistency calendar ── */
 [data-ui-mode="y2k"] .cw__month-label {
   font-family: 'Courier New', Courier, monospace !important;
   color: var(--accent-light) !important;
-  font-weight: 700;
+  font-weight: 700 !important;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -2375,25 +2399,28 @@
 
 [data-ui-mode="y2k"] .cw__nav button {
   background: linear-gradient(180deg, #1a2a4a, #0d1830) !important;
-  border: 1px outset #4466aa !important;
-  border-radius: 3px !important;
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius-sm) !important;
   color: var(--accent-light) !important;
+  box-shadow: var(--y2k-shadow-btn);
 }
 
 [data-ui-mode="y2k"] .cw__nav button:active {
-  border: 1px inset #4466aa !important;
+  border: var(--y2k-border-sunken) !important;
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 [data-ui-mode="y2k"] .cw__weekdays span {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #4466aa !important;
-  font-weight: 700;
+  color: color-mix(in srgb, var(--accent-light) 50%, #4466aa) !important;
+  font-weight: 700 !important;
   font-size: 10px !important;
   text-transform: uppercase;
 }
 
 [data-ui-mode="y2k"] .cw-day {
-  border-radius: 3px !important;
+  border-radius: var(--y2k-radius-sm) !important;
 }
 
 [data-ui-mode="y2k"] .cw-day__num {
@@ -2405,30 +2432,24 @@
 [data-ui-mode="y2k"] .cw-day--empty {
   background: linear-gradient(180deg, #0d1830, #060c18) !important;
   border: 1px inset #223355 !important;
-  color: #334466 !important;
+  color: color-mix(in srgb, var(--accent-light) 25%, #334466) !important;
 }
 
-[data-ui-mode="y2k"] .cw-day--nutrition {
-  background: linear-gradient(180deg, #2a3a6a, #1a2a4a) !important;
-  border: 1px outset #4466aa !important;
-  color: var(--accent-light) !important;
-}
-
-[data-ui-mode="y2k"] .cw-day--workout {
-  background: linear-gradient(180deg, #6a3a2a, #4a2a1a) !important;
-  border: 1px outset #aa6644 !important;
-  color: #ffcc88 !important;
-}
-
+[data-ui-mode="y2k"] .cw-day--nutrition,
+[data-ui-mode="y2k"] .cw-day--workout,
 [data-ui-mode="y2k"] .cw-day--both {
-  background: linear-gradient(180deg, #2a6a3a, #1a4a2a) !important;
-  border: 1px outset #44aa66 !important;
-  color: #88ffaa !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 45%, #2a3a6a),
+    color-mix(in srgb, var(--accent) 20%, #1a2a4a)
+  ) !important;
+  border: var(--y2k-border-raised) !important;
+  color: var(--accent-light) !important;
+  text-shadow: var(--y2k-text-shadow);
 }
 
 [data-ui-mode="y2k"] .cw-day--today {
   border: 2px solid var(--accent-light) !important;
-  box-shadow: 0 0 4px var(--accent-light);
+  box-shadow: 0 0 6px var(--accent-glow, var(--accent-light));
 }
 
 [data-ui-mode="y2k"] .cw-day--future {
@@ -2439,8 +2460,8 @@
 
 [data-ui-mode="y2k"] .cw__legend-item {
   font-family: 'Courier New', Courier, monospace !important;
-  color: #8899cc !important;
-  font-weight: 700;
+  color: color-mix(in srgb, var(--accent-light) 55%, #8899cc) !important;
+  font-weight: 700 !important;
   font-size: 10px !important;
   text-transform: uppercase;
 }
@@ -2448,8 +2469,44 @@
 [data-ui-mode="y2k"] .cw__legend-stat {
   font-family: 'Courier New', Courier, monospace !important;
   color: var(--accent-light) !important;
-  font-weight: 700;
+  font-weight: 700 !important;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
   font-size: 10px !important;
   text-transform: uppercase;
+}
+
+/* ── Donut tooltip ── */
+[data-ui-mode="y2k"] .hd-donut-tooltip {
+  font-family: 'Courier New', Courier, monospace !important;
+  background: linear-gradient(180deg, #0d1830, #060c18) !important;
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius-sm) !important;
+  box-shadow: var(--y2k-shadow-card);
+}
+
+[data-ui-mode="y2k"] .hd-donut-tooltip__name {
+  color: color-mix(in srgb, var(--accent-light) 50%, #4466aa) !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 10px !important;
+}
+
+[data-ui-mode="y2k"] .hd-donut-tooltip__val {
+  font-weight: 700 !important;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+[data-ui-mode="y2k"] .hd-donut-tooltip__sub {
+  color: color-mix(in srgb, var(--accent-light) 45%, #4466aa) !important;
+  font-size: 10px !important;
+}
+
+/* ── Consistency day tooltip ── */
+[data-ui-mode="y2k"] .cw__tooltip {
+  font-family: 'Courier New', Courier, monospace !important;
+  background: linear-gradient(180deg, #0d1830, #060c18) !important;
+  border: var(--y2k-border-raised) !important;
+  border-radius: var(--y2k-radius-sm) !important;
+  box-shadow: var(--y2k-shadow-card);
+  color: var(--accent-light);
 }

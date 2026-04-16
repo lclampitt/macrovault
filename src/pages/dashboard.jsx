@@ -419,9 +419,9 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
   const isOver = cal > goalCal;
 
   const donutData = [
-    { name: 'Protein', value: proKcal, grams: pro, goal: goalPlan?.protein, color: '#7F77DD', pct: Math.round(proKcal / Math.max(cal, 1) * 100) },
-    { name: 'Carbs', value: carbKcal, grams: carbs, goal: goalPlan?.carbs, color: 'var(--accent)', pct: Math.round(carbKcal / Math.max(cal, 1) * 100) },
-    { name: 'Fat', value: fatKcal, grams: fat, goal: goalPlan?.fat, color: '#D85A30', pct: Math.round(fatKcal / Math.max(cal, 1) * 100) },
+    { name: 'Protein', value: proKcal, grams: pro, goal: goalPlan?.protein, color: 'var(--color-protein, #7F77DD)', pct: Math.round(proKcal / Math.max(cal, 1) * 100) },
+    { name: 'Carbs', value: carbKcal, grams: carbs, goal: goalPlan?.carbs, color: 'var(--color-carbs, var(--accent))', pct: Math.round(carbKcal / Math.max(cal, 1) * 100) },
+    { name: 'Fat', value: fatKcal, grams: fat, goal: goalPlan?.fat, color: 'var(--color-fat, #D85A30)', pct: Math.round(fatKcal / Math.max(cal, 1) * 100) },
     { name: 'Remaining', value: remaining || 1, color: 'rgba(255,255,255,0.07)', isRemaining: true, remainingKcal: remaining },
   ].filter((s) => s.value > 0);
 
@@ -433,7 +433,7 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
       name: d.name,
       value: d.isRemaining ? `${d.remainingKcal} kcal` : `${d.grams}g`,
       sub: d.isRemaining ? 'remaining' : d.goal ? `of ${d.goal}g goal \u00b7 ${d.pct}%` : `${d.pct}%`,
-      color: d.isRemaining ? '#EF9F27' : d.color,
+      color: d.isRemaining ? 'var(--warning, #EF9F27)' : d.color,
       x: 0, y: 0,
     });
   };
@@ -504,7 +504,7 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
             </PieChart>
           </ResponsiveContainer>
           <div className="hd-donut-center">
-            <span className="hd-donut-center__val" style={isOver ? { color: '#EF9F27' } : undefined}>
+            <span className="hd-donut-center__val" style={isOver ? { color: 'var(--warning, #EF9F27)' } : undefined}>
               {cal.toLocaleString()}
             </span>
             <span className="hd-donut-center__label">{centerLabel}</span>
@@ -512,9 +512,9 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
         </div>
         <div className="hd-macro-legend">
           {[
-            { name: 'Protein', g: pro, goal: goalPlan?.protein, color: '#7F77DD' },
-            { name: 'Carbs', g: carbs, goal: goalPlan?.carbs, color: 'var(--accent)' },
-            { name: 'Fat', g: fat, goal: goalPlan?.fat, color: '#D85A30' },
+            { name: 'Protein', g: pro, goal: goalPlan?.protein, color: 'var(--color-protein, #7F77DD)' },
+            { name: 'Carbs', g: carbs, goal: goalPlan?.carbs, color: 'var(--color-carbs, var(--accent))' },
+            { name: 'Fat', g: fat, goal: goalPlan?.fat, color: 'var(--color-fat, #D85A30)' },
           ].map(({ name, g, goal, color }) => (
             <div key={name} className="hd-macro-legend__row">
               <span className="hd-macro-legend__left">
@@ -530,11 +530,11 @@ function MacroDonut({ userId, todayNutrition, goalPlan, isY2K }) {
           <div className="hd-macro-legend__divider" />
           <div className="hd-macro-legend__row">
             <span className="hd-macro-legend__left">
-              <span className="hd-macro-legend__swatch" style={{ background: '#EF9F27' }} />
+              <span className="hd-macro-legend__swatch" style={{ background: 'var(--warning, #EF9F27)' }} />
               Remaining
             </span>
             <span className="hd-macro-legend__right">
-              <strong style={{ color: '#EF9F27' }}>{remaining}</strong>
+              <strong style={{ color: 'var(--warning, #EF9F27)' }}>{remaining}</strong>
               <span className="hd-macro-legend__sub">kcal left</span>
             </span>
           </div>
