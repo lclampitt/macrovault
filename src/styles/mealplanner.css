@@ -1287,71 +1287,6 @@
   margin: 0;
 }
 
-/* ── Y2K AI MODAL ───────────────────────── */
-.y2k-ai-modal {
-  background: linear-gradient(180deg, #0d1e3a, #080f1e);
-  border: 2px outset #4466aa;
-  border-radius: 4px;
-  width: 340px;
-  max-width: calc(100vw - 32px);
-  box-shadow: 4px 4px 12px rgba(0,0,0,0.8);
-  overflow: hidden;
-}
-
-.y2k-ai-modal__titlebar {
-  height: 24px;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--accent) 50%, #3344aa),
-    color-mix(in srgb, var(--accent) 25%, #1a2266)
-  );
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  border-bottom: 1px solid #223388;
-}
-
-.y2k-ai-modal__titlebar-left {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.y2k-ai-modal__app-icon {
-  width: 13px;
-  height: 13px;
-  border-radius: 2px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark, #145a44));
-  border: 1px outset var(--accent-light, #3be0a8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.y2k-ai-modal__title-text {
-  font-size: 10px;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
-}
-
-.y2k-ai-modal__body {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.y2k-ai-modal__status {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-light, #3be0a8);
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  margin: 0 0 16px;
-}
-
 /* ── SNACK QUICK-ADD BUTTON ──────────────── */
 .mp-snack-btn {
   display: flex;
@@ -2105,4 +2040,79 @@
 .mpm-clear-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════
+   Replace-logged-meals confirmation modal
+   ═══════════════════════════════════════════════════ */
+.mp-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.mp-confirm-dialog {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.mp-confirm-dialog__title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.mp-confirm-dialog__body {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.mp-confirm-dialog__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.mp-confirm-dialog__btn {
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.mp-confirm-dialog__btn--cancel {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+.mp-confirm-dialog__btn--cancel:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.mp-confirm-dialog__btn--confirm {
+  background: var(--accent);
+  color: #fff;
+}
+.mp-confirm-dialog__btn--confirm:hover {
+  background: var(--accent-dark, var(--accent));
 }

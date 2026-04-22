@@ -27,8 +27,6 @@ import { supabase } from '../../supabaseClient';
 import { useUpgrade } from '../../context/UpgradeContext';
 import { useTheme } from '../../hooks/useTheme';
 import { useUsage } from '../../hooks/useUsage';
-import Y2KDialog from '../../components/ui/Y2KDialog';
-import Y2KProgressBar from '../../components/ui/Y2KProgressBar';
 import FoodSearch from '../../components/FoodSearch/FoodSearch';
 import '../../styles/mealplanner.css';
 
@@ -195,7 +193,7 @@ function SlotPanel({
   isProPlus = false,
 }) {
   const { triggerUpgrade } = useUpgrade();
-  const { isSpectrum, isRetro, isY2K } = useTheme();
+  const { isSpectrum, isRetro } = useTheme();
   const [tab, setTab] = useState(isProPlus ? 'ai' : 'manual');
   const [suggestions, setSuggestions] = useState([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -701,11 +699,6 @@ function SlotPanel({
               </div>
 
               {loadingSuggestions ? (
-                isY2K ? (
-                  <div style={{ padding: '20px 0' }}>
-                    <Y2KProgressBar label="Fetching suggestions..." progress={null} subLabel="Consulting the database..." />
-                  </div>
-                ) : (
                 <>
                   {[0, 1, 2, 3, 4].map((i) => (
                     <motion.div
@@ -724,7 +717,6 @@ function SlotPanel({
                     Generating suggestions...
                   </p>
                 </>
-                )
               ) : (
                 <>
                   <AnimatePresence>
@@ -1272,7 +1264,7 @@ function SnackSheet({ userId, onClose }) {
    ──────────────────────────────────────────────────── */
 function MealPlannerContent({ isProPlus = false }) {
   const { triggerUpgrade } = useUpgrade();
-  const { isSpectrum, isRetro, isY2K } = useTheme();
+  const { isSpectrum, isRetro } = useTheme();
   const [userId, setUserId] = useState(null);
   const { usage, refetchUsage } = useUsage(userId);
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
@@ -1282,7 +1274,9 @@ function MealPlannerContent({ isProPlus = false }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [aiWeekLoading, setAiWeekLoading] = useState(false);
   const [clearing, setClearing] = useState(false);
-  const [y2kClearDialog, setY2kClearDialog] = useState(false);
+  // Confirmation when a week-level operation (clear/AI) would wipe logged meals.
+  // `pendingAction` is the async fn to run if the user confirms.
+  const [replaceConfirm, setReplaceConfirm] = useState({ open: false, pendingAction: null });
 
   /* ── Mobile state ─────────────────────────── */
   const [mobileDay, setMobileDay] = useState(() => {
@@ -1520,6 +1514,35 @@ function MealPlannerContent({ isProPlus = false }) {
         .eq('id', existing.id);
 
       if (error) throw error;
+
+      // If the old meal had been logged to food_logs, remove that row so the
+      // logged state reflects the replacement (new meal starts unlogged).
+      if (userId && weekStart && existing.meal_name) {
+        const entryDateStr = fmtDate(addDays(weekStart, dayIdx));
+        await supabase
+          .from('food_logs')
+          .delete()
+          .eq('user_id', userId)
+          .eq('logged_date', entryDateStr)
+          .eq('meal_name', existing.meal_name)
+          .eq('notes', 'From meal planner');
+
+        // If this was the only logged meal for the day, clear the day's flag.
+        const { data: remaining } = await supabase
+          .from('food_logs')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('logged_date', entryDateStr)
+          .eq('notes', 'From meal planner')
+          .limit(1);
+        if (!remaining || remaining.length === 0) {
+          setLoggedDays((prev) => {
+            const next = new Set(prev);
+            next.delete(dayIdx);
+            return next;
+          });
+        }
+      }
     } else {
       // Insert new entry
       const { error } = await supabase.from('meal_plan_entries').insert({
@@ -1587,6 +1610,30 @@ function MealPlannerContent({ isProPlus = false }) {
     setSelectedSlot({ day: DAY_NAMES[dayIdx], mealType });
   }
 
+  /* ── Purge this week's planner-originated food_logs ──
+     Used by clear-week and ai-week so replaced meals stop appearing
+     as logged on the dashboard / food diary. */
+  async function purgeWeekFoodLogs() {
+    if (!userId || !weekStart) return;
+    const dates = DAY_NAMES.map((_, i) => fmtDate(addDays(weekStart, i)));
+    await supabase
+      .from('food_logs')
+      .delete()
+      .eq('user_id', userId)
+      .in('logged_date', dates)
+      .eq('notes', 'From meal planner');
+    setLoggedDays(new Set());
+  }
+
+  /* ── Gate a week-level replace on a confirm modal if any day is logged ── */
+  function requestWeekReplace(action) {
+    if (loggedDays.size > 0) {
+      setReplaceConfirm({ open: true, pendingAction: action });
+    } else {
+      action();
+    }
+  }
+
   /* ── Clear entire week ───────────────────── */
   async function handleClearWeek() {
     if (!planId) return;
@@ -1600,6 +1647,7 @@ function MealPlannerContent({ isProPlus = false }) {
     if (error) {
       toast.error('Failed to clear week.');
     } else {
+      await purgeWeekFoodLogs();
       setEntries([]);
       toast.success('Week cleared');
     }
@@ -1647,6 +1695,10 @@ function MealPlannerContent({ isProPlus = false }) {
           .from('meal_plan_entries')
           .delete()
           .eq('plan_id', planId);
+
+        // Also unlog any previously-logged days for this week — the old
+        // food_logs no longer match what's on the plan.
+        await purgeWeekFoodLogs();
 
         // Insert new entries
         const rows = data.entries.map((e) => ({
@@ -1948,7 +2000,7 @@ function MealPlannerContent({ isProPlus = false }) {
           )}
           <button
             className="mp-week-nav__ai-btn"
-            onClick={isProPlus ? handleAiWeek : () => triggerUpgrade('ai_week', 'pro_plus')}
+            onClick={isProPlus ? () => requestWeekReplace(handleAiWeek) : () => triggerUpgrade('ai_week', 'pro_plus')}
             disabled={aiWeekLoading}
           >
             <Sparkles size={14} />
@@ -1957,7 +2009,13 @@ function MealPlannerContent({ isProPlus = false }) {
           {entries.length > 0 && (
             <button
               className="mp-week-nav__clear-btn"
-              onClick={() => isY2K ? setY2kClearDialog(true) : handleClearWeek()}
+              onClick={() => {
+                if (loggedDays.size > 0) {
+                  requestWeekReplace(handleClearWeek);
+                } else {
+                  handleClearWeek();
+                }
+              }}
               disabled={clearing}
             >
               <Trash2 size={14} />
@@ -2280,7 +2338,7 @@ function MealPlannerContent({ isProPlus = false }) {
         <div className="mpm-ai-row">
           <motion.button
             className="mpm-ai-btn"
-            onClick={isProPlus ? handleAiWeek : () => triggerUpgrade('ai_week', 'pro_plus')}
+            onClick={isProPlus ? () => requestWeekReplace(handleAiWeek) : () => triggerUpgrade('ai_week', 'pro_plus')}
             disabled={aiWeekLoading}
             whileTap={{ scale: 0.97 }}
           >
@@ -2598,7 +2656,13 @@ function MealPlannerContent({ isProPlus = false }) {
             {entries.length > 0 && (
               <button
                 className="mpm-clear-btn"
-                onClick={() => isY2K ? setY2kClearDialog(true) : handleClearWeek()}
+                onClick={() => {
+                if (loggedDays.size > 0) {
+                  requestWeekReplace(handleClearWeek);
+                } else {
+                  handleClearWeek();
+                }
+              }}
                 disabled={clearing}
               >
                 <Trash2 size={14} />
@@ -2644,62 +2708,69 @@ function MealPlannerContent({ isProPlus = false }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            {isY2K ? (
-              <motion.div
-                className="y2k-ai-modal"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ type: 'spring', damping: 20, stiffness: 400 }}
-              >
-                <div className="y2k-ai-modal__titlebar">
-                  <div className="y2k-ai-modal__titlebar-left">
-                    <div className="y2k-ai-modal__app-icon">
-                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
-                        <path d="M3 3v18h18" /><path d="M7 16l4-8 4 4 5-9" />
-                      </svg>
-                    </div>
-                    <span className="y2k-ai-modal__title-text">MacroVault — Generating Meals</span>
-                  </div>
-                </div>
-                <div className="y2k-ai-modal__body">
-                  <Sparkles size={28} style={{ color: 'var(--accent-light)', marginBottom: 12 }} />
-                  <p className="y2k-ai-modal__status">Generating your weekly meal plan...</p>
-                  <Y2KProgressBar label="Progress" progress={null} subLabel="Please wait..." />
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                className="mp-ai-overlay__card"
-                initial={{ opacity: 0, scale: 0.94, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.94, y: 20 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-              >
-                <Loader size={32} className="mp-ai-overlay__spinner" />
-                <p className="mp-ai-overlay__text">
-                  Generating your weekly meal plan...
-                </p>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-                  This may take a moment
-                </p>
-              </motion.div>
-            )}
+            <motion.div
+              className="mp-ai-overlay__card"
+              initial={{ opacity: 0, scale: 0.94, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 20 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              <Loader size={32} className="mp-ai-overlay__spinner" />
+              <p className="mp-ai-overlay__text">
+                Generating your weekly meal plan...
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
+                This may take a moment
+              </p>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Y2K Clear Week Dialog */}
-      <Y2KDialog
-        isOpen={y2kClearDialog}
-        onClose={() => setY2kClearDialog(false)}
-        onConfirm={handleClearWeek}
-        title="MacroVault — Warning"
-        message="Are you sure you want to clear all meals for this week? This action cannot be undone."
-        confirmLabel="Clear Week"
-        cancelLabel="Cancel"
-        type="warning"
-      />
+      {/* Replace-logged-meals confirmation (week-level ops) */}
+      <AnimatePresence>
+          {replaceConfirm.open && (
+            <motion.div
+              className="mp-confirm-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setReplaceConfirm({ open: false, pendingAction: null })}
+            >
+              <motion.div
+                className="mp-confirm-dialog"
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ duration: 0.15 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="mp-confirm-dialog__title">Replace logged meals?</h3>
+                <p className="mp-confirm-dialog__body">
+                  You have meals already logged this week. Replacing them will remove your logged entries for those meals.
+                </p>
+                <div className="mp-confirm-dialog__actions">
+                  <button
+                    className="mp-confirm-dialog__btn mp-confirm-dialog__btn--cancel"
+                    onClick={() => setReplaceConfirm({ open: false, pendingAction: null })}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="mp-confirm-dialog__btn mp-confirm-dialog__btn--confirm"
+                    onClick={() => {
+                      const action = replaceConfirm.pendingAction;
+                      setReplaceConfirm({ open: false, pendingAction: null });
+                      if (action) action();
+                    }}
+                  >
+                    Replace anyway
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
     </div>
   );
 }
