@@ -134,6 +134,7 @@ class AnalysisResponse(BaseModel):
     bmr: Optional[int] = None
     tdee: Optional[int] = None
     deficit_or_surplus: Optional[int] = None
+    formula: Optional[str] = None    # "katch" | "mifflin" — tells UI which disclaimer to show
 
 
 class ContactRequest(BaseModel):
@@ -501,21 +502,35 @@ def calculate_tdee(
     gender: int,
     activity_level: str,
     goal: str,
-) -> tuple[int, int, int, int]:
+    bodyfat_pct: Optional[float] = None,
+) -> tuple[int, int, int, int, str]:
     """
-    Returns (bmr, tdee, suggested_calories, deficit_or_surplus).
+    Returns (bmr, tdee, suggested_calories, deficit_or_surplus, formula).
 
-    BMR via Mifflin-St Jeor:
-      Male   (gender=0): 10w + 6.25h - 5a + 5
-      Female (gender=1): 10w + 6.25h - 5a - 161
+    When bodyfat_pct is provided, BMR is computed via Katch-McArdle
+    (body-composition aware). Otherwise we fall back to Mifflin-St Jeor,
+    which ignores lean mass and therefore returns the same number for
+    two users at the same weight regardless of body fat %.
+
+      Katch-McArdle:   BMR = 370 + 21.6 × LBM(kg)
+                       LBM = weight_kg × (1 - bodyfat_pct / 100)
+      Mifflin-St Jeor:
+        Male   (gender=0): 10w + 6.25h - 5a + 5
+        Female (gender=1): 10w + 6.25h - 5a - 161
     """
-    gender_offset = 5 if gender == 0 else -161
-    bmr  = (10 * weight_kg) + (6.25 * height_cm) - (5 * age) + gender_offset
+    if bodyfat_pct is not None and bodyfat_pct > 0:
+        lean_mass_kg = weight_kg * (1 - bodyfat_pct / 100)
+        bmr = 370 + 21.6 * lean_mass_kg
+        formula = "katch"
+    else:
+        gender_offset = 5 if gender == 0 else -161
+        bmr = (10 * weight_kg) + (6.25 * height_cm) - (5 * age) + gender_offset
+        formula = "mifflin"
     mult = _ACTIVITY_MULTIPLIERS.get(activity_level, 1.55)
     tdee = bmr * mult
     adj  = _GOAL_ADJUSTMENTS.get(goal, 0)
     suggested = tdee + adj
-    return round(bmr), round(tdee), round(suggested), round(adj)
+    return round(bmr), round(tdee), round(suggested), round(adj), formula
 
 
 # -------------------------------------------------
@@ -834,14 +849,16 @@ async def analyze_measurements(data: MeasurementRequest):
         bodyfat, gender=data.gender, user_goal=data.goal,
     )
 
-    # Replace hardcoded calorie bucket with proper TDEE (Mifflin-St Jeor)
-    bmr, tdee, suggested_calories, deficit_or_surplus = calculate_tdee(
+    # Body-composition-aware TDEE: the body-fat model just produced `bodyfat`,
+    # so feed it into Katch-McArdle for a BMR that reflects lean mass.
+    bmr, tdee, suggested_calories, deficit_or_surplus, formula = calculate_tdee(
         weight_kg=data.weight_kg,
         height_cm=data.height_cm,
         age=data.age,
         gender=data.gender,
         activity_level=data.activity_level,
         goal=data.goal,
+        bodyfat_pct=bodyfat,
     )
 
     # Track analysis event
@@ -870,6 +887,7 @@ async def analyze_measurements(data: MeasurementRequest):
         bmr=bmr,
         tdee=tdee,
         deficit_or_surplus=deficit_or_surplus,
+        formula=formula,
     )
 
 

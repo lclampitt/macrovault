@@ -286,34 +286,47 @@ function AnalyzerContent() {
             </div>
 
             {result.tdee != null && (
-              <div className="tdee-chips">
-                <div className="tdee-chip">
-                  <span className="tdee-chip__value">{result.bmr?.toLocaleString()}</span>
-                  <span className="tdee-chip__label">BMR (kcal at rest)</span>
+              <>
+                <div className="tdee-chips">
+                  <div className="tdee-chip">
+                    <span className="tdee-chip__value">{result.bmr?.toLocaleString()}</span>
+                    <span className="tdee-chip__label">BMR (kcal at rest)</span>
+                  </div>
+                  <div className="tdee-chip">
+                    <span className="tdee-chip__value">{result.tdee?.toLocaleString()}</span>
+                    <span className="tdee-chip__label">TDEE (kcal/day)</span>
+                  </div>
+                  <div className="tdee-chip">
+                    <span className="tdee-chip__value">{result.suggested_calories?.toLocaleString()}</span>
+                    <span className="tdee-chip__label">Target (kcal/day)</span>
+                  </div>
+                  <div className="tdee-chip">
+                    <span className="tdee-chip__value" style={{
+                      color: result.deficit_or_surplus < 0 ? '#f87171' : result.deficit_or_surplus > 0 ? 'var(--accent-light)' : 'var(--text-muted)',
+                    }}>
+                      {result.deficit_or_surplus > 0 ? '+' : ''}{result.deficit_or_surplus?.toLocaleString()}
+                    </span>
+                    <span className="tdee-chip__label">
+                      {result.deficit_or_surplus < 0
+                        ? 'Deficit (kcal/day)'
+                        : result.deficit_or_surplus > 0
+                          ? 'Surplus (kcal/day)'
+                          : 'Balance (maintenance)'}
+                    </span>
+                  </div>
                 </div>
-                <div className="tdee-chip">
-                  <span className="tdee-chip__value">{result.tdee?.toLocaleString()}</span>
-                  <span className="tdee-chip__label">TDEE (kcal/day)</span>
-                </div>
-                <div className="tdee-chip">
-                  <span className="tdee-chip__value">{result.suggested_calories?.toLocaleString()}</span>
-                  <span className="tdee-chip__label">Target (kcal/day)</span>
-                </div>
-                <div className="tdee-chip">
-                  <span className="tdee-chip__value" style={{
-                    color: result.deficit_or_surplus < 0 ? '#f87171' : result.deficit_or_surplus > 0 ? 'var(--accent-light)' : 'var(--text-muted)',
-                  }}>
-                    {result.deficit_or_surplus > 0 ? '+' : ''}{result.deficit_or_surplus?.toLocaleString()}
-                  </span>
-                  <span className="tdee-chip__label">
-                    {result.deficit_or_surplus < 0
-                      ? 'Deficit (kcal/day)'
-                      : result.deficit_or_surplus > 0
-                        ? 'Surplus (kcal/day)'
-                        : 'Balance (maintenance)'}
-                  </span>
-                </div>
-              </div>
+                <p style={{
+                  fontSize: '12px',
+                  color: 'rgba(255,255,255,0.4)',
+                  fontStyle: 'italic',
+                  marginTop: '10px',
+                  lineHeight: 1.5,
+                }}>
+                  {result.formula === 'katch'
+                    ? 'Calculated using your body composition data for a more personalized estimate.'
+                    : 'Add your body fat % in Measurements for a more accurate estimate.'}
+                </p>
+              </>
             )}
 
             {result.goal_suggestion && (

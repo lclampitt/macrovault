@@ -98,7 +98,17 @@ function computeMacros({ sex, age, heightUnit, heightFt, heightIn, heightCm, wei
   const ageN   = Number(age);
   const isMale = sex === 'male';
 
-  const bmr  = Math.round(10 * weightKg + 6.25 * heightCmN - 5 * ageN + (isMale ? 5 : -161));
+  // Katch-McArdle when BF% is provided (body-composition aware), Mifflin-St Jeor otherwise.
+  // Two users at the same weight but different BF% will correctly get different BMRs with Katch.
+  const hasBodyFat = bodyFat !== '' && Number(bodyFat) > 0;
+  const bmrFormula = hasBodyFat ? 'katch' : 'mifflin';
+  let bmr;
+  if (hasBodyFat) {
+    const leanMassKg = weightKg * (1 - Number(bodyFat) / 100);
+    bmr = Math.round(370 + 21.6 * leanMassKg);
+  } else {
+    bmr = Math.round(10 * weightKg + 6.25 * heightCmN - 5 * ageN + (isMale ? 5 : -161));
+  }
   const mult = ACTIVITY_OPTS.find(a => a.value === activity)?.mult ?? 1.55;
   const tdee = Math.round(bmr * mult);
   const delta      = GOAL_OPTS.find(g => g.value === goal)?.delta ?? 0;
@@ -122,15 +132,18 @@ function computeMacros({ sex, age, heightUnit, heightFt, heightIn, heightCm, wei
     proteinG = Math.max(0, Math.round((targetCals - carbG * 4 - fatG * 9) / 4));
   }
 
-  return { bmr, tdee, targetCals, proteinG, carbG, fatG };
+  return { bmr, tdee, targetCals, proteinG, carbG, fatG, bmrFormula };
 }
 
 // ── Results view ───────────────────────────────────────────────────────────────
 
 function ResultsView({ results, goal, onReset, onSave, onCopy, saving = false }) {
-  const { tdee, targetCals, proteinG, carbG, fatG } = results;
+  const { tdee, targetCals, proteinG, carbG, fatG, bmrFormula } = results;
   const goalBadge  = { cut: 'Cutting phase', maintain: 'Maintenance', bulk: 'Building phase' }[goal] ?? '';
   const deltaLabel = goal === 'cut' ? 'Deficit: −500 kcal' : goal === 'bulk' ? 'Surplus: +300 kcal' : 'Maintenance';
+  const formulaNote = bmrFormula === 'katch'
+    ? 'Calculated using your body composition data for a more personalized estimate.'
+    : 'Add your body fat % in Measurements for a more accurate estimate.';
 
   const totalCals = proteinG * 4 + carbG * 4 + fatG * 9;
   const pPct = Math.round((proteinG * 4 / totalCals) * 100);
@@ -165,6 +178,15 @@ function ResultsView({ results, goal, onReset, onSave, onCopy, saving = false })
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>kcal per day</div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
             TDEE: {tdee.toLocaleString()} kcal · {deltaLabel}
+          </div>
+          <div style={{
+            fontSize: 12,
+            color: 'rgba(255,255,255,0.4)',
+            fontStyle: 'italic',
+            marginTop: 8,
+            lineHeight: 1.4,
+          }}>
+            {formulaNote}
           </div>
         </div>
 
