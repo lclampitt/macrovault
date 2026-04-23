@@ -786,31 +786,6 @@
     z-index: 1;
   }
 
-  /* Radial glow bloom — subtle ambient halo that hugs the + button and
-     bleeds upward into the card area above the nav. Masked to fade out
-     before reaching the "Log" label so the text stays readable. */
-  .mob-nav-log-btn::before {
-    content: '';
-    position: absolute;
-    top: -22px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 50% 35%,
-      rgba(var(--accent-rgb), 0.32) 0%,
-      rgba(var(--accent-rgb), 0.14) 40%,
-      rgba(var(--accent-rgb), 0) 70%
-    );
-    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
-            mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
-    pointer-events: none;
-    z-index: -1;
-    transition: opacity 0.2s ease;
-  }
-
   .mob-nav-log-btn svg {
     width: 48px;
     height: 48px;
@@ -831,15 +806,6 @@
       0 4px 14px rgba(var(--accent-rgb), 0.36);
     filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.30));
     transform: scale(1.05);
-  }
-
-  .mob-nav-log-btn--active::before {
-    background: radial-gradient(
-      circle at 50% 35%,
-      rgba(var(--accent-rgb), 0.40) 0%,
-      rgba(var(--accent-rgb), 0.16) 40%,
-      rgba(var(--accent-rgb), 0) 70%
-    );
   }
 
   .mob-nav-log-btn__label {
