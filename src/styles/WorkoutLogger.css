@@ -3382,151 +3382,81 @@
 }
 
 /* ============================================================
-   REST TIMER — picker sheet + floating pill on exercise card
+   REST ROW — inline draggable rest marker in the items list
+   Sits between sets inside an exercise. Countdown is wall-clock
+   derived; the "Done" state dims the row without removing it.
    ============================================================ */
-.wlm-timer-overlay {
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.wlm-timer-sheet {
-  width: 100%;
-  max-width: 480px;
-  background: var(--bg-surface, #151820);
-  border-radius: 20px 20px 0 0;
-  padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.35);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.wlm-timer-sheet__title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.wlm-timer-sheet__subtitle {
-  margin: -8px 0 0;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.wlm-timer-sheet__pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.wlm-timer-sheet__pill {
-  flex: 1 1 70px;
-  padding: 12px;
-  background: var(--bg-base);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  color: var(--text-primary);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-.wlm-timer-sheet__pill:active {
-  background: rgba(var(--accent-rgb), 0.12);
-  border-color: var(--accent);
-}
-
-.wlm-timer-sheet__custom {
+.wlm-rest-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.wlm-timer-sheet__custom-label {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.wlm-timer-sheet__custom-input {
-  width: 120px;
-  padding: 10px 12px;
-  background: var(--bg-base);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--text-primary);
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-.wlm-timer-sheet__custom-input:focus {
-  border-color: var(--accent);
-}
-
-.wlm-timer-sheet__actions {
-  display: flex;
   gap: 8px;
-}
-.wlm-timer-sheet__cancel {
-  flex: 1;
-  padding: 12px;
-  background: none;
-  border: 1px solid var(--border);
+  min-height: 38px;
+  padding: 6px 8px 6px 4px;
+  margin: 4px 0;
+  background: color-mix(in oklab, var(--accent) 6%, var(--bg-surface));
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
   border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  color: var(--text-muted);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: opacity 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
-
-/* Floating pill anchored inside the exercise card. */
-.wlm-ex-block__timer-pill {
-  margin: 8px 14px 12px;
+.wlm-rest-row--done {
+  opacity: 0.55;
+  border-color: var(--border);
+  background: var(--bg-hover);
+}
+.wlm-rest-row__grip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: rgba(var(--accent-rgb), 0.12);
-  border: 1px solid rgba(var(--accent-rgb), 0.3);
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent-light, var(--accent));
-  align-self: flex-start;
-  width: fit-content;
+  justify-content: center;
+  padding: 6px 2px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
 }
-.wlm-ex-block__timer-pill svg {
-  color: var(--accent);
-}
-.wlm-ex-block__timer-time {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.5px;
-}
-.wlm-ex-block__timer-label {
+.wlm-rest-row__grip:active { cursor: grabbing; color: var(--text-primary); }
+.wlm-rest-row__icon { color: var(--accent); flex-shrink: 0; }
+.wlm-rest-row__label {
   text-transform: uppercase;
-  font-size: 11px;
   letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-muted);
 }
-.wlm-ex-block__timer-cancel {
+.wlm-rest-row__time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+}
+.wlm-rest-row--done .wlm-rest-row__time {
+  color: var(--text-muted);
+}
+.wlm-rest-row__duration {
+  font-size: 11px;
+  color: var(--text-hint, var(--text-muted));
+}
+.wlm-rest-row__delete {
+  margin-left: auto;
   background: none;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 2px;
+  padding: 6px;
   display: inline-flex;
   border-radius: 6px;
   -webkit-tap-highlight-color: transparent;
 }
-.wlm-ex-block__timer-cancel:active {
-  color: var(--error, #ef4444);
+.wlm-rest-row__delete:active { color: var(--error, #ef4444); background: var(--bg-hover); }
+
+/* Nested Reorder.Group container inside the set table — sets + rests
+   share this list. Inherits layout from the parent wlm-ex-block__table
+   so set rows look unchanged; only rests introduce new styles. */
+.wlm-ex-block__tbody {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Destructive variant of the confirm-primary button (used by the

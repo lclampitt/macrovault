@@ -18,6 +18,7 @@ import {
 } from '../../hooks/useActiveWorkout';
 import { appToast as toast } from '../../utils/toast';
 import exerciseDB from '../../data/exercises.json';
+import RestTimerDialog from '../../components/common/RestTimerDialog';
 import '../../styles/WorkoutLogger.css';
 
 /* Unique id generator for session exercises. Used to give each row a
@@ -25,6 +26,49 @@ import '../../styles/WorkoutLogger.css';
    (completedSets) without relying on mutable array indexes. */
 let _exUidCounter = 0;
 const newExId = () => `ex-${Date.now()}-${++_exUidCounter}`;
+
+/* Stable per-set id — needed so the `items` manifest can reference a
+   set by id instead of position, and so rest rows can be interleaved
+   without shifting set indexes under the completedSets map. */
+let _setUidCounter = 0;
+const newSetId = () => `s-${Date.now()}-${++_setUidCounter}`;
+
+/* Stable per-rest-row id. Distinct from setIds so a rest and a set
+   never collide in a Reorder.Group key. */
+let _restUidCounter = 0;
+const newRestId = () => `r-${Date.now()}-${++_restUidCounter}`;
+
+/* Ensure every set has a `_setId` and the exercise has an `items`
+   manifest. Back-compat: legacy rows without items get one derived
+   from the current sets order. Called at every session-entry point
+   (new, template, resume, localStorage restore). */
+function hydrateExerciseItems(ex) {
+  const sets = Array.isArray(ex.sets) ? ex.sets : [];
+  const hydratedSets = sets.map((s) => (s && s._setId ? s : { ...s, _setId: newSetId() }));
+  const existingItems = Array.isArray(ex.items) ? ex.items : null;
+  const validSetIds = new Set(hydratedSets.map((s) => s._setId));
+  let items;
+  if (existingItems) {
+    // Keep any valid items, drop orphaned set refs, keep rests as-is.
+    items = existingItems
+      .map((it) => (it && it.kind === 'rest' ? { ...it, id: it.id || newRestId() } : it))
+      .filter((it) => it && (it.kind === 'rest' || (it.kind === 'set' && validSetIds.has(it.setId))));
+    // Append any hydrated sets missing from items (defensive).
+    const seen = new Set(items.filter((i) => i.kind === 'set').map((i) => i.setId));
+    hydratedSets.forEach((s) => {
+      if (!seen.has(s._setId)) items.push({ kind: 'set', setId: s._setId });
+    });
+  } else {
+    items = hydratedSets.map((s) => ({ kind: 'set', setId: s._setId }));
+  }
+  return { ...ex, sets: hydratedSets, items };
+}
+
+/* Format seconds as "M:SS". Shared by the rest-row countdown. */
+const formatRestTime = (secs) => {
+  const s = Math.max(0, Math.round(secs));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
 
 /* Resume-card window: if a workout finished less than this long ago
    and is still present in history, the mobile home view shows a
@@ -159,6 +203,60 @@ function useAutoScrollOnDrag() {
 }
 
 /**
+ * A single inline rest-row, rendered inside the exercise's items list.
+ * Reorder.Item so it can be dragged to a new position via the grip.
+ * Countdown is wall-clock derived from `startedAt + durationSec`, so
+ * it stays accurate across re-renders and tab-backgrounding.
+ */
+function RestRowItem({ item, exIdx, onRemove }) {
+  const controls = useDragControls();
+  const startAutoScroll = useAutoScrollOnDrag();
+  const now = Date.now();
+  const elapsedSec = item.startedAt ? Math.floor((now - item.startedAt) / 1000) : 0;
+  const remainingSec = Math.max(0, item.durationSec - elapsedSec);
+  const done = item.startedAt && remainingSec === 0;
+  return (
+    <Reorder.Item
+      value={item}
+      dragListener={false}
+      dragControls={controls}
+      as="div"
+      className={`wlm-rest-row ${done ? 'wlm-rest-row--done' : ''}`}
+      initial={{ opacity: 0, scaleY: 0.6 }}
+      animate={{ opacity: 1, scaleY: 1 }}
+      exit={{ opacity: 0, scaleY: 0.6 }}
+      transition={{ duration: 0.18 }}
+      style={{ originY: 0 }}
+    >
+      <button
+        type="button"
+        className="wlm-rest-row__grip"
+        aria-label="Drag to reorder rest"
+        onPointerDown={(e) => { controls.start(e); startAutoScroll(e); }}
+        style={{ touchAction: 'none' }}
+      >
+        <GripVertical size={14} />
+      </button>
+      <Timer size={14} className="wlm-rest-row__icon" />
+      <span className="wlm-rest-row__label">Rest</span>
+      <span className="wlm-rest-row__time">
+        {done ? 'Done' : formatRestTime(remainingSec)}
+      </span>
+      <span className="wlm-rest-row__duration">· {formatRestTime(item.durationSec)}</span>
+      <button
+        type="button"
+        className="wlm-rest-row__delete"
+        onClick={() => onRemove(exIdx, item.id)}
+        aria-label="Remove rest"
+        style={{ touchAction: 'manipulation' }}
+      >
+        <X size={14} />
+      </button>
+    </Reorder.Item>
+  );
+}
+
+/**
  * One exercise card rendered as a Framer Motion Reorder.Item. Drag is
  * gated to the grip handle via `dragListener={false}` + useDragControls
  * so tapping the weight/reps inputs never starts a drag.
@@ -181,8 +279,8 @@ function ReorderableExerciseBlock({
   onStartEditNote,
   onChangeNoteDraft,
   onCommitNoteDraft,
-  restTimerState,
-  onCancelRestTimer,
+  reorderSessionItems,
+  removeRestItem,
 }) {
   const controls = useDragControls();
   const startAutoScroll = useAutoScrollOnDrag();
@@ -190,7 +288,7 @@ function ReorderableExerciseBlock({
   const rawNote = ex.notes && String(ex.notes).trim();
   const hasNote = !!rawNote;
   const displayNote = hasNote && rawNote.length > 60 ? `${rawNote.slice(0, 60)}…` : rawNote;
-  const timerActive = restTimerState && restTimerState.exIdx === exIdx;
+  const items = Array.isArray(ex.items) ? ex.items : [];
 
   /* Expanded inline note input: on open, focus and scroll the card into
      view so the iOS keyboard doesn't hide it. Mirrors the pattern used
@@ -292,16 +390,38 @@ function ReorderableExerciseBlock({
         </button>
       ) : null}
       {cardio ? (
-        <div className="wlm-ex-block__cardio-sets">
-          {ex.sets.map((set, setIdx) => {
+        <Reorder.Group
+          axis="y"
+          values={items}
+          onReorder={(newOrder) => reorderSessionItems(exIdx, newOrder)}
+          as="div"
+          className="wlm-ex-block__cardio-sets"
+        >
+          {items.map((item) => {
+            if (item.kind === 'rest') {
+              return (
+                <RestRowItem
+                  key={item.id}
+                  item={item}
+                  exIdx={exIdx}
+                  onRemove={removeRestItem}
+                />
+              );
+            }
+            const setIdx = ex.sets.findIndex((s) => s._setId === item.setId);
+            if (setIdx < 0) return null;
+            const set = ex.sets[setIdx];
             const isDone = !!completedSets[`${exIdx}-${setIdx}`];
             const durationUnit = set.durationUnit || 'min';
             const speedUnit = set.speedUnit || 'mph';
             const distanceUnit = set.distanceUnit || 'mi';
             const distanceShown = !!set.distanceShown || (set.distance != null && set.distance !== '');
             return (
-              <div
-                key={setIdx}
+              <Reorder.Item
+                value={item}
+                dragListener={false}
+                key={item.setId}
+                as="div"
                 className={`wlm-cardio-row ${isDone ? 'wlm-cardio-row--done' : ''}`}
                 style={{ touchAction: 'manipulation' }}
               >
@@ -443,10 +563,10 @@ function ReorderableExerciseBlock({
                     + Add distance
                   </button>
                 )}
-              </div>
+              </Reorder.Item>
             );
           })}
-        </div>
+        </Reorder.Group>
       ) : (
         <div className="wlm-ex-block__table">
           <div className="wlm-ex-block__thead">
@@ -455,10 +575,30 @@ function ReorderableExerciseBlock({
             <span className="wlm-ex-col wlm-ex-col--reps">REPS</span>
             <span className="wlm-ex-col wlm-ex-col--check" />
           </div>
-          {ex.sets.map((set, setIdx) => {
+          <Reorder.Group
+            axis="y"
+            values={items}
+            onReorder={(newOrder) => reorderSessionItems(exIdx, newOrder)}
+            as="div"
+            className="wlm-ex-block__tbody"
+          >
+          {items.map((item) => {
+            if (item.kind === 'rest') {
+              return (
+                <RestRowItem
+                  key={item.id}
+                  item={item}
+                  exIdx={exIdx}
+                  onRemove={removeRestItem}
+                />
+              );
+            }
+            const setIdx = ex.sets.findIndex((s) => s._setId === item.setId);
+            if (setIdx < 0) return null;
+            const set = ex.sets[setIdx];
             const isDone = !!completedSets[`${exIdx}-${setIdx}`];
             return (
-              <div key={setIdx} className={`wlm-ex-row ${isDone ? 'wlm-ex-row--done' : ''}`}>
+              <Reorder.Item value={item} dragListener={false} key={item.setId} as="div" className={`wlm-ex-row ${isDone ? 'wlm-ex-row--done' : ''}`}>
                 <span className="wlm-ex-col wlm-ex-col--set">{setIdx + 1}</span>
                 <input
                   type="number"
@@ -489,9 +629,10 @@ function ReorderableExerciseBlock({
                 >
                   <Check size={16} />
                 </button>
-              </div>
+              </Reorder.Item>
             );
           })}
+          </Reorder.Group>
         </div>
       )}
       <button
@@ -501,26 +642,6 @@ function ReorderableExerciseBlock({
       >
         {cardio ? '+ Add Interval' : '+ Add Set'}
       </button>
-      {timerActive && (
-        <div className="wlm-ex-block__timer-pill" role="status" aria-live="polite">
-          <Timer size={14} />
-          <span className="wlm-ex-block__timer-time">
-            {Math.floor(restTimerState.remaining / 60)}
-            :
-            {String(restTimerState.remaining % 60).padStart(2, '0')}
-          </span>
-          <span className="wlm-ex-block__timer-label">Rest</span>
-          <button
-            type="button"
-            className="wlm-ex-block__timer-cancel"
-            onClick={onCancelRestTimer}
-            aria-label="Cancel rest timer"
-            style={{ touchAction: 'manipulation' }}
-          >
-            <X size={14} />
-          </button>
-        </div>
-      )}
     </Reorder.Item>
   );
 }
@@ -643,10 +764,14 @@ export default function WorkoutLogger() {
      expanded-editing state; `draft` is the in-progress textarea value.
      Committed to the exercise on blur via setSessionExerciseNotes. */
   const [noteSheet, setNoteSheet] = useState(null); // { exIdx, draft }
-  /* Rest-timer picker sheet opened from the menu. */
-  const [restTimerPicker, setRestTimerPicker] = useState(null); // { exIdx }
-  /* Active rest timer — at most one runs at a time. */
-  const [restTimerState, setRestTimerState] = useState(null); // { exIdx, remaining, endsAt }
+  /* Rest-timer picker dialog — a centered modal (see RestTimerDialog).
+     Stores the exIdx the rest row will be inserted into. */
+  const [restPickerExIdx, setRestPickerExIdx] = useState(null);
+  /* Shared 1 Hz tick. Only runs while there's at least one active
+     (started, not-yet-fired) rest row in the session, so idle
+     sessions don't re-render every second. Individual rest rows
+     read Date.now() to compute their own `remaining` on render. */
+  const [, setNowTick] = useState(0);
   /* Destructive confirmation for Remove Exercise. */
   const [confirmRemoveExercise, setConfirmRemoveExercise] = useState(null); // exIdx
 
@@ -1057,7 +1182,11 @@ export default function WorkoutLogger() {
     const startMs = snap.session_start_time
       ? new Date(snap.session_start_time).getTime()
       : Date.now();
-    setSessionExercises(Array.isArray(snap.session_exercises) ? snap.session_exercises : []);
+    setSessionExercises(
+      Array.isArray(snap.session_exercises)
+        ? snap.session_exercises.map(hydrateExerciseItems)
+        : [],
+    );
     setSessionName(snap.session_name || '');
     setSessionMuscleGroup(snap.session_muscle_group || '');
     setSessionNotes(snap.session_notes || '');
@@ -1208,6 +1337,7 @@ export default function WorkoutLogger() {
     const exs = (template.exercises || []).map((ex) => {
       const cardio = isCardioExercise(ex);
       const hydrateCardioSet = (s) => ({
+        _setId: newSetId(),
         duration: s.duration ?? (s.duration_seconds != null ? String(Math.round(s.duration_seconds / 60)) : ''),
         durationUnit: s.durationUnit || 'min',
         speed: s.speed ?? (s.speed_mph != null ? String(s.speed_mph) : ''),
@@ -1217,7 +1347,7 @@ export default function WorkoutLogger() {
         distanceShown: !!s.distanceShown || s.distance_miles != null,
         notes: '',
       });
-      return {
+      return hydrateExerciseItems({
         _id: newExId(),
         name: ex.name,
         isCardio: cardio || undefined,
@@ -1226,14 +1356,14 @@ export default function WorkoutLogger() {
           ? ex.sets.map((s) =>
               cardio
                 ? hydrateCardioSet(s)
-                : { weight: s.weight || '', reps: s.reps || '', notes: '' },
+                : { _setId: newSetId(), weight: s.weight || '', reps: s.reps || '', notes: '' },
             )
           : Array.from({ length: ex.sets || 3 }, () =>
               cardio
-                ? { duration: '', durationUnit: 'min', speed: '', speedUnit: 'mph', distance: '', distanceUnit: 'mi', distanceShown: false, notes: '' }
-                : { weight: ex.weight || '', reps: ex.reps || '', notes: '' },
+                ? { _setId: newSetId(), duration: '', durationUnit: 'min', speed: '', speedUnit: 'mph', distance: '', distanceUnit: 'mi', distanceShown: false, notes: '' }
+                : { _setId: newSetId(), weight: ex.weight || '', reps: ex.reps || '', notes: '' },
             ),
-      };
+      });
     });
     setSessionExercises(exs);
     setSessionName(template.name);
@@ -1254,17 +1384,17 @@ export default function WorkoutLogger() {
       exercise?.bodyPart === 'cardio' ||
       CARDIO_NAME_SET.has((exercise?.name || '').toLowerCase().trim());
     const blankSet = cardio
-      ? { duration: '', durationUnit: 'min', speed: '', speedUnit: 'mph', distance: '', distanceUnit: 'mi', distanceShown: false, notes: '' }
-      : { weight: '', reps: '', notes: '' };
+      ? { _setId: newSetId(), duration: '', durationUnit: 'min', speed: '', speedUnit: 'mph', distance: '', distanceUnit: 'mi', distanceShown: false, notes: '' }
+      : { _setId: newSetId(), weight: '', reps: '', notes: '' };
     setSessionExercises((prev) => [
       ...prev,
-      {
+      hydrateExerciseItems({
         _id: newExId(),
         name: exercise.name,
         isCardio: cardio || undefined,
         bodyPart: exercise?.bodyPart,
         sets: [blankSet],
-      },
+      }),
     ]);
     setExerciseSearchOpen(false);
     setExerciseSearchQuery('');
@@ -1298,8 +1428,10 @@ export default function WorkoutLogger() {
       // Inherit unit preferences from the last set so the user doesn't
       // have to re-toggle km/h or km for each interval.
       const lastSet = (ex.sets && ex.sets[ex.sets.length - 1]) || {};
+      const newId = newSetId();
       const blankSet = cardio
         ? {
+            _setId: newId,
             duration: '',
             durationUnit: lastSet.durationUnit || 'min',
             speed: '',
@@ -1309,8 +1441,12 @@ export default function WorkoutLogger() {
             distanceShown: !!lastSet.distanceShown,
             notes: '',
           }
-        : { weight: '', reps: '', notes: '' };
-      updated[exIdx] = { ...ex, sets: [...ex.sets, blankSet] };
+        : { _setId: newId, weight: '', reps: '', notes: '' };
+      updated[exIdx] = {
+        ...ex,
+        sets: [...ex.sets, blankSet],
+        items: [...(ex.items || []), { kind: 'set', setId: newId }],
+      };
       return updated;
     });
   };
@@ -1320,7 +1456,12 @@ export default function WorkoutLogger() {
       const updated = [...prev];
       const ex = updated[exIdx];
       if (!ex) return prev;
-      updated[exIdx] = { ...ex, sets: ex.sets.filter((_, i) => i !== setIdx) };
+      const targetSet = ex.sets[setIdx];
+      const nextSets = ex.sets.filter((_, i) => i !== setIdx);
+      const nextItems = (ex.items || []).filter(
+        (it) => !(it.kind === 'set' && targetSet && it.setId === targetSet._setId),
+      );
+      updated[exIdx] = { ...ex, sets: nextSets, items: nextItems };
       return updated;
     });
     setCompletedSets((prev) => {
@@ -1332,6 +1473,35 @@ export default function WorkoutLogger() {
         else if (si > setIdx) next[`${ei}-${si - 1}`] = prev[key];
       });
       return next;
+    });
+  };
+
+  /* Reorder the items manifest (sets + rest rows) within a single
+     exercise. Set positions in `ex.sets` don't change — only the
+     render order in `items` does. The completedSets map keys by
+     set-index into `ex.sets`, which stays stable, so no remap. */
+  const reorderSessionItems = (exIdx, newItems) => {
+    setSessionExercises((prev) => {
+      const updated = [...prev];
+      const ex = updated[exIdx];
+      if (!ex) return prev;
+      updated[exIdx] = { ...ex, items: newItems };
+      return updated;
+    });
+  };
+
+  /* Remove a single rest row from the items manifest. Sets are
+     removed via removeSessionSet, not this. */
+  const removeRestItem = (exIdx, itemId) => {
+    setSessionExercises((prev) => {
+      const updated = [...prev];
+      const ex = updated[exIdx];
+      if (!ex) return prev;
+      updated[exIdx] = {
+        ...ex,
+        items: (ex.items || []).filter((it) => !(it.kind === 'rest' && it.id === itemId)),
+      };
+      return updated;
     });
   };
 
@@ -1368,8 +1538,6 @@ export default function WorkoutLogger() {
       });
       return next;
     });
-    // If the timer was scoped to this exercise, cancel it.
-    setRestTimerState((prev) => (prev && prev.exIdx === exIdx ? null : prev));
   };
 
   /* Writes `notes` onto a specific exercise in the active session.
@@ -1385,38 +1553,107 @@ export default function WorkoutLogger() {
     });
   };
 
-  /* Rest-timer tick. Runs only while an active timer is present;
-     stops itself when `remaining` hits 0 and fires a soft haptic
-     pulse on iOS if the device supports navigator.vibrate. */
+  /* Shared 1 Hz ticker. Only runs while the session has at least one
+     active-but-unfired rest row, so idle sessions don't re-render
+     every second. Each rest row computes its own `remaining` from
+     wall clock (Date.now() - startedAt) on render, which is
+     drift-free and survives tab-backgrounding. */
+  const hasActiveRest = useMemo(
+    () =>
+      sessionExercises.some((ex) =>
+        (ex.items || []).some(
+          (it) =>
+            it.kind === 'rest' &&
+            it.startedAt &&
+            !it.notified &&
+            Date.now() - it.startedAt < it.durationSec * 1000,
+        ),
+      ),
+    [sessionExercises],
+  );
   useEffect(() => {
-    if (!restTimerState) return;
-    const id = setInterval(() => {
-      setRestTimerState((prev) => {
-        if (!prev) return prev;
-        const remaining = Math.max(0, Math.round((prev.endsAt - Date.now()) / 1000));
-        if (remaining <= 0) {
-          if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-            try { navigator.vibrate(200); } catch { /* noop */ }
-          }
-          try { toast.success('Rest complete'); } catch { /* noop */ }
-          return null;
-        }
-        return { ...prev, remaining };
-      });
-    }, 1000);
+    if (!hasActiveRest) return;
+    const id = setInterval(() => setNowTick((n) => n + 1), 1000);
     return () => clearInterval(id);
-  }, [restTimerState]);
+  }, [hasActiveRest]);
 
-  /* Kicks off a rest timer for a specific exercise. Only one timer
-     runs at a time — starting a new one cancels any prior. */
+  /* Fires the haptic + toast side effect once per rest when its
+     countdown first crosses 0. The `notified` flag is flipped on the
+     rest item so the effect doesn't re-fire on every tick. */
+  useEffect(() => {
+    let fired = false;
+    setSessionExercises((prev) => {
+      let changed = false;
+      const next = prev.map((ex) => {
+        if (!Array.isArray(ex.items)) return ex;
+        let exChanged = false;
+        const nextItems = ex.items.map((it) => {
+          if (it.kind !== 'rest' || !it.startedAt || it.notified) return it;
+          const elapsedMs = Date.now() - it.startedAt;
+          if (elapsedMs >= it.durationSec * 1000) {
+            exChanged = true;
+            changed = true;
+            if (!fired) {
+              fired = true;
+              if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+                try { navigator.vibrate(200); } catch { /* noop */ }
+              }
+              try { toast.success('Rest complete'); } catch { /* noop */ }
+            }
+            return { ...it, notified: true };
+          }
+          return it;
+        });
+        return exChanged ? { ...ex, items: nextItems } : ex;
+      });
+      return changed ? next : prev;
+    });
+    // Intentionally depends on sessionExercises so a freshly-inserted
+    // rest that completes quickly (e.g. a leftover from restore) also
+    // gets checked on mount, not only on tick.
+  }, [sessionExercises]);
+
+  /* Inserts a fresh rest row into an exercise's items manifest. The
+     insert position is right after the last completed set (falls back
+     to end of list). Marking `startedAt` immediately means the
+     countdown begins the moment the user picks a duration. */
   const startRestTimer = (exIdx, seconds) => {
     const secs = Math.max(5, Math.min(60 * 60, Math.round(seconds)));
-    setRestTimerState({
-      exIdx,
-      remaining: secs,
-      endsAt: Date.now() + secs * 1000,
+    setSessionExercises((prev) => {
+      const updated = [...prev];
+      const ex = updated[exIdx];
+      if (!ex) return prev;
+      const items = Array.isArray(ex.items) ? [...ex.items] : [];
+      // Find insert position: after the last completed set in this
+      // exercise, or end of list if none completed yet.
+      let insertAt = items.length;
+      const completedIndices = [];
+      Object.keys(completedSets).forEach((k) => {
+        const [ei, si] = k.split('-').map(Number);
+        if (ei === exIdx) completedIndices.push(si);
+      });
+      if (completedIndices.length) {
+        const lastCompletedSetIdx = Math.max(...completedIndices);
+        const lastCompletedSet = ex.sets[lastCompletedSetIdx];
+        if (lastCompletedSet) {
+          const pos = items.findIndex(
+            (it) => it.kind === 'set' && it.setId === lastCompletedSet._setId,
+          );
+          if (pos >= 0) insertAt = pos + 1;
+        }
+      }
+      const restRow = {
+        kind: 'rest',
+        id: newRestId(),
+        durationSec: secs,
+        startedAt: Date.now(),
+        notified: false,
+      };
+      items.splice(insertAt, 0, restRow);
+      updated[exIdx] = { ...ex, items };
+      return updated;
     });
-    setRestTimerPicker(null);
+    setRestPickerExIdx(null);
     setExerciseMenu(null);
   };
 
@@ -1626,17 +1863,21 @@ export default function WorkoutLogger() {
       return;
     }
     // Attach stable _id so the Reorder.Item keys stay consistent.
+    // Rests are not restored into a resumed workout — we rebuild items
+    // fresh from sets only (see hydrateExerciseItems).
     const exs = (w.exercises || []).map((ex) => {
       const cardio = isCardioExercise(ex);
-      return {
+      return hydrateExerciseItems({
         _id: newExId(),
         name: ex.name,
         isCardio: cardio || undefined,
         bodyPart: ex.bodyPart,
+        items: undefined,
         sets: Array.isArray(ex.sets)
           ? ex.sets.map((s) =>
               cardio
                 ? {
+                    _setId: newSetId(),
                     duration: s.duration ?? (s.duration_seconds != null ? String(Math.round(s.duration_seconds / 60)) : ''),
                     durationUnit: s.durationUnit || 'min',
                     speed: s.speed ?? (s.speed_mph != null ? String(s.speed_mph) : ''),
@@ -1647,15 +1888,16 @@ export default function WorkoutLogger() {
                     notes: s.notes || '',
                   }
                 : {
+                    _setId: newSetId(),
                     weight: s.weight || '',
                     reps: s.reps || '',
                     notes: s.notes || '',
                   },
             )
           : [cardio
-              ? { duration: '', durationUnit: 'min', speed: '', speedUnit: 'mph', distance: '', distanceUnit: 'mi', distanceShown: false, notes: '' }
-              : { weight: '', reps: '', notes: '' }],
-      };
+              ? { _setId: newSetId(), duration: '', durationUnit: 'min', speed: '', speedUnit: 'mph', distance: '', distanceUnit: 'mi', distanceShown: false, notes: '' }
+              : { _setId: newSetId(), weight: '', reps: '', notes: '' }],
+      });
     });
     setSessionExercises(exs);
     setSessionName(w.workout_name || '');
@@ -2856,8 +3098,8 @@ export default function WorkoutLogger() {
                       setSessionExerciseNotes(noteSheet.exIdx, noteSheet.draft);
                       setNoteSheet(null);
                     }}
-                    restTimerState={restTimerState}
-                    onCancelRestTimer={() => setRestTimerState(null)}
+                    reorderSessionItems={reorderSessionItems}
+                    removeRestItem={removeRestItem}
                   />
                 ))}
               </Reorder.Group>
@@ -3447,7 +3689,7 @@ export default function WorkoutLogger() {
                     onClick={() => {
                       const idx = exerciseMenu.idx;
                       setExerciseMenu(null);
-                      setRestTimerPicker({ exIdx: idx });
+                      setRestPickerExIdx(idx);
                     }}
                     style={{ touchAction: 'manipulation' }}
                   >
@@ -3473,82 +3715,14 @@ export default function WorkoutLogger() {
           })()}
         </AnimatePresence>
 
-        {/* ── REST TIMER PICKER (mobile) ── */}
-        <AnimatePresence>
-          {restTimerPicker && sessionExercises[restTimerPicker.exIdx] && (
-            <motion.div
-              key="wlm-timer-overlay"
-              className="wlm-overlay wlm-timer-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              onClick={() => setRestTimerPicker(null)}
-            >
-              <motion.div
-                className="wlm-timer-sheet"
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="wlm-ex-menu__handle" aria-hidden="true" />
-                <p className="wlm-timer-sheet__title">Rest timer</p>
-                <p className="wlm-timer-sheet__subtitle">
-                  {sessionExercises[restTimerPicker.exIdx]?.name}
-                </p>
-                <div className="wlm-timer-sheet__pills">
-                  {[30, 60, 90, 120, 180].map((sec) => (
-                    <button
-                      key={sec}
-                      type="button"
-                      className="wlm-timer-sheet__pill"
-                      onClick={() => startRestTimer(restTimerPicker.exIdx, sec)}
-                      style={{ touchAction: 'manipulation' }}
-                    >
-                      {sec < 60 ? `${sec}s` : `${Math.round(sec / 60)}:${String(sec % 60).padStart(2, '0')}`}
-                    </button>
-                  ))}
-                </div>
-                <div className="wlm-timer-sheet__custom">
-                  <label htmlFor="wlm-timer-custom" className="wlm-timer-sheet__custom-label">
-                    Custom (seconds)
-                  </label>
-                  <input
-                    id="wlm-timer-custom"
-                    type="number"
-                    inputMode="numeric"
-                    min={5}
-                    max={3600}
-                    placeholder="e.g. 75"
-                    className="wlm-timer-sheet__custom-input"
-                    onFocus={handleInputFocus}
-                    onClick={handleInputClick}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const secs = parseInt(e.currentTarget.value, 10);
-                        if (isFinite(secs) && secs >= 5) {
-                          startRestTimer(restTimerPicker.exIdx, secs);
-                        }
-                      }
-                    }}
-                  />
-                </div>
-                <div className="wlm-timer-sheet__actions">
-                  <button
-                    type="button"
-                    className="wlm-timer-sheet__cancel"
-                    onClick={() => setRestTimerPicker(null)}
-                    style={{ touchAction: 'manipulation' }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* ── REST TIMER PICKER ── centered themed dialog, same shell
+            as ConfirmDialog. Opened from the per-exercise 3-dots menu. */}
+        <RestTimerDialog
+          open={restPickerExIdx != null && !!sessionExercises[restPickerExIdx]}
+          exerciseName={restPickerExIdx != null ? sessionExercises[restPickerExIdx]?.name : ''}
+          onStart={(secs) => startRestTimer(restPickerExIdx, secs)}
+          onCancel={() => setRestPickerExIdx(null)}
+        />
 
         {/* ── CONFIRM REMOVE EXERCISE (mobile) ── */}
         <AnimatePresence>
