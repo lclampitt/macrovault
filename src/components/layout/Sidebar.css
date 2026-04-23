@@ -786,24 +786,26 @@
     z-index: 1;
   }
 
-  /* Radial glow bloom — sits behind the circular button, extends
-     ~24px beyond it on all sides. Uses pseudo-element so it escapes
-     the opaque nav background by painting above the nav. */
+  /* Radial glow bloom — subtle ambient halo that hugs the + button and
+     bleeds upward into the card area above the nav. Masked to fade out
+     before reaching the "Log" label so the text stays readable. */
   .mob-nav-log-btn::before {
     content: '';
     position: absolute;
-    top: -12px;
+    top: -22px;
     left: 50%;
     transform: translateX(-50%);
-    width: 96px;
-    height: 96px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
     background: radial-gradient(
-      circle,
-      rgba(var(--accent-rgb), 0.55) 0%,
-      rgba(var(--accent-rgb), 0.25) 40%,
+      circle at 50% 35%,
+      rgba(var(--accent-rgb), 0.32) 0%,
+      rgba(var(--accent-rgb), 0.14) 40%,
       rgba(var(--accent-rgb), 0) 70%
     );
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+            mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
     pointer-events: none;
     z-index: -1;
     transition: opacity 0.2s ease;
@@ -817,25 +819,25 @@
     background: var(--accent);
     color: #fff;
     box-shadow:
-      0 0 0 4px rgba(var(--accent-rgb), 0.15),
-      0 6px 22px rgba(var(--accent-rgb), 0.55);
-    filter: drop-shadow(0 0 14px rgba(var(--accent-rgb), 0.45));
+      0 0 0 3px rgba(var(--accent-rgb), 0.10),
+      0 4px 12px rgba(var(--accent-rgb), 0.28);
+    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.22));
     transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
   }
 
   .mob-nav-log-btn--active svg {
     box-shadow:
-      0 0 0 6px rgba(var(--accent-rgb), 0.18),
-      0 6px 26px rgba(var(--accent-rgb), 0.7);
-    filter: drop-shadow(0 0 18px rgba(var(--accent-rgb), 0.6));
+      0 0 0 4px rgba(var(--accent-rgb), 0.12),
+      0 4px 14px rgba(var(--accent-rgb), 0.36);
+    filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.30));
     transform: scale(1.05);
   }
 
   .mob-nav-log-btn--active::before {
     background: radial-gradient(
-      circle,
-      rgba(var(--accent-rgb), 0.7) 0%,
-      rgba(var(--accent-rgb), 0.3) 40%,
+      circle at 50% 35%,
+      rgba(var(--accent-rgb), 0.40) 0%,
+      rgba(var(--accent-rgb), 0.16) 40%,
       rgba(var(--accent-rgb), 0) 70%
     );
   }
