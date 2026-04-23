@@ -2378,53 +2378,44 @@
   min-height: 48px;
 }
 
-/* ── MOBILE: End-workout confirm as bottom sheet ────────
-   Below 768px, the confirm dialog is presented as a
-   slide-up bottom sheet with drag handle + stacked
-   buttons. Desktop presentation is unchanged. */
+/* ── MOBILE: Confirm dialogs render as centered modals ────
+   Below 768px, both the delete confirm and end-workout
+   confirm appear as a centered card (not a bottom sheet),
+   so they don't get clipped by the fixed bottom nav. */
 @media (max-width: 767px) {
-  /* Overlay aligns to bottom instead of center so the sheet
-     hugs the bottom edge. */
   .wlm-overlay--confirm {
-    align-items: flex-end;
-    justify-content: stretch;
-    padding: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
     background: rgba(0, 0, 0, 0.6);
   }
 
   .wlm-confirm--end-workout {
     width: 100%;
-    max-width: 100%;
+    max-width: 340px;
     background: #151820;
-    border: none;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: 14px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
     text-align: center;
   }
 
+  /* Drag handle is irrelevant on a centered modal. */
   .wlm-confirm--end-workout .wlm-confirm__handle {
-    display: block;
-    width: 40px;
-    height: 4px;
-    margin: 0 auto 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
+    display: none;
   }
 
   .wlm-confirm--end-workout .wlm-confirm__title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #fff;
     margin: 0 0 8px;
   }
 
   .wlm-confirm--end-workout .wlm-confirm__message {
-    font-size: 14px;
+    font-size: 13px;
     color: rgba(255, 255, 255, 0.5);
-    margin: 0 0 24px;
+    margin: 0 0 20px;
     line-height: 1.5;
   }
 
@@ -2436,7 +2427,7 @@
 
   .wlm-confirm--end-workout .wlm-confirm__primary {
     width: 100%;
-    height: 52px;
+    height: 48px;
     padding: 0;
     border-radius: 12px;
     font-size: 15px;
@@ -2447,7 +2438,7 @@
 
   .wlm-confirm--end-workout .wlm-confirm__cancel {
     width: 100%;
-    height: 52px;
+    height: 48px;
     padding: 0;
     border-radius: 12px;
     font-size: 15px;
@@ -3216,11 +3207,16 @@
 }
 
 /* ============================================================
-   EXERCISE 3-DOTS MENU (bottom sheet on mobile)
+   EXERCISE 3-DOTS MENU (popover dropdown on mobile)
+   Anchored under the 3-dots button (positioned inline). Previous
+   bottom-sheet variant was getting clipped by the fixed bottom
+   nav, so the menu is now a compact dropdown.
    ============================================================ */
-.wlm-ex-menu-overlay {
-  align-items: flex-end;
-  justify-content: center;
+.wlm-ex-menu-popover-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: transparent;
 }
 
 .wlm-ex-menu {
@@ -3233,6 +3229,17 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+/* Popover variant overrides the bottom-sheet defaults. */
+.wlm-ex-menu--popover {
+  max-width: 220px;
+  border-radius: 12px;
+  padding: 6px;
+  background: var(--bg-surface, #151820);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  gap: 2px;
 }
 
 .wlm-ex-menu__handle {
@@ -3301,6 +3308,17 @@
 }
 .wlm-ex-menu__item--danger:active {
   background: rgba(239, 68, 68, 0.08);
+}
+
+/* Popover variant: compact row sizing, no left accent bar. */
+.wlm-ex-menu--popover .wlm-ex-menu__item {
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+.wlm-ex-menu--popover .wlm-ex-menu__item--primary {
+  box-shadow: none;
 }
 
 /* ============================================================

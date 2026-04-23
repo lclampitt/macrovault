@@ -219,7 +219,11 @@ function ReorderableExerciseBlock({
         <button
           type="button"
           className="wlm-ex-block__more"
-          onClick={() => onOpenExerciseMenu && onOpenExerciseMenu(exIdx)}
+          onClick={(e) => {
+            if (!onOpenExerciseMenu) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            onOpenExerciseMenu(exIdx, rect);
+          }}
           aria-label="Exercise options"
           style={{ touchAction: 'manipulation' }}
         >
@@ -584,8 +588,11 @@ export default function WorkoutLogger() {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [workoutDetailSheet, setWorkoutDetailSheet] = useState(null);
 
-  /* Per-exercise action menu (3-dots popover on mobile exercise block). */
-  const [exerciseMenuIdx, setExerciseMenuIdx] = useState(null);
+  /* Per-exercise action menu (3-dots popover on mobile exercise block).
+     Stored as { idx, anchorRect } so the popover can position itself
+     directly under the 3-dots button instead of using a full-width
+     bottom sheet (which was clipped by the fixed bottom nav). */
+  const [exerciseMenu, setExerciseMenu] = useState(null);
   /* Per-exercise note editor sheet. `exIdx` is the exercise we're editing. */
   const [noteSheet, setNoteSheet] = useState(null); // { exIdx, draft }
   /* Rest-timer picker sheet opened from the menu. */
@@ -1362,7 +1369,7 @@ export default function WorkoutLogger() {
       endsAt: Date.now() + secs * 1000,
     });
     setRestTimerPicker(null);
-    setExerciseMenuIdx(null);
+    setExerciseMenu(null);
   };
 
   const finishSession = async () => {
@@ -2777,7 +2784,7 @@ export default function WorkoutLogger() {
                     handleInputFocus={handleInputFocus}
                     handleInputKeyDown={handleInputKeyDown}
                     handleInputClick={handleInputClick}
-                    onOpenExerciseMenu={setExerciseMenuIdx}
+                    onOpenExerciseMenu={(idx, anchorRect) => setExerciseMenu({ idx, anchorRect })}
                     onOpenNoteSheet={(idx) => setNoteSheet({ exIdx: idx, draft: sessionExercises[idx]?.notes || '' })}
                     restTimerState={restTimerState}
                     onCancelRestTimer={() => setRestTimerState(null)}
@@ -3139,19 +3146,13 @@ export default function WorkoutLogger() {
             CSS (and the Framer Motion variants below) differ. */}
         <AnimatePresence>
           {endWorkoutConfirm && (() => {
-            /* Recompute each time the sheet is mounted so a rotate /
-               resize between opens picks up the correct breakpoint. */
-            const isMobileViewport = typeof window !== 'undefined'
-              && window.matchMedia('(max-width: 767px)').matches;
-            const sheetInitial = isMobileViewport
-              ? { y: '100%' }
-              : { opacity: 0, scale: 0.92 };
-            const sheetAnimate = isMobileViewport
-              ? { y: 0 }
-              : { opacity: 1, scale: 1 };
-            const sheetExit = isMobileViewport
-              ? { y: '100%' }
-              : { opacity: 0, scale: 0.92 };
+            /* Centered-modal animation — used on both mobile and
+               desktop now that the confirm dialog no longer slides
+               up from the bottom (it was getting clipped by the
+               fixed bottom nav on mobile). */
+            const sheetInitial = { opacity: 0, scale: 0.92 };
+            const sheetAnimate = { opacity: 1, scale: 1 };
+            const sheetExit = { opacity: 0, scale: 0.92 };
             /* Cardio roll-up — shown only when the session has at
                least one cardio exercise. Avg speed is duration-weighted
                so a long slow run dominates a short fast sprint. */
@@ -3200,11 +3201,9 @@ export default function WorkoutLogger() {
                 initial={sheetInitial}
                 animate={sheetAnimate}
                 exit={sheetExit}
-                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.15 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Mobile drag-handle pill (hidden on desktop via CSS) */}
-                <span className="wlm-confirm__handle" aria-hidden="true" />
                 <h4 className="wlm-confirm__title">End workout?</h4>
                 <p className="wlm-confirm__message">
                   Are you sure you want to finish? Your progress will be saved.
@@ -3262,70 +3261,96 @@ export default function WorkoutLogger() {
           })()}
         </AnimatePresence>
 
-        {/* ── PER-EXERCISE 3-DOTS MENU (mobile) ── */}
+        {/* ── PER-EXERCISE 3-DOTS MENU (mobile) ──
+            Popover-style dropdown anchored under the 3-dots button
+            that opened it. A transparent overlay above captures outside
+            taps to dismiss. The popover flips to appear ABOVE the
+            button when there isn't enough room below. */}
         <AnimatePresence>
-          {exerciseMenuIdx != null && sessionExercises[exerciseMenuIdx] && (
-            <motion.div
-              key="wlm-ex-menu-overlay"
-              className="wlm-overlay wlm-ex-menu-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              onClick={() => setExerciseMenuIdx(null)}
-            >
+          {exerciseMenu && sessionExercises[exerciseMenu.idx] && (() => {
+            const MENU_WIDTH = 200;
+            const MENU_HEIGHT_APPROX = 172;
+            const MARGIN = 8;
+            const vw = typeof window !== 'undefined' ? window.innerWidth : 375;
+            const vh = typeof window !== 'undefined' ? window.innerHeight : 812;
+            const rect = exerciseMenu.anchorRect || { top: 0, bottom: 0, right: vw, left: vw };
+            const spaceBelow = vh - rect.bottom;
+            const flipUp = spaceBelow < (MENU_HEIGHT_APPROX + MARGIN) && rect.top > (MENU_HEIGHT_APPROX + MARGIN);
+            const top = flipUp
+              ? Math.max(MARGIN, rect.top - MENU_HEIGHT_APPROX - 6)
+              : Math.min(vh - MENU_HEIGHT_APPROX - MARGIN, rect.bottom + 6);
+            // Right-align the menu with the button's right edge, clamp to viewport.
+            const right = Math.max(MARGIN, vw - rect.right);
+            return (
               <motion.div
-                className="wlm-ex-menu"
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-                onClick={(e) => e.stopPropagation()}
+                key="wlm-ex-menu-overlay"
+                className="wlm-ex-menu-popover-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.12 }}
+                onClick={() => setExerciseMenu(null)}
               >
-                <span className="wlm-ex-menu__handle" aria-hidden="true" />
-                <p className="wlm-ex-menu__title">{sessionExercises[exerciseMenuIdx]?.name}</p>
-                <button
-                  type="button"
-                  className="wlm-ex-menu__item wlm-ex-menu__item--primary"
-                  onClick={() => {
-                    const idx = exerciseMenuIdx;
-                    setExerciseMenuIdx(null);
-                    setNoteSheet({ exIdx: idx, draft: sessionExercises[idx]?.notes || '' });
+                <motion.div
+                  className="wlm-ex-menu wlm-ex-menu--popover"
+                  initial={{ opacity: 0, y: flipUp ? 4 : -4, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: flipUp ? 4 : -4, scale: 0.97 }}
+                  transition={{ duration: 0.14, ease: [0.4, 0, 0.2, 1] }}
+                  style={{
+                    position: 'fixed',
+                    top,
+                    right,
+                    width: MENU_WIDTH,
+                    zIndex: 10001,
                   }}
-                  style={{ touchAction: 'manipulation' }}
+                  onClick={(e) => e.stopPropagation()}
+                  role="menu"
+                  aria-label={`${sessionExercises[exerciseMenu.idx]?.name} options`}
                 >
-                  <StickyNote size={16} />
-                  <span>Add Note</span>
-                </button>
-                <button
-                  type="button"
-                  className="wlm-ex-menu__item"
-                  onClick={() => {
-                    const idx = exerciseMenuIdx;
-                    setExerciseMenuIdx(null);
-                    setRestTimerPicker({ exIdx: idx });
-                  }}
-                  style={{ touchAction: 'manipulation' }}
-                >
-                  <Timer size={16} />
-                  <span>Rest Timer</span>
-                </button>
-                <button
-                  type="button"
-                  className="wlm-ex-menu__item wlm-ex-menu__item--danger"
-                  onClick={() => {
-                    const idx = exerciseMenuIdx;
-                    setExerciseMenuIdx(null);
-                    setConfirmRemoveExercise(idx);
-                  }}
-                  style={{ touchAction: 'manipulation' }}
-                >
-                  <Trash2 size={16} />
-                  <span>Remove Exercise</span>
-                </button>
+                  <button
+                    type="button"
+                    className="wlm-ex-menu__item wlm-ex-menu__item--primary"
+                    onClick={() => {
+                      const idx = exerciseMenu.idx;
+                      setExerciseMenu(null);
+                      setNoteSheet({ exIdx: idx, draft: sessionExercises[idx]?.notes || '' });
+                    }}
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <StickyNote size={16} />
+                    <span>Add Note</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="wlm-ex-menu__item"
+                    onClick={() => {
+                      const idx = exerciseMenu.idx;
+                      setExerciseMenu(null);
+                      setRestTimerPicker({ exIdx: idx });
+                    }}
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <Timer size={16} />
+                    <span>Rest Timer</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="wlm-ex-menu__item wlm-ex-menu__item--danger"
+                    onClick={() => {
+                      const idx = exerciseMenu.idx;
+                      setExerciseMenu(null);
+                      setConfirmRemoveExercise(idx);
+                    }}
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <Trash2 size={16} />
+                    <span>Remove Exercise</span>
+                  </button>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          )}
+            );
+          })()}
         </AnimatePresence>
 
         {/* ── PER-EXERCISE NOTE EDITOR (mobile) ── */}
