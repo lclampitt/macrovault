@@ -648,6 +648,40 @@ function ReorderableExerciseBlock({
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'https://gainlytics-1.onrender.com';
 
+/* Render free-tier sleeps after ~15 min idle. The first request after
+   sleep takes 30-60s to wake the dyno — long enough that the browser
+   sees a fetch error before the response arrives. Two coping helpers:
+
+   warmBackend(): fired when the user STARTS a workout so the dyno is
+   awake by the time they hit Finish. Fire-and-forget, swallows errors.
+
+   postWithRetry(): used by the save flow. If the first attempt fails
+   with a TypeError (network/CORS/DNS — what a cold start looks like
+   from the browser), wait 2.5s and try again. Does NOT retry on
+   real HTTP errors (4xx/5xx) — those are intentional responses. */
+function warmBackend() {
+  try {
+    fetch(`${API_BASE}/`, { method: 'GET' }).catch(() => {});
+  } catch { /* no-op */ }
+}
+
+async function postWithRetry(url, body) {
+  const opts = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  };
+  try {
+    return await fetch(url, opts);
+  } catch (err) {
+    if (err && err.name === 'TypeError') {
+      await new Promise((r) => setTimeout(r, 2500));
+      return await fetch(url, opts);
+    }
+    throw err;
+  }
+}
+
 
 /* Format date string: "2025-12-12" → "Dec 12, 2025" */
 function formatDate(dateStr = '') {
@@ -983,18 +1017,15 @@ export default function WorkoutLogger() {
       exercises: workout.exercises || [],
     };
     try {
-      const res = await fetch(`${API_BASE}/workouts/save`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(workoutData),
-      });
+      const res = await postWithRetry(`${API_BASE}/workouts/save`, workoutData);
       if (res.status === 403) { triggerUpgrade('workouts'); return; }
       if (!res.ok) throw new Error(await res.text());
       toast.success(`${workout.workout_name} logged for ${formatDate(copyDate)}`);
       setCopyPopover(null);
       fetchWorkouts();
     } catch (err) {
-      toast.error(`Failed to copy workout: ${err.message}`);
+      console.error('Copy workout error:', err);
+      toast.error("Couldn't copy that workout. Check your connection and try again.");
     }
   };
 
@@ -1111,11 +1142,7 @@ export default function WorkoutLogger() {
     } else {
       // New workout — route through backend to enforce free-tier limit
       try {
-        const res = await fetch(`${API_BASE}/workouts/save`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(workoutData),
-        });
+        const res = await postWithRetry(`${API_BASE}/workouts/save`, workoutData);
         if (res.status === 403) {
           triggerUpgrade('workouts');
           return;
@@ -1128,7 +1155,7 @@ export default function WorkoutLogger() {
         setMessage('Workout saved successfully!');
       } catch (err) {
         console.error('Save error:', err);
-        setMessage(`Error saving workout: ${err.message}`);
+        setMessage("Couldn't save your workout. Check your connection and try again.");
         return;
       }
     }
@@ -1193,6 +1220,7 @@ export default function WorkoutLogger() {
     setSessionTimer(Math.floor((Date.now() - startMs) / 1000));
     setSessionStartTime(startMs);
     setCompletedSets(snap.completed_sets || {});
+    warmBackend();
     setMobileView('session');
   }, [userId]);
 
@@ -1330,6 +1358,7 @@ export default function WorkoutLogger() {
     setSessionStartTime(Date.now());
     setSessionTimer(0);
     setSessionFromTemplateId(null);
+    warmBackend();
     setMobileView('session');
   };
 
@@ -1375,6 +1404,7 @@ export default function WorkoutLogger() {
     setSessionFromTemplateId(template.id);
     setSessionOriginalTemplate(template);
     setTemplatePreview(null);
+    warmBackend();
     setMobileView('session');
   };
 
@@ -1736,11 +1766,7 @@ export default function WorkoutLogger() {
         if (updErr) throw new Error(updErr.message || 'Failed to update workout');
         savedWorkoutId = resumedFromWorkoutId;
       } else {
-        const res = await fetch(`${API_BASE}/workouts/save`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(workoutData),
-        });
+        const res = await postWithRetry(`${API_BASE}/workouts/save`, workoutData);
         if (res.status === 403) { triggerUpgrade('workouts'); finishInFlight.current = false; setIsFinishing(false); return; }
         if (!res.ok) throw new Error(await res.text());
         const saved = await res.json().catch(() => null);
@@ -1814,7 +1840,8 @@ export default function WorkoutLogger() {
       // will update when it returns; we don't block navigation on it.
       fetchWorkouts();
     } catch (err) {
-      toast.error(`Error: ${err.message}`);
+      console.error('Finish workout error:', err);
+      toast.error("Couldn't save your workout. Check your connection and try again.");
     } finally {
       finishInFlight.current = false;
       setIsFinishing(false);
@@ -1909,6 +1936,7 @@ export default function WorkoutLogger() {
     setSessionFromTemplateId(null);
     setSessionOriginalTemplate(null);
     setResumedFromWorkoutId(w.id);
+    warmBackend();
     setMobileView('session');
     // Keep the Resume marker until the workout is re-finished —
     // if the user backs out without finishing, they still have the
