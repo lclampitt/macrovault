@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import {
+  motion,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
 import {
   Ruler,
   Target,
@@ -103,10 +109,14 @@ const FEATURE_STRIP = [
   { label: 'Workout tracking', desc: 'Log sessions, track PRs, view charts' },
 ];
 
-const STATS = [
-  { value: 'Free', label: 'to get started' },
-  { value: '96+', label: 'exercises tracked' },
-  { value: '5 min', label: 'to set up' },
+/* Hero display headline, split per-word for the entrance stagger.
+   A line can flag `italic: true` to wrap each word in <em> (unused in
+   current copy but kept for future headings), or `accent: true` to
+   apply `.lp-display__accent` (teal) to every word in the line. */
+const HEADLINE_LINES = [
+  { words: ['Made', 'for', 'people'], italic: false },
+  { words: ['who', 'track'], italic: false },
+  { words: ['everything.'], italic: false, accent: true },
 ];
 
 const FREE_FEATURES = [
@@ -176,8 +186,54 @@ function Hero() {
           transition: { duration: 0.7, ease: [0.4, 0, 0.2, 1], delay },
         };
 
+  /* Cursor-tracked spotlight on the hero background. Writes the
+     cursor position (as a percentage of the hero's bounding box)
+     to --lp-spotlight-x / --lp-spotlight-y CSS custom properties.
+     Updates are throttled via requestAnimationFrame so we update
+     at most once per paint. Reduced-motion is handled in CSS
+     (the spotlight layers are display:none in that media query),
+     so this listener stays attached either way — it just has
+     nothing visible to drive. */
+  useEffect(() => {
+    const hero = document.querySelector('.lp-hero');
+    if (!hero) return;
+
+    let rafId = null;
+    let pendingX = null;
+    let pendingY = null;
+
+    const updateSpotlight = () => {
+      if (pendingX !== null && pendingY !== null) {
+        hero.style.setProperty('--lp-spotlight-x', pendingX + '%');
+        hero.style.setProperty('--lp-spotlight-y', pendingY + '%');
+      }
+      rafId = null;
+    };
+
+    const handleMove = (e) => {
+      const rect = hero.getBoundingClientRect();
+      pendingX = ((e.clientX - rect.left) / rect.width) * 100;
+      pendingY = ((e.clientY - rect.top) / rect.height) * 100;
+      if (rafId === null) {
+        rafId = requestAnimationFrame(updateSpotlight);
+      }
+    };
+
+    hero.addEventListener('mousemove', handleMove);
+    return () => {
+      hero.removeEventListener('mousemove', handleMove);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   return (
     <section className="lp-hero" id="hero">
+      {/* Decorative background layers — render first so they sit
+          behind all hero content. Spotlight x/y are driven by the
+          mousemove useEffect above; ambient-drift is CSS-animated. */}
+      <div className="lp-hero__spotlight-bright-grid" aria-hidden="true" />
+      <div className="lp-hero__spotlight-glow" aria-hidden="true" />
+      <div className="lp-hero__ambient-drift" aria-hidden="true" />
       {/* Background orbs */}
       <motion.div
         className="lp-hero__orb lp-hero__orb--1"
@@ -195,29 +251,54 @@ function Hero() {
       <div className="lp-hero__grid">
         {/* LEFT COLUMN */}
         <div className="lp-hero__left">
-          <motion.div className="lp-hero__badge" {...fadeUp(0.1)}>
-            <span className="lp-hero__badge-dot" />
-            Track smarter. Train harder.
+          <motion.div className="lp-kicker" {...fadeUp(0.1)}>
+            <span className="lp-kicker__dot" />
+            <span>Lift. Eat. Track. Repeat.</span>
           </motion.div>
 
-          <motion.h1 className="lp-hero__heading" {...fadeUp(0.25)}>
-            <span>Data-driven fitness,</span>
-            <br />
-            <span className="lp-hero__heading--accent">without the guesswork.</span>
-          </motion.h1>
+          <h1 className="lp-display">
+            {HEADLINE_LINES.map((line, lineIdx) => (
+              <span key={lineIdx} style={{ display: 'block' }}>
+                {line.words.map((word, wordIdx) => {
+                  const globalIdx = HEADLINE_LINES
+                    .slice(0, lineIdx)
+                    .reduce((acc, l) => acc + l.words.length, 0) + wordIdx;
+                  const wordEl = (
+                    <motion.span
+                      key={wordIdx}
+                      className={line.accent ? 'lp-display__accent' : undefined}
+                      style={{ display: 'inline-block', marginRight: '0.25em' }}
+                      initial={reduced ? false : { opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        delay: reduced ? 0 : globalIdx * 0.05,
+                        duration: 0.7,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                    >
+                      {word}
+                    </motion.span>
+                  );
+                  return line.italic ? <em key={wordIdx}>{wordEl}</em> : wordEl;
+                })}
+              </span>
+            ))}
+          </h1>
 
-          <motion.p className="lp-hero__sub" {...fadeUp(0.4)}>
-            Track workouts, estimate your body composition and hit your goals all in one place.
-            Built for people who want real data, not just motivation.
+          <motion.p className="lp-lead" {...fadeUp(0.4)}>
+            Most fitness apps optimize for motivation. MacroVault optimizes for the spreadsheet underneath it. Track macros, log lifts, model body comp.
           </motion.p>
 
           <motion.div className="lp-hero__ctas" {...fadeUp(0.55)}>
-            <button
+            <motion.button
               className="lp-hero__cta-primary"
+              whileHover={reduced ? {} : { y: -1, boxShadow: '0 12px 28px -10px rgba(29, 158, 117, 0.55)' }}
+              whileTap={reduced ? {} : { scale: 0.97 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
               onClick={() => navigate('/auth')}
             >
-              Start for free
-            </button>
+              Start tracking
+            </motion.button>
             <a
               href="#live-demo"
               className="lp-hero__cta-secondary"
@@ -230,22 +311,29 @@ function Hero() {
               }}
             >
               <Play size={12} />
-              See how it works
+              Open the live demo
             </a>
           </motion.div>
 
           <motion.div className="lp-hero__stats-wrap" {...fadeUp(0.7)}>
-            <div className="lp-hero__stats-divider" />
             <div className="lp-hero__stats">
-              {STATS.map((s, i) => (
-                <React.Fragment key={s.value}>
-                  {i > 0 && <div className="lp-hero__stat-sep" />}
-                  <div className="lp-hero__stat">
-                    <div className="lp-hero__stat-value">{s.value}</div>
-                    <div className="lp-hero__stat-label">{s.label}</div>
-                  </div>
-                </React.Fragment>
-              ))}
+              <div className="lp-hero__stat">
+                <div className="lp-hero__stat-index">01</div>
+                <div className="lp-hero__stat-label">Log lifts</div>
+                <div className="lp-hero__stat-detail">sets, reps, weight</div>
+              </div>
+              <div className="lp-vrule" />
+              <div className="lp-hero__stat">
+                <div className="lp-hero__stat-index">02</div>
+                <div className="lp-hero__stat-label">Track progress</div>
+                <div className="lp-hero__stat-detail">weight & body comp</div>
+              </div>
+              <div className="lp-vrule" />
+              <div className="lp-hero__stat">
+                <div className="lp-hero__stat-index">03</div>
+                <div className="lp-hero__stat-label">Plan meals with AI</div>
+                <div className="lp-hero__stat-detail">macro-fit suggestions</div>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -256,6 +344,41 @@ function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Cursor-tracked perspective tilt wrapper for the dashboard frame    */
+/* ------------------------------------------------------------------ */
+
+function TiltedPreviewFrame({ children }) {
+  const reduceMotion = useReducedMotion();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-14, -2]), { stiffness: 150, damping: 20 });
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [10, -2]), { stiffness: 150, damping: 20 });
+
+  if (reduceMotion) {
+    return <div className="lp-preview__frame">{children}</div>;
+  }
+
+  const handleMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    x.set((e.clientX - rect.left) / rect.width - 0.5);
+    y.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const handleLeave = () => { x.set(0); y.set(0); };
+
+  return (
+    <motion.div
+      className="lp-preview__frame"
+      style={{ rotateX, rotateY, transformPerspective: 1800 }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+    >
+      {children}
+    </motion.div>
   );
 }
 
@@ -286,17 +409,7 @@ function DashboardPreview({ reduced }) {
       animate={floatAnim}
       transition={floatTrans}
     >
-      <div className="lp-preview__frame">
-        {/* Browser header */}
-        <div className="lp-preview__header">
-          <div className="lp-preview__dots">
-            <span className="lp-preview__dot" style={{ background: '#ff5f57' }} />
-            <span className="lp-preview__dot" style={{ background: '#febc2e' }} />
-            <span className="lp-preview__dot" style={{ background: '#28c840' }} />
-          </div>
-          <div className="lp-preview__url">macro-vault.com/dashboard</div>
-        </div>
-
+      <TiltedPreviewFrame>
         {/* Dashboard body */}
         <div className="lp-preview__body">
           <div className="lp-preview__greet-row">
@@ -387,7 +500,7 @@ function DashboardPreview({ reduced }) {
             </div>
           </div>
         </div>
-      </div>
+      </TiltedPreviewFrame>
     </motion.div>
   );
 }
@@ -400,15 +513,20 @@ function FeatureStrip() {
   return (
     <section className="lp-strip">
       <div className="lp-strip__inner">
-        {FEATURE_STRIP.map((f, i) => (
-          <React.Fragment key={f.label}>
-            {i > 0 && <div className="lp-strip__sep" />}
-            <div className="lp-strip__item">
-              <div className="lp-strip__label">{f.label}</div>
-              <div className="lp-strip__desc">{f.desc}</div>
-            </div>
-          </React.Fragment>
-        ))}
+        <div className="lp-strip__item">
+          <div className="lp-strip__label">Track macros</div>
+          <div className="lp-strip__desc">Full TDEE + macro breakdown</div>
+        </div>
+        <div className="lp-strip__sep" />
+        <div className="lp-strip__item">
+          <div className="lp-strip__label">Log lifts</div>
+          <div className="lp-strip__desc">Sets, reps, weight, rest timer</div>
+        </div>
+        <div className="lp-strip__sep" />
+        <div className="lp-strip__item">
+          <div className="lp-strip__label">Model body comp</div>
+          <div className="lp-strip__desc">NHANES-trained ML estimates</div>
+        </div>
       </div>
     </section>
   );
@@ -419,38 +537,132 @@ function FeatureStrip() {
 /* ------------------------------------------------------------------ */
 
 function Features() {
-  const reduced = usePrefersReducedMotion();
   return (
     <section className="lp-features" id="features">
       <div className="lp-features__header">
-        <span className="lp-features__eyebrow">FEATURES</span>
+        <div className="lp-kicker">
+          <span className="lp-kicker__dot" />
+          <span>Built for the long game</span>
+        </div>
         <h2 className="lp-features__heading">
-          <span>Everything you need</span>
-          <br />
-          <span className="lp-features__heading--accent">to reach your goals</span>
+          Seven tools.<br/>
+          <span style={{ fontWeight: 300, fontStyle: 'italic', color: 'var(--lp-muted)' }}>One feedback loop.</span>
         </h2>
-        <p className="lp-features__sub">
-          A complete fitness toolkit for body measurements, workout logging and goal tracking.
-        </p>
       </div>
 
       <div className="lp-features__grid">
-        {FEATURES.map(({ icon: Icon, title, desc }, i) => (
-          <motion.div
-            key={title}
-            className="lp-feat-card"
-            initial={reduced ? false : { opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={reduced ? { duration: 0 } : { duration: 0.5, delay: i * 0.05, ease: [0.4, 0, 0.2, 1] }}
-          >
-            <div className="lp-feat-card__icon">
-              <Icon size={22} />
+
+        <div className="lp-bento-card lp-bento-card--hero">
+          <div className="lp-bento-card__glow" />
+          <div className="lp-bento-card__head">
+            <span className="lp-bento-card__icon"><Dumbbell size={18} strokeWidth={2} /></span>
+            <span className="lp-bento-card__kicker">Workouts</span>
+          </div>
+          <h3 className="lp-bento-card__title">Log 3 sets in 4 taps.</h3>
+          <p className="lp-bento-card__desc">Built for one hand mid-set. Tap reps, swipe weight, done. Your training history compounds session by session.</p>
+
+          <div className="lp-bento-card__workout-frame">
+            <div className="lp-bento-card__workout-head">
+              <div>
+                <div className="lp-bento-card__workout-meta-label">Push day · Week 3</div>
+                <div className="lp-bento-card__workout-status">In progress · 32 min</div>
+              </div>
+              <div className="lp-bento-card__workout-rest">
+                <span className="lp-bento-card__workout-rest-label">Rest</span>
+                <span className="lp-bento-card__workout-rest-time">1:24</span>
+              </div>
             </div>
-            <div className="lp-feat-card__title">{title}</div>
-            <div className="lp-feat-card__desc">{desc}</div>
-          </motion.div>
-        ))}
+
+            <div className="lp-bento-card__workout-sets">
+              <div className="lp-bento-card__workout-row lp-bento-card__workout-row--active">
+                <span className="lp-bento-card__workout-name">Bench press</span>
+                <span className="lp-bento-card__workout-data">Set 3/4</span>
+                <span className="lp-bento-card__workout-data">8 reps</span>
+                <span className="lp-bento-card__workout-data lp-bento-card__workout-data--accent">185 lb</span>
+              </div>
+              <div className="lp-bento-card__workout-row lp-bento-card__workout-row--pending">
+                <span className="lp-bento-card__workout-name">Incline DB press</span>
+                <span className="lp-bento-card__workout-data">Set 2/3</span>
+                <span className="lp-bento-card__workout-data">10 reps</span>
+                <span className="lp-bento-card__workout-data">65 lb</span>
+              </div>
+              <div className="lp-bento-card__workout-row lp-bento-card__workout-row--upcoming">
+                <span className="lp-bento-card__workout-name">Cable fly</span>
+                <span className="lp-bento-card__workout-data">Set —</span>
+                <span className="lp-bento-card__workout-data">— reps</span>
+                <span className="lp-bento-card__workout-data">— lb</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="lp-bento-card__workout-meta-row">
+            <span>4-tap entry</span>
+            <span className="lp-bento-card__workout-meta-sep">·</span>
+            <span>Rest timer built in</span>
+            <span className="lp-bento-card__workout-meta-sep">·</span>
+            <span>Cardio + drag-to-reorder</span>
+          </div>
+        </div>
+
+        <div className="lp-bento-card lp-bento-card--medium">
+          <div className="lp-bento-card__head">
+            <span className="lp-bento-card__icon"><TrendingUp size={18} strokeWidth={2} /></span>
+            <span className="lp-bento-card__kicker">Progress</span>
+          </div>
+          <h3 className="lp-bento-card__title">Trend, not snapshot.</h3>
+          <p className="lp-bento-card__desc">Weight and body comp in dual-axis charts. See what&apos;s actually changing.</p>
+          <div className="lp-bento-card__meta">2W · 1M · 3M · 6M · All</div>
+        </div>
+
+        <div className="lp-bento-card lp-bento-card--medium">
+          <div className="lp-bento-card__head">
+            <span className="lp-bento-card__icon"><Calculator size={18} strokeWidth={2} /></span>
+            <span className="lp-bento-card__kicker">Calculators</span>
+          </div>
+          <h3 className="lp-bento-card__title">TDEE, macros, the math.</h3>
+          <p className="lp-bento-card__desc">6-step setup. Recalculate anytime your body changes.</p>
+          <div className="lp-bento-card__meta">katch + mifflin · ~90s</div>
+        </div>
+
+        <div className="lp-bento-card lp-bento-card--small">
+          <div className="lp-bento-card__head">
+            <span className="lp-bento-card__icon"><Target size={18} strokeWidth={2} /></span>
+            <span className="lp-bento-card__kicker">Goal planner</span>
+          </div>
+          <h3 className="lp-bento-card__title">Set the target.</h3>
+          <p className="lp-bento-card__desc">Weight, strength, body comp.</p>
+        </div>
+
+        <div className="lp-bento-card lp-bento-card--small">
+          <div className="lp-bento-card__head">
+            <span className="lp-bento-card__icon"><UtensilsCrossed size={18} strokeWidth={2} /></span>
+            <span className="lp-bento-card__kicker">Meal planner</span>
+          </div>
+          <h3 className="lp-bento-card__title">AI-fit meals.</h3>
+          <p className="lp-bento-card__desc">Macros, hit. 300/mo on Pro+.</p>
+        </div>
+
+        <div className="lp-bento-card lp-bento-card--small">
+          <div className="lp-bento-card__head">
+            <span className="lp-bento-card__icon"><Ruler size={18} strokeWidth={2} /></span>
+            <span className="lp-bento-card__kicker">Measurements</span>
+          </div>
+          <h3 className="lp-bento-card__title">Track every inch.</h3>
+          <p className="lp-bento-card__desc">Chest, waist, arms, more.</p>
+        </div>
+
+        <div className="lp-bento-card lp-bento-card--small">
+          <div className="lp-bento-card__head">
+            <span className="lp-bento-card__icon"><BookOpen size={18} strokeWidth={2} /></span>
+            <span className="lp-bento-card__kicker">Exercise library</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <h3 className="lp-bento-card__title" style={{ margin: 0 }}>Illustrated.</h3>
+            <span className="lp-bento-card__count">96</span>
+          </div>
+          <p className="lp-bento-card__desc">Muscle maps, form cues.</p>
+        </div>
+
       </div>
     </section>
   );
@@ -1623,12 +1835,15 @@ function LiveDemo() {
   return (
     <section className="lp-demo" id="live-demo">
       <div className="lp-demo__header">
-        <span className="lp-demo__section-eyebrow">LIVE DEMO</span>
-        <h2 className="lp-demo__section-heading">See the app before you sign up</h2>
-        <p className="lp-demo__section-sub">
-          Click through a full walkthrough of MacroVault&apos;s Pro+ features. Every screen below
-          is loaded with sample data so you can explore without signing in.
-        </p>
+        <div className="lp-kicker" style={{ justifyContent: 'center', marginBottom: 20 }}>
+          <span className="lp-kicker__dot" />
+          <span>Click around. Nothing&apos;s locked.</span>
+        </div>
+        <h2 className="lp-demo__section-heading">
+          The whole app,<br/>
+          <span style={{ fontWeight: 300, fontStyle: 'italic', color: 'var(--lp-muted)' }}>before the sign-up wall.</span>
+        </h2>
+        <p className="lp-demo__section-sub">Pre-filled with sample data so you can poke around every screen. No card, no email, no commitment.</p>
       </div>
 
       <div className="lp-demo__shell">
@@ -1849,12 +2064,15 @@ function FinalCTA() {
   const navigate = useNavigate();
   return (
     <section className="lp-cta">
-      <span className="lp-cta__eyebrow">READY TO START?</span>
+      <div className="lp-kicker" style={{ justifyContent: 'center', marginBottom: 20 }}>
+        <span className="lp-kicker__dot" />
+        <span>Free. Forever. No card.</span>
+      </div>
       <h2 className="lp-cta__heading">
-        <span>Stop guessing. </span>
-        <span className="lp-cta__heading--accent">Start tracking.</span>
+        Start with the calculator.<br/>
+        <span style={{ fontWeight: 300, fontStyle: 'italic', color: 'var(--lp-muted)' }}>The rest follows.</span>
       </h2>
-      <p className="lp-cta__sub">Free forever. No credit card required.</p>
+      <p className="lp-cta__sub">Six tools, free forever. Upgrade only when you outgrow them.</p>
       <button className="lp-cta__btn" onClick={() => navigate('/auth')}>
         Create your free account
       </button>
@@ -1875,8 +2093,9 @@ function Footer() {
             <Link to="/" className="lp-footer__logo">
               <span className="lp-footer__logo-icon"><Lock size={14} /></span>
               <span className="lp-footer__logo-name">MacroVault</span>
+              <span className="lp-footer__version">v2.4</span>
             </Link>
-            <p className="lp-footer__tagline">Data-driven fitness for everyone.</p>
+            <p className="lp-footer__tagline">Made in California by one person who lifts.</p>
           </div>
 
           <div className="lp-footer__links">

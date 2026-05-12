@@ -542,7 +542,7 @@ export default function Sidebar({ session, onLogout, isPro, isProPlus, usage }) 
           aria-label={hasActiveWorkout ? 'Workout in progress — tap to return' : 'Log workout'}
         >
           <Plus size={22} strokeWidth={2.5} />
-          <span className="mob-nav-log-btn__label">Log</span>
+          <span className="mob-nav-log-btn__label">Log workout</span>
           {hasActiveWorkout && (
             <span className="mob-nav-log-btn__pulse-dot" aria-hidden="true" />
           )}

@@ -813,6 +813,7 @@
     font-weight: 500;
     color: var(--accent);
     margin-top: 2px;
+    white-space: nowrap;
   }
 
   /* ── More sheet overlay ── */

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MacroVault — Home Dashboard · Mobile Rethink Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --bg-void: #0A0B0F;
+    --bg-card: #14171E;
+    --bg-card-hero: linear-gradient(135deg, #14211B 0%, #14171E 100%);
+    --bg-subtle: rgba(255, 255, 255, 0.04);
+    --bg-overlay: rgba(255, 255, 255, 0.05);
+    --border-faint: rgba(255, 255, 255, 0.04);
+    --border-soft: rgba(255, 255, 255, 0.06);
+    --border-teal: rgba(29, 158, 117, 0.3);
+    --teal: #1D9E75;
+    --teal-light: #5DCAA5;
+    --teal-dark: #04342C;
+    --teal-glow: rgba(29, 158, 117, 0.12);
+    --text-soft: #F4F5F7;
+    --text-default: #E8EAED;
+    --text-muted: #9AA0A6;
+    --text-faint: #6B7280;
+    --protein: #A78BFA;
+    --carbs: #5DCAA5;
+    --fat: #FCA130;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-void);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-default);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .device {
+    width: 100%;
+    max-width: 390px;
+    background: var(--bg-void);
+    border-radius: 28px;
+    border: 1px solid var(--border-soft);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+  }
+  .device__inner { padding: 20px 16px 90px; position: relative; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .topbar__brand { display: flex; align-items: center; gap: 8px; }
+  .topbar__brand-icon {
+    width: 28px; height: 28px; border-radius: 7px; background: var(--teal);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .topbar__brand-icon i { font-size: 14px; color: var(--teal-dark); }
+  .topbar__brand-name { font-weight: 600; font-size: 16px; color: var(--text-soft); letter-spacing: -0.01em; }
+  .topbar__right { display: flex; align-items: center; gap: 8px; }
+  .topbar__streak {
+    background: var(--bg-subtle); border: 1px solid var(--border-soft); border-radius: 8px;
+    padding: 5px 10px; display: flex; align-items: center; gap: 5px;
+  }
+  .topbar__streak i { font-size: 13px; color: var(--teal-light); }
+  .topbar__streak-count { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-soft); font-weight: 500; }
+  .topbar__avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--teal);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--teal-dark);
+  }
+  .nutrition {
+    background: var(--bg-card); border: 1px solid var(--border-soft);
+    border-radius: 16px; padding: 22px 20px 20px; margin-bottom: 14px;
+  }
+  .nutrition__kicker { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+  .nutrition__kicker-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--teal-light);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .nutrition__kicker-text {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--teal-light);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .nutrition__main { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+  .nutrition__main-left { flex: 1; }
+  .nutrition__label {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;
+  }
+  .nutrition__kcal {
+    font-family: 'JetBrains Mono', monospace; font-size: 34px; color: var(--text-soft);
+    font-weight: 500; letter-spacing: -0.03em; line-height: 1;
+  }
+  .nutrition__remaining { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .nutrition__remaining-value { color: var(--teal-light); font-weight: 500; }
+  .nutrition__ring { width: 76px; height: 76px; flex-shrink: 0; transform: rotate(-90deg); }
+  .nutrition__ring-track { fill: none; stroke: rgba(255, 255, 255, 0.06); stroke-width: 7; }
+  .nutrition__ring-fill {
+    fill: none; stroke: var(--teal-light); stroke-width: 7; stroke-linecap: round;
+    stroke-dasharray: 264; stroke-dashoffset: 65;
+  }
+  .nutrition__bars { display: grid; gap: 9px; padding-top: 14px; border-top: 1px solid var(--border-faint); }
+  .macro-row { display: grid; gap: 4px; }
+  .macro-row__head { display: flex; justify-content: space-between; align-items: baseline; }
+  .macro-row__label { font-size: 12px; color: var(--text-default); display: inline-flex; align-items: center; gap: 6px; }
+  .macro-row__dot { width: 7px; height: 7px; border-radius: 50%; }
+  .macro-row__dot--protein { background: var(--protein); }
+  .macro-row__dot--carbs { background: var(--carbs); }
+  .macro-row__dot--fat { background: var(--fat); }
+  .macro-row__values { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .macro-row__values-target { color: var(--text-faint); }
+  .macro-row__track { background: var(--bg-overlay); border-radius: 99px; height: 4px; overflow: hidden; }
+  .macro-row__fill { height: 100%; border-radius: 99px; }
+  .macro-row__fill--protein { background: var(--protein); }
+  .macro-row__fill--carbs { background: var(--carbs); }
+  .macro-row__fill--fat { background: var(--fat); }
+  .status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .status-card { background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 12px; padding: 14px 16px; }
+  .status-card__label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
+  }
+  .status-card__value {
+    font-family: 'JetBrains Mono', monospace; font-size: 19px; color: var(--text-soft);
+    font-weight: 500; letter-spacing: -0.02em; line-height: 1.1;
+  }
+  .status-card__value-sub { font-size: 10px; color: var(--text-faint); font-weight: 400; }
+  .status-card__caption { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+  .status-card__caption--accent { color: var(--teal-light); }
+  .status-card__strip { display: flex; gap: 2px; margin-top: 9px; }
+  .status-card__strip-cell { flex: 1; height: 3px; border-radius: 2px; background: var(--bg-overlay); }
+  .status-card__strip-cell--filled { background: var(--teal-light); }
+  .status-card__spark { width: 100%; height: 14px; margin-top: 7px; }
+  .actions { margin-bottom: 14px; }
+  .actions__heading {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; padding: 0 4px;
+  }
+  .action-primary {
+    background: var(--bg-card-hero); border: 1px solid var(--border-teal);
+    border-radius: 14px; padding: 16px 18px; margin-bottom: 8px;
+    position: relative; overflow: hidden; cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .action-primary:active { transform: scale(0.99); border-color: rgba(29, 158, 117, 0.5); }
+  .action-primary__glow {
+    position: absolute; top: 0; right: 0; width: 160px; height: 80px;
+    background: radial-gradient(circle at top right, var(--teal-glow), transparent 70%);
+    pointer-events: none;
+  }
+  .action-primary__body { display: flex; align-items: center; gap: 14px; position: relative; }
+  .action-primary__icon {
+    width: 42px; height: 42px; border-radius: 10px; background: rgba(29, 158, 117, 0.15);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .action-primary__icon i { font-size: 20px; color: var(--teal-light); }
+  .action-primary__text { flex: 1; }
+  .action-primary__kicker {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--teal-light);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px;
+  }
+  .action-primary__title { font-size: 17px; color: var(--text-soft); font-weight: 600; letter-spacing: -0.01em; line-height: 1.1; }
+  .action-primary__sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .action-primary__arrow { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--teal-light); }
+  .action-secondary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .action-secondary {
+    background: var(--bg-card); border: 1px solid var(--border-soft);
+    border-radius: 12px; padding: 14px 12px; text-align: center; cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .action-secondary:active { transform: scale(0.98); border-color: rgba(255, 255, 255, 0.1); }
+  .action-secondary__icon-wrap {
+    width: 34px; height: 34px; border-radius: 9px; background: var(--bg-subtle);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;
+  }
+  .action-secondary__icon-wrap i { font-size: 17px; color: var(--text-muted); }
+  .action-secondary__title { font-size: 13px; color: var(--text-soft); font-weight: 600; margin: 0; }
+  .action-secondary__sub { font-size: 10px; color: var(--text-muted); margin: 2px 0 0; }
+  .bottomnav {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(10, 11, 15, 0.95);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-faint);
+    padding: 8px 12px 14px; display: flex; justify-content: space-around; align-items: center;
+  }
+  .bottomnav__item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .bottomnav__item i { font-size: 18px; color: var(--text-faint); }
+  .bottomnav__item-label { font-size: 10px; color: var(--text-faint); }
+  .bottomnav__item--active i, .bottomnav__item--active .bottomnav__item-label { color: var(--teal-light); }
+  .bottomnav__log { display: flex; flex-direction: column; align-items: center; margin-top: -20px; }
+  .bottomnav__log-button {
+    width: 50px; height: 50px; border-radius: 50%; background: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 16px -4px rgba(29, 158, 117, 0.5);
+    border: 3px solid var(--bg-void);
+  }
+  .bottomnav__log-button i { font-size: 22px; color: var(--teal-dark); }
+  .bottomnav__log-label { font-size: 10px; color: var(--text-faint); margin-top: 2px; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .device--empty .nutrition__kcal { color: var(--text-faint); }
+  .device--empty .nutrition__remaining-value { color: var(--text-muted); }
+  .device--empty .macro-row__dot { opacity: 0.4; }
+  .device--empty .macro-row__fill { width: 0% !important; }
+  .stage { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; width: 100%; }
+  .stage__label {
+    text-align: center; margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .stage__column { display: flex; flex-direction: column; align-items: center; }
+  @media (max-width: 880px) { .stage { flex-direction: column; align-items: center; } }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="stage__column">
+    <div class="stage__label">· Active state · data populated</div>
+    <div class="device">
+      <div class="device__inner">
+        <div class="topbar">
+          <div class="topbar__brand">
+            <div class="topbar__brand-icon"><i class="ti ti-lock"></i></div>
+            <div class="topbar__brand-name">MacroVault</div>
+          </div>
+          <div class="topbar__right">
+            <div class="topbar__streak"><i class="ti ti-flame"></i><span class="topbar__streak-count">11d</span></div>
+            <div class="topbar__avatar">LO</div>
+          </div>
+        </div>
+        <div class="nutrition">
+          <div class="nutrition__kicker">
+            <span class="nutrition__kicker-dot"></span>
+            <span class="nutrition__kicker-text">2:47 PM · Afternoon</span>
+          </div>
+          <div class="nutrition__main">
+            <div class="nutrition__main-left">
+              <div class="nutrition__label">Calories today</div>
+              <div class="nutrition__kcal">1,640</div>
+              <div class="nutrition__remaining">
+                <span class="nutrition__remaining-value">540 kcal</span> left · 2,180 target
+              </div>
+            </div>
+            <svg class="nutrition__ring" viewBox="0 0 100 100">
+              <circle class="nutrition__ring-track" cx="50" cy="50" r="42"></circle>
+              <circle class="nutrition__ring-fill" cx="50" cy="50" r="42"></circle>
+            </svg>
+          </div>
+          <div class="nutrition__bars">
+            <div class="macro-row">
+              <div class="macro-row__head">
+                <span class="macro-row__label"><span class="macro-row__dot macro-row__dot--protein"></span>Protein</span>
+                <span class="macro-row__values">120<span class="macro-row__values-target">/145g</span></span>
+              </div>
+              <div class="macro-row__track"><div class="macro-row__fill macro-row__fill--protein" style="width: 82%;"></div></div>
+            </div>
+            <div class="macro-row">
+              <div class="macro-row__head">
+                <span class="macro-row__label"><span class="macro-row__dot macro-row__dot--carbs"></span>Carbs</span>
+                <span class="macro-row__values">152<span class="macro-row__values-target">/218g</span></span>
+              </div>
+              <div class="macro-row__track"><div class="macro-row__fill macro-row__fill--carbs" style="width: 70%;"></div></div>
+            </div>
+            <div class="macro-row">
+              <div class="macro-row__head">
+                <span class="macro-row__label"><span class="macro-row__dot macro-row__dot--fat"></span>Fat</span>
+                <span class="macro-row__values">42<span class="macro-row__values-target">/61g</span></span>
+              </div>
+              <div class="macro-row__track"><div class="macro-row__fill macro-row__fill--fat" style="width: 69%;"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-card">
+            <div class="status-card__label">This week</div>
+            <div class="status-card__value">3<span class="status-card__value-sub">/4</span></div>
+            <div class="status-card__caption">workouts logged</div>
+            <div class="status-card__strip">
+              <div class="status-card__strip-cell status-card__strip-cell--filled"></div>
+              <div class="status-card__strip-cell status-card__strip-cell--filled"></div>
+              <div class="status-card__strip-cell status-card__strip-cell--filled"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+            </div>
+          </div>
+          <div class="status-card">
+            <div class="status-card__label">Weight</div>
+            <div class="status-card__value">174.2<span class="status-card__value-sub"> lb</span></div>
+            <div class="status-card__caption status-card__caption--accent">−2.1 lb / 30d</div>
+            <svg class="status-card__spark" viewBox="0 0 120 16" preserveAspectRatio="none">
+              <polyline points="0,11 15,10 30,7 45,9 60,5 75,3 90,7 105,4 120,2" fill="none" stroke="#5DCAA5" stroke-width="1.3"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="actions__heading">Quick actions</div>
+          <div class="action-primary">
+            <div class="action-primary__glow"></div>
+            <div class="action-primary__body">
+              <div class="action-primary__icon"><i class="ti ti-tools-kitchen-2"></i></div>
+              <div class="action-primary__text">
+                <div class="action-primary__kicker">Next up</div>
+                <div class="action-primary__title">Log lunch</div>
+                <div class="action-primary__sub">scan, search, or from your plan</div>
+              </div>
+              <div class="action-primary__arrow">→</div>
+            </div>
+          </div>
+          <div class="action-secondary-row">
+            <div class="action-secondary">
+              <div class="action-secondary__icon-wrap"><i class="ti ti-bolt"></i></div>
+              <div class="action-secondary__title">Workout</div>
+              <div class="action-secondary__sub">pick a template</div>
+            </div>
+            <div class="action-secondary">
+              <div class="action-secondary__icon-wrap"><i class="ti ti-scale"></i></div>
+              <div class="action-secondary__title">Weight</div>
+              <div class="action-secondary__sub">last 174 lb · 1w ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottomnav">
+          <div class="bottomnav__item bottomnav__item--active"><i class="ti ti-home"></i><span class="bottomnav__item-label">Home</span></div>
+          <div class="bottomnav__item"><i class="ti ti-tools-kitchen-2"></i><span class="bottomnav__item-label">Meals</span></div>
+          <div class="bottomnav__log"><div class="bottomnav__log-button"><i class="ti ti-plus"></i></div><span class="bottomnav__log-label">Log</span></div>
+          <div class="bottomnav__item"><i class="ti ti-chart-line"></i><span class="bottomnav__item-label">Progress</span></div>
+          <div class="bottomnav__item"><i class="ti ti-layout-grid"></i><span class="bottomnav__item-label">More</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage__column">
+    <div class="stage__label">· Empty state · fresh day, nothing logged</div>
+    <div class="device device--empty">
+      <div class="device__inner">
+        <div class="topbar">
+          <div class="topbar__brand">
+            <div class="topbar__brand-icon"><i class="ti ti-lock"></i></div>
+            <div class="topbar__brand-name">MacroVault</div>
+          </div>
+          <div class="topbar__right">
+            <div class="topbar__streak"><i class="ti ti-flame"></i><span class="topbar__streak-count">11d</span></div>
+            <div class="topbar__avatar">LO</div>
+          </div>
+        </div>
+        <div class="nutrition">
+          <div class="nutrition__kicker">
+            <span class="nutrition__kicker-dot"></span>
+            <span class="nutrition__kicker-text">7:42 AM · Morning</span>
+          </div>
+          <div class="nutrition__main">
+            <div class="nutrition__main-left">
+              <div class="nutrition__label">Calories today</div>
+              <div class="nutrition__kcal">—</div>
+              <div class="nutrition__remaining">
+                <span class="nutrition__remaining-value">2,180 kcal</span> to spend
+              </div>
+            </div>
+            <svg class="nutrition__ring" viewBox="0 0 100 100">
+              <circle class="nutrition__ring-track" cx="50" cy="50" r="42"></circle>
+            </svg>
+          </div>
+          <div class="nutrition__bars">
+            <div class="macro-row">
+              <div class="macro-row__head">
+                <span class="macro-row__label"><span class="macro-row__dot macro-row__dot--protein"></span>Protein</span>
+                <span class="macro-row__values">0<span class="macro-row__values-target">/145g</span></span>
+              </div>
+              <div class="macro-row__track"><div class="macro-row__fill macro-row__fill--protein" style="width: 0%;"></div></div>
+            </div>
+            <div class="macro-row">
+              <div class="macro-row__head">
+                <span class="macro-row__label"><span class="macro-row__dot macro-row__dot--carbs"></span>Carbs</span>
+                <span class="macro-row__values">0<span class="macro-row__values-target">/218g</span></span>
+              </div>
+              <div class="macro-row__track"><div class="macro-row__fill macro-row__fill--carbs" style="width: 0%;"></div></div>
+            </div>
+            <div class="macro-row">
+              <div class="macro-row__head">
+                <span class="macro-row__label"><span class="macro-row__dot macro-row__dot--fat"></span>Fat</span>
+                <span class="macro-row__values">0<span class="macro-row__values-target">/61g</span></span>
+              </div>
+              <div class="macro-row__track"><div class="macro-row__fill macro-row__fill--fat" style="width: 0%;"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-card">
+            <div class="status-card__label">This week</div>
+            <div class="status-card__value">0<span class="status-card__value-sub">/4</span></div>
+            <div class="status-card__caption">starting fresh</div>
+            <div class="status-card__strip">
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+              <div class="status-card__strip-cell"></div>
+            </div>
+          </div>
+          <div class="status-card">
+            <div class="status-card__label">Weight</div>
+            <div class="status-card__value">174.2<span class="status-card__value-sub"> lb</span></div>
+            <div class="status-card__caption">last 1 wk ago</div>
+            <svg class="status-card__spark" viewBox="0 0 120 16" preserveAspectRatio="none">
+              <polyline points="0,11 15,10 30,7 45,9 60,5 75,3 90,7 105,4 120,2" fill="none" stroke="#5DCAA5" stroke-width="1.3" opacity="0.5"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="actions__heading">Quick actions</div>
+          <div class="action-primary">
+            <div class="action-primary__glow"></div>
+            <div class="action-primary__body">
+              <div class="action-primary__icon"><i class="ti ti-tools-kitchen-2"></i></div>
+              <div class="action-primary__text">
+                <div class="action-primary__kicker">Start your day</div>
+                <div class="action-primary__title">Log breakfast</div>
+                <div class="action-primary__sub">scan, search, or from your plan</div>
+              </div>
+              <div class="action-primary__arrow">→</div>
+            </div>
+          </div>
+          <div class="action-secondary-row">
+            <div class="action-secondary">
+              <div class="action-secondary__icon-wrap"><i class="ti ti-bolt"></i></div>
+              <div class="action-secondary__title">Workout</div>
+              <div class="action-secondary__sub">pick a template</div>
+            </div>
+            <div class="action-secondary">
+              <div class="action-secondary__icon-wrap"><i class="ti ti-scale"></i></div>
+              <div class="action-secondary__title">Weight</div>
+              <div class="action-secondary__sub">last 174 lb · 1w ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottomnav">
+          <div class="bottomnav__item bottomnav__item--active"><i class="ti ti-home"></i><span class="bottomnav__item-label">Home</span></div>
+          <div class="bottomnav__item"><i class="ti ti-tools-kitchen-2"></i><span class="bottomnav__item-label">Meals</span></div>
+          <div class="bottomnav__log"><div class="bottomnav__log-button"><i class="ti ti-plus"></i></div><span class="bottomnav__log-label">Log</span></div>
+          <div class="bottomnav__item"><i class="ti ti-chart-line"></i><span class="bottomnav__item-label">Progress</span></div>
+          <div class="bottomnav__item"><i class="ti ti-layout-grid"></i><span class="bottomnav__item-label">More</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

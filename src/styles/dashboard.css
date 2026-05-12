@@ -947,3 +947,905 @@
 [data-accent="y2k-chrome"] .cw {
   border-color: rgba(255, 215, 0, 0.35);
 }
+
+
+/* ============================================================
+   ACTION-FIRST DESKTOP DASHBOARD
+   All rules below scoped via .hd-desktop visibility toggle +
+   @media (min-width: 768px). Mobile layout (.hd-mobile) renders
+   the original stat-card / macro-donut / consistency / meal-plan
+   stack unchanged. No existing rule above this block is
+   modified by this refactor.
+   ============================================================ */
+
+/* Default state: desktop hidden, mobile visible.
+   Flipped at the 768px breakpoint below. */
+.hd-desktop { display: none; }
+.hd-mobile  { display: block; }
+
+@media (min-width: 768px) {
+  .hd-desktop { display: block; }
+  .hd-mobile  { display: none; }
+
+  /* ── Section 1: Greeting bar ─────────────────────────────── */
+  .hd-d-greeting {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .hd-d-greeting__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-light);
+  }
+
+  .hd-d-greeting__kicker-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  .hd-d-greeting__name {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .hd-d-greeting__sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 6px 0 0;
+  }
+
+  .hd-d-greeting__sub-accent {
+    color: var(--accent-light);
+    font-weight: 500;
+  }
+
+  .hd-d-greeting__streak-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .hd-d-greeting__streak-flame {
+    color: var(--accent-light);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .hd-d-greeting__streak-num {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .hd-d-greeting__streak-label {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ── Section 2: Three action cards ───────────────────────── */
+  .hd-d-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .hd-d-action {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hd-d-action:hover {
+    border-color: rgba(var(--accent-rgb), 0.3);
+    transform: translateY(-1px);
+  }
+
+  .hd-d-action--primary {
+    background: linear-gradient(135deg,
+      color-mix(in oklab, var(--accent) 16%, var(--bg-surface)) 0%,
+      var(--bg-surface) 100%);
+    border-color: rgba(var(--accent-rgb), 0.25);
+  }
+
+  .hd-d-action--primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 80px;
+    background: radial-gradient(circle at top right,
+      rgba(var(--accent-rgb), 0.18),
+      transparent 70%);
+    pointer-events: none;
+  }
+
+  .hd-d-action__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+
+  .hd-d-action__icon {
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .hd-d-action--primary .hd-d-action__icon {
+    color: var(--accent-light);
+  }
+
+  .hd-d-action__kicker {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .hd-d-action--primary .hd-d-action__kicker {
+    color: var(--accent-light);
+  }
+
+  .hd-d-action__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .hd-d-action__title {
+    font-size: 18px;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .hd-d-action__arrow {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .hd-d-action--primary .hd-d-action__arrow {
+    color: var(--accent-light);
+  }
+
+  .hd-d-action__sub {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 4px 0 0;
+    position: relative;
+  }
+
+  /* ── Section 3: Today's nutrition card ───────────────────── */
+  .hd-d-nutrition {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+  }
+
+  .hd-d-nutrition__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .hd-d-nutrition__label {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .hd-d-nutrition__kcal {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .hd-d-nutrition__kcal-current {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 32px;
+    color: var(--text-primary);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hd-d-nutrition__kcal-target {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .hd-d-nutrition__pills {
+    display: flex;
+    gap: 4px;
+  }
+
+  .hd-d-nutrition__pill {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  }
+
+  .hd-d-nutrition__pill--active {
+    background: rgba(var(--accent-rgb), 0.12);
+    color: var(--accent-light);
+    border-color: rgba(var(--accent-rgb), 0.3);
+  }
+
+  .hd-d-nutrition__bars {
+    display: grid;
+    gap: 12px;
+  }
+
+  .hd-d-macro-bar__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+
+  .hd-d-macro-bar__label {
+    font-size: 12px;
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hd-d-macro-bar__dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .hd-d-macro-bar__dot--protein { background: #A78BFA; }
+  .hd-d-macro-bar__dot--carbs   { background: var(--accent); }
+  .hd-d-macro-bar__dot--fat     { background: #FCA130; }
+
+  .hd-d-macro-bar__dot--empty { opacity: 0.4; }
+
+  .hd-d-macro-bar__num {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .hd-d-macro-bar__track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .hd-d-macro-bar__fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hd-d-macro-bar__fill--protein { background: #A78BFA; }
+  .hd-d-macro-bar__fill--carbs   { background: var(--accent); }
+  .hd-d-macro-bar__fill--fat     { background: #FCA130; }
+
+  /* ── Section 4: 50/50 row — This week + Weight trend ─────── */
+  .hd-d-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .hd-d-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .hd-d-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .hd-d-card__label {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .hd-d-card__badge {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    color: var(--accent-light);
+  }
+
+  .hd-d-card__badge--muted {
+    color: var(--text-muted);
+  }
+
+  .hd-d-card__big {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .hd-d-card__big-num {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 24px;
+    color: var(--text-primary);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hd-d-card__big-unit {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 2px;
+  }
+
+  .hd-d-card__sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .hd-d-card__week-strip {
+    display: flex;
+    gap: 3px;
+    margin-top: 12px;
+  }
+
+  .hd-d-card__week-cell {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .hd-d-card__week-cell--filled {
+    background: var(--accent);
+  }
+
+  .hd-d-card__spark {
+    width: 100%;
+    height: 24px;
+    margin-top: 8px;
+    display: block;
+  }
+
+  .hd-d-card__cta {
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--accent-light);
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 8px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+
+/* ============================================================
+   MOBILE RETHINK — Home dashboard
+   All rules sit at base scope. They render on mobile because
+   `.hd-mobile` is `display: block` by default and is hidden by
+   the desktop @media (min-width: 768px) block above. Desktop
+   styling at ≥768px is unchanged.
+   ============================================================ */
+
+/* ── Streak strip (compact row above nutrition card) ───────── */
+.hd-m-streak-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.hd-m-streak-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.hd-m-streak-pill__num {
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ── Nutrition card (visual anchor) ─────────────────────────── */
+.hd-m-nutrition {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 20px 20px;
+  margin-bottom: 14px;
+}
+
+.hd-m-nutrition__kicker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.hd-m-nutrition__kicker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  animation: hd-m-pulse 2s ease-in-out infinite;
+}
+
+.hd-m-nutrition__kicker-text {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 10px;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@keyframes hd-m-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hd-m-nutrition__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.hd-m-nutrition__main-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.hd-m-nutrition__label {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 10px;
+  color: var(--text-hint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+.hd-m-nutrition__kcal {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 34px;
+  color: var(--text-primary);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hd-m-nutrition__kcal--empty {
+  color: var(--text-hint);
+}
+
+.hd-m-nutrition__remaining {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.hd-m-nutrition__remaining-value {
+  color: var(--accent-light);
+  font-weight: 500;
+}
+
+.hd-m-nutrition__remaining-value--muted {
+  color: var(--text-muted);
+}
+
+/* Donut ring — 76×76 SVG, viewBox 100×100, r=42 → circumference ≈ 264. */
+.hd-m-nutrition__ring {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+
+.hd-m-nutrition__ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 7;
+}
+
+.hd-m-nutrition__ring-fill {
+  fill: none;
+  stroke: var(--accent-light);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 264;
+  /* stroke-dashoffset set inline via React style prop */
+  transition: stroke-dashoffset 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hd-m-nutrition__bars {
+  display: grid;
+  gap: 9px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.hd-m-macro-row {
+  display: grid;
+  gap: 4px;
+}
+
+.hd-m-macro-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.hd-m-macro-row__label {
+  font-size: 12px;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hd-m-macro-row__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.hd-m-macro-row__dot--protein { background: #A78BFA; }
+.hd-m-macro-row__dot--carbs   { background: var(--accent-light); }
+.hd-m-macro-row__dot--fat     { background: #FCA130; }
+
+.hd-m-macro-row__dot--empty { opacity: 0.4; }
+
+.hd-m-macro-row__values {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hd-m-macro-row__values-target {
+  color: var(--text-hint);
+}
+
+.hd-m-macro-row__track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  height: 4px;
+  overflow: hidden;
+}
+
+.hd-m-macro-row__fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hd-m-macro-row__fill--protein { background: #A78BFA; }
+.hd-m-macro-row__fill--carbs   { background: var(--accent-light); }
+.hd-m-macro-row__fill--fat     { background: #FCA130; }
+
+
+/* ── Status row (2-col: This week + Weight) ─────────────────── */
+.hd-m-status-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.hd-m-status-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.hd-m-status-card__label {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 9px;
+  color: var(--text-hint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.hd-m-status-card__value {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 19px;
+  color: var(--text-primary);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hd-m-status-card__value-sub {
+  font-size: 10px;
+  color: var(--text-hint);
+  font-weight: 400;
+}
+
+.hd-m-status-card__caption {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.hd-m-status-card__caption--accent {
+  color: var(--accent-light);
+}
+
+.hd-m-status-card__strip {
+  display: flex;
+  gap: 2px;
+  margin-top: 9px;
+}
+
+.hd-m-status-card__strip-cell {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hd-m-status-card__strip-cell--filled {
+  background: var(--accent-light);
+}
+
+.hd-m-status-card__spark {
+  width: 100%;
+  height: 14px;
+  margin-top: 7px;
+  display: block;
+}
+
+.hd-m-status-card__cta {
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--accent-light);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 6px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* ── Quick actions (primary + 2 secondary squares) ──────────── */
+.hd-m-actions {
+  margin-bottom: 14px;
+}
+
+.hd-m-actions__heading {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 10px;
+  color: var(--text-hint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+.hd-m-action-primary {
+  width: 100%;
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--accent) 16%, var(--bg-surface)) 0%,
+    var(--bg-surface) 100%);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.hd-m-action-primary:active {
+  transform: scale(0.99);
+  border-color: rgba(var(--accent-rgb), 0.5);
+}
+
+.hd-m-action-primary__glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 160px;
+  height: 80px;
+  background: radial-gradient(circle at top right,
+    rgba(var(--accent-rgb), 0.12),
+    transparent 70%);
+  pointer-events: none;
+}
+
+.hd-m-action-primary__body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+}
+
+.hd-m-action-primary__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(var(--accent-rgb), 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--accent-light);
+}
+
+.hd-m-action-primary__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hd-m-action-primary__kicker {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 9px;
+  color: var(--accent-light);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.hd-m-action-primary__title {
+  font-size: 17px;
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.hd-m-action-primary__sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.hd-m-action-primary__arrow {
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 14px;
+  color: var(--accent-light);
+  flex-shrink: 0;
+}
+
+.hd-m-action-secondary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.hd-m-action-secondary {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  font-family: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.hd-m-action-secondary:active {
+  transform: scale(0.98);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.hd-m-action-secondary__icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  color: var(--text-muted);
+}
+
+.hd-m-action-secondary__title {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.hd-m-action-secondary__sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   TrendingUp, ChevronLeft, ChevronRight,
-  UtensilsCrossed, Dumbbell, Check,
+  UtensilsCrossed, Dumbbell, Check, Scale,
 } from 'lucide-react';
 import posthog from '../lib/posthog';
 import { getStreak, invalidateStreakCache } from '../lib/streak';
@@ -24,6 +24,35 @@ function getGreeting(hour) {
   if (hour >= 12 && hour < 17) return 'Good afternoon';
   if (hour >= 17 && hour < 21) return 'Good evening';
   return 'Good night';
+}
+
+/* Action-first dashboard helper — time-of-day meal label for the
+   primary "Log a meal" card. Mirrors the windows the user spec'd:
+     5-10am   Breakfast
+     10-2pm   Lunch
+     2-5pm    Snack
+     5-9pm    Dinner
+     9pm+     Tomorrow's Breakfast
+*/
+function getNextMealLabel() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 10) return 'Breakfast';
+  if (h >= 10 && h < 14) return 'Lunch';
+  if (h >= 14 && h < 17) return 'Snack';
+  if (h >= 17 && h < 21) return 'Dinner';
+  return "Tomorrow's Breakfast";
+}
+
+/* Format a "how long ago" string from a YYYY-MM-DD date. */
+function fmtAgo(dateStr) {
+  if (!dateStr) return '';
+  const dt = new Date(dateStr + 'T00:00:00');
+  const days = Math.floor((Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24));
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return `${days} days ago`;
+  if (days < 30) return `${Math.floor(days / 7)} wk ago`;
+  return `${Math.floor(days / 30)} mo ago`;
 }
 
 /** Animate a number from 0 → target. */
@@ -806,6 +835,14 @@ export default function Dashboard() {
   // Workout count this week
   const [weekWorkouts, setWeekWorkouts] = useState(0);
 
+  // ── Action-first desktop state (additive, no impact on mobile) ──
+  // Last 30 days of `progress` rows for the weight-trend card.
+  const [progressRows, setProgressRows] = useState([]);
+  // Time-range pill for the macro bars (Today / 7D-avg / 30D-avg).
+  // Mirrors MacroDonut's internal range/avgData pattern.
+  const [macroRange, setMacroRange] = useState('today');
+  const [macroAvgData, setMacroAvgData] = useState(null);
+
 
   // Session
   useEffect(() => {
@@ -877,6 +914,61 @@ export default function Dashboard() {
     })();
   }, [userId]);
 
+  /* Additive: progress rows for the desktop Weight trend card.
+     Last 30 days, desc. weight_kg is stored as lbs (DB naming
+     quirk acknowledged in ProgressCharts.jsx). */
+  useEffect(() => {
+    if (!userId) return;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+    (async () => {
+      const { data } = await supabase
+        .from('progress')
+        .select('date, weight_kg')
+        .eq('user_id', userId)
+        .gte('date', fmtDate(cutoff))
+        .order('date', { ascending: false })
+        .limit(30);
+      setProgressRows(data || []);
+    })();
+  }, [userId]);
+
+  /* Additive: macro 7D / 30D averages, computed only when the
+     corresponding pill is active. Direct port of MacroDonut's
+     avg fetch — same query, same averaging. Today uses the
+     existing todayNutrition state (no extra round-trip). */
+  useEffect(() => {
+    if (!userId || macroRange === 'today') { setMacroAvgData(null); return; }
+    const days = macroRange === '7d' ? 7 : 30;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    (async () => {
+      const { data } = await supabase
+        .from('food_logs')
+        .select('logged_date, calories, protein_g, carbs_g, fat_g')
+        .eq('user_id', userId)
+        .gte('logged_date', fmtDate(cutoff));
+      if (data && data.length) {
+        const totals = data.reduce((a, r) => ({
+          cal: a.cal + (r.calories || 0),
+          pro: a.pro + (r.protein_g || 0),
+          carb: a.carb + (r.carbs_g || 0),
+          fat: a.fat + (r.fat_g || 0),
+        }), { cal: 0, pro: 0, carb: 0, fat: 0 });
+        const uniqueDays = new Set(data.map((r) => r.logged_date)).size;
+        const divisor = Math.max(uniqueDays, 1);
+        setMacroAvgData({
+          calories: Math.round(totals.cal / divisor),
+          protein: Math.round(totals.pro / divisor),
+          carbs: Math.round(totals.carb / divisor),
+          fat: Math.round(totals.fat / divisor),
+        });
+      } else {
+        setMacroAvgData({ calories: 0, protein: 0, carbs: 0, fat: 0 });
+      }
+    })();
+  }, [userId, macroRange]);
+
 
   // Stat card computations
   const calGoal = goalPlan?.calories;
@@ -901,59 +993,583 @@ export default function Dashboard() {
     || session?.user?.user_metadata?.full_name?.split(' ')[0]
     || '';
 
+  /* ── Action-first desktop derived data ──
+     Computed inline at render so the food_logs realtime push
+     (which mutates todayNutrition) automatically re-derives the
+     greeting subtitle, action card subtitles, and macro bars. */
+
+  // Smart greeting: data-driven subtitle. Priority order:
+  //   1. no calorie goal set → onboarding nudge
+  //   2. nothing logged today → fresh-day copy with next-meal window
+  //   3. day complete (cal >= goal) → "Day logged"
+  //   4. within 300 kcal of target → "Within range" (any time of day, priority)
+  //   5. evening + within 400 kcal of target → "Within range… before bed"
+  //   6. otherwise → "X kcal under, next-meal is next window"
+  const greetingCtx = (() => {
+    let g;
+    if (hour >= 5 && hour < 12) g = 'Morning';
+    else if (hour >= 12 && hour < 17) g = 'Afternoon';
+    else if (hour >= 17 && hour < 21) g = 'Evening';
+    else g = 'Night owl';
+
+    const cal = todayNutrition.calories;
+    const gl = goalPlan?.calories;
+    const remaining = gl ? gl - cal : null;
+    const nextMeal = getNextMealLabel();
+
+    let sub;
+    if (!gl) {
+      sub = 'Pick a calorie goal to get started.';
+    } else if (cal === 0) {
+      sub = `Fresh day. ${gl.toLocaleString()} kcal to spend. ${nextMeal} is your first window.`;
+    } else if (cal >= gl) {
+      sub = 'Day logged. Nice work.';
+    } else if (remaining < 300 && remaining > 0) {
+      // Priority: midday near-target. Triggers any time of day.
+      sub = `Within range. ${remaining} kcal left for the rest of the day.`;
+    } else if (remaining < 400 && hour >= 17) {
+      sub = `Within range. ${remaining} kcal left before bed.`;
+    } else if (remaining > 0) {
+      sub = `You're ${remaining.toLocaleString()} kcal under. ${nextMeal} is the next big window.`;
+    } else {
+      sub = 'Day logged. Nice work.';
+    }
+    return { greeting: g, sub };
+  })();
+
+  /* Macro display: pick today or the active 7D/30D avg. */
+  const macroSrc = macroRange === 'today' ? todayNutrition : (macroAvgData || { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  const macroPro = macroSrc.protein || 0;
+  const macroCarb = macroSrc.carbs || 0;
+  const macroFat = macroSrc.fat || 0;
+  const macroCal = macroSrc.calories || 0;
+  const macroProGoal = goalPlan?.protein || 0;
+  const macroCarbGoal = goalPlan?.carbs || 0;
+  const macroFatGoal = goalPlan?.fat || 0;
+
+  /* Weight trend: latest, 30-day delta, sparkline points. */
+  const weightSeries = progressRows
+    .filter((r) => r.weight_kg != null && r.weight_kg !== '')
+    .map((r) => ({ date: r.date, weight: Number(r.weight_kg) })); // desc
+  const currentWeight = weightSeries[0]?.weight ?? null;
+  const oldestWeight = weightSeries[weightSeries.length - 1]?.weight ?? null;
+  const weightDelta30 = currentWeight != null && oldestWeight != null && weightSeries.length >= 2
+    ? currentWeight - oldestWeight
+    : null;
+  const lastWeightAgo = weightSeries[0]?.date ? fmtAgo(weightSeries[0].date) : null;
+  // Sparkline points (oldest → newest, for left-to-right SVG)
+  const sparkAscending = weightSeries.slice().reverse();
+
+  /* Helpers for desktop JSX (kept inline so they have closure
+     access to derived state above). */
+  const formatTime = () => {
+    const h12 = ((now.getHours() + 11) % 12) + 1;
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+    return `${h12}:${mm} ${ampm}`;
+  };
+  const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+
+  const macroProPct = macroProGoal > 0 ? Math.min(100, Math.round((macroPro / macroProGoal) * 100)) : 0;
+  const macroCarbPct = macroCarbGoal > 0 ? Math.min(100, Math.round((macroCarb / macroCarbGoal) * 100)) : 0;
+  const macroFatPct = macroFatGoal > 0 ? Math.min(100, Math.round((macroFat / macroFatGoal) * 100)) : 0;
+
+  // 7-cell weekly progress strip — fill first N cells (day-specific
+  // accuracy is a follow-up phase per user direction).
+  const weekCells = Array.from({ length: 7 }, (_, i) => i < weekWorkouts);
+
+  // Weight-trend sparkline path. Normalize y-values to viewBox.
+  const spark = (() => {
+    if (sparkAscending.length < 2) return null;
+    const weights = sparkAscending.map((p) => p.weight);
+    const min = Math.min(...weights);
+    const max = Math.max(...weights);
+    const range = max - min || 1;
+    const stepX = 240 / (sparkAscending.length - 1);
+    return sparkAscending
+      .map((p, i) => `${(i * stepX).toFixed(1)},${(25 - ((p.weight - min) / range) * 20).toFixed(1)}`)
+      .join(' ');
+  })();
+
+  /* Mobile variants — same data, smaller viewBox + freshness flag. */
+  const isRecentWeight = weightSeries[0]?.date
+    ? (Date.now() - new Date(weightSeries[0].date + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24) <= 7
+    : false;
+
+  const sparkMobile = (() => {
+    if (sparkAscending.length < 2) return null;
+    const weights = sparkAscending.map((p) => p.weight);
+    const min = Math.min(...weights);
+    const max = Math.max(...weights);
+    const range = max - min || 1;
+    const stepX = 120 / (sparkAscending.length - 1);
+    return sparkAscending
+      .map((p, i) => `${(i * stepX).toFixed(1)},${(13 - ((p.weight - min) / range) * 11).toFixed(1)}`)
+      .join(' ');
+  })();
+
   return (
     <div className="hd">
-      {/* Page header */}
-      <div className="hd__header">
-        <div>
-          <h1 className="hd__greeting">{greeting}{firstName ? `, ${firstName}` : ''}</h1>
-          <p className="hd__date">{todayStr}</p>
+      {/* ============================================================
+          DESKTOP: action-first layout (visible at ≥768px via CSS)
+          ============================================================ */}
+      <div className="hd-desktop">
+        {/* Section 1: Greeting bar */}
+        <div className="hd-d-greeting">
+          <div>
+            <div className="hd-d-greeting__kicker">
+              <span className="hd-d-greeting__kicker-dot" />
+              <span>{dayName} · {formatTime()}</span>
+            </div>
+            <h1 className="hd-d-greeting__name">
+              {greetingCtx.greeting}{firstName ? `, ${firstName}` : ''}.
+            </h1>
+            <p className="hd-d-greeting__sub">{greetingCtx.sub}</p>
+          </div>
+          {streak > 0 && (
+            <div className="hd-d-greeting__streak-pill" title={`${streak} day streak`}>
+              <span className="hd-d-greeting__streak-flame" aria-hidden="true">🔥</span>
+              <span className="hd-d-greeting__streak-num">{streak}</span>
+              <span className="hd-d-greeting__streak-label">day streak</span>
+            </div>
+          )}
+        </div>
+
+        {/* Section 2: Three action cards */}
+        <div className="hd-d-actions">
+          <button
+            type="button"
+            className="hd-d-action hd-d-action--primary"
+            onClick={() => navigate('/goalplanner', { state: { spotlight: 'nutrition' } })}
+          >
+            <div className="hd-d-action__head">
+              <span className="hd-d-action__icon"><UtensilsCrossed size={20} /></span>
+              <span className="hd-d-action__kicker">Log a meal</span>
+            </div>
+            <div className="hd-d-action__row">
+              <h3 className="hd-d-action__title">{getNextMealLabel()}</h3>
+              <span className="hd-d-action__arrow">→</span>
+            </div>
+            <p className="hd-d-action__sub">scan, search, or pick from your plan</p>
+          </button>
+
+          <button
+            type="button"
+            className="hd-d-action"
+            onClick={() => navigate('/workouts')}
+          >
+            <div className="hd-d-action__head">
+              <span className="hd-d-action__icon"><Dumbbell size={20} /></span>
+              <span className="hd-d-action__kicker">Log a workout</span>
+            </div>
+            <div className="hd-d-action__row">
+              <h3 className="hd-d-action__title">Workout</h3>
+              <span className="hd-d-action__arrow">→</span>
+            </div>
+            <p className="hd-d-action__sub">pick a template or start fresh</p>
+          </button>
+
+          <button
+            type="button"
+            className="hd-d-action"
+            onClick={() => navigate('/progress')}
+          >
+            <div className="hd-d-action__head">
+              <span className="hd-d-action__icon"><Scale size={20} /></span>
+              <span className="hd-d-action__kicker">Log weight</span>
+            </div>
+            <div className="hd-d-action__row">
+              <h3 className="hd-d-action__title">Daily</h3>
+              <span className="hd-d-action__arrow">→</span>
+            </div>
+            <p className="hd-d-action__sub">
+              {lastWeightAgo && currentWeight != null
+                ? `last logged ${lastWeightAgo} · ${currentWeight.toFixed(1)} lb`
+                : 'no entries yet'}
+            </p>
+          </button>
+        </div>
+
+        {/* Section 3: Today's nutrition card */}
+        <div className="hd-d-nutrition">
+          <div className="hd-d-nutrition__head">
+            <div>
+              <div className="hd-d-nutrition__label">
+                {macroRange === 'today' ? "Today's nutrition" : macroRange === '7d' ? '7-day average' : '30-day average'}
+              </div>
+              <div className="hd-d-nutrition__kcal">
+                <span className="hd-d-nutrition__kcal-current">
+                  {macroCal === 0 && macroRange === 'today' ? '—' : macroCal.toLocaleString()}
+                </span>
+                <span className="hd-d-nutrition__kcal-target">
+                  / {calGoal ? calGoal.toLocaleString() : '—'} kcal
+                </span>
+              </div>
+            </div>
+            <div className="hd-d-nutrition__pills">
+              {['today', '7d', '30d'].map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  className={`hd-d-nutrition__pill ${macroRange === k ? 'hd-d-nutrition__pill--active' : ''}`}
+                  onClick={() => setMacroRange(k)}
+                >
+                  {k === 'today' ? 'Today' : k === '7d' ? '7D' : '30D'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="hd-d-nutrition__bars">
+            {/* Protein */}
+            <div className="hd-d-macro-bar">
+              <div className="hd-d-macro-bar__head">
+                <span className="hd-d-macro-bar__label">
+                  <span className={`hd-d-macro-bar__dot hd-d-macro-bar__dot--protein ${macroPro === 0 ? 'hd-d-macro-bar__dot--empty' : ''}`} />
+                  Protein
+                </span>
+                <span className="hd-d-macro-bar__num">{macroPro} / {macroProGoal}g</span>
+              </div>
+              <div className="hd-d-macro-bar__track">
+                <div className="hd-d-macro-bar__fill hd-d-macro-bar__fill--protein" style={{ width: `${macroProPct}%` }} />
+              </div>
+            </div>
+            {/* Carbs */}
+            <div className="hd-d-macro-bar">
+              <div className="hd-d-macro-bar__head">
+                <span className="hd-d-macro-bar__label">
+                  <span className={`hd-d-macro-bar__dot hd-d-macro-bar__dot--carbs ${macroCarb === 0 ? 'hd-d-macro-bar__dot--empty' : ''}`} />
+                  Carbs
+                </span>
+                <span className="hd-d-macro-bar__num">{macroCarb} / {macroCarbGoal}g</span>
+              </div>
+              <div className="hd-d-macro-bar__track">
+                <div className="hd-d-macro-bar__fill hd-d-macro-bar__fill--carbs" style={{ width: `${macroCarbPct}%` }} />
+              </div>
+            </div>
+            {/* Fat */}
+            <div className="hd-d-macro-bar">
+              <div className="hd-d-macro-bar__head">
+                <span className="hd-d-macro-bar__label">
+                  <span className={`hd-d-macro-bar__dot hd-d-macro-bar__dot--fat ${macroFat === 0 ? 'hd-d-macro-bar__dot--empty' : ''}`} />
+                  Fat
+                </span>
+                <span className="hd-d-macro-bar__num">{macroFat} / {macroFatGoal}g</span>
+              </div>
+              <div className="hd-d-macro-bar__track">
+                <div className="hd-d-macro-bar__fill hd-d-macro-bar__fill--fat" style={{ width: `${macroFatPct}%` }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: 50/50 row — This week + Weight trend */}
+        <div className="hd-d-row">
+          {/* This week */}
+          <div className="hd-d-card">
+            <div className="hd-d-card__head">
+              <div className="hd-d-card__label">This week</div>
+              <span className={`hd-d-card__badge ${weekWorkouts === 0 ? 'hd-d-card__badge--muted' : ''}`}>
+                {weekWorkouts === 0 ? 'starting fresh' : 'on track'}
+              </span>
+            </div>
+            <div className="hd-d-card__big">
+              <span className="hd-d-card__big-num">{weekWorkouts}</span>
+              <span className="hd-d-card__sub">of 4 workouts logged</span>
+            </div>
+            <div className="hd-d-card__week-strip">
+              {weekCells.map((on, i) => (
+                <div
+                  key={i}
+                  className={`hd-d-card__week-cell ${on ? 'hd-d-card__week-cell--filled' : ''}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Weight trend */}
+          <div className="hd-d-card">
+            <div className="hd-d-card__head">
+              <div className="hd-d-card__label">Weight trend</div>
+              {weightDelta30 != null && (
+                <span className="hd-d-card__badge">
+                  {weightDelta30 < 0 ? '−' : '+'}{Math.abs(weightDelta30).toFixed(1)} lb / 30d
+                </span>
+              )}
+            </div>
+            {currentWeight != null ? (
+              <>
+                <div className="hd-d-card__big">
+                  <span className="hd-d-card__big-num">
+                    {currentWeight.toFixed(1)}
+                    <span className="hd-d-card__big-unit">lb</span>
+                  </span>
+                </div>
+                {spark && (
+                  <svg className="hd-d-card__spark" viewBox="0 0 240 30" preserveAspectRatio="none">
+                    <polyline points={spark} fill="none" stroke="var(--accent-light)" strokeWidth="1.5" />
+                  </svg>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="hd-d-card__big">
+                  <span className="hd-d-card__big-num">—</span>
+                </div>
+                <button
+                  type="button"
+                  className="hd-d-card__cta"
+                  onClick={() => navigate('/progress')}
+                >
+                  Add your first weight →
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <motion.div className="hd__main" variants={containerVariants} initial="hidden" animate="show">
-          {/* Stat cards row */}
-          <div className="hd-stats-row">
-            <StatCard
-              label="Calories"
-              rawValue={todayNutrition.calories}
-              formatted={(v) => v.toLocaleString()}
-              delta={calDelta?.text}
-              deltaColor={calDelta?.color}
-            />
-            <StatCard
-              label="Protein"
-              rawValue={todayNutrition.protein}
-              formatted={(v) => `${v}g`}
-              delta={proDelta?.text}
-              deltaColor={proDelta?.color}
-            />
-            <StatCard
-              label="Workouts"
-              rawValue={weekWorkouts}
-              formatted={(v) => `${v}`}
-              delta="this week"
-            />
-            <StatCard
-              label="Streak"
-              rawValue={streak}
-              formatted={(v) => `${v}d`}
-              delta={streak >= 7 ? 'keep it going' : 'day streak'}
-              deltaColor={streak >= 7 ? '--accent-light' : '--text-muted'}
-            />
-          </div>
+      {/* ============================================================
+          MOBILE: new mobile-rethink layout (visible at <768px)
+          ============================================================ */}
+      <div className="hd-mobile">
 
-          {/* Bottom row: left column (macro + meal plan) + right column (consistency) */}
-          <div className="hd-bottom-row">
-            <div className="hd-bottom-col">
-              <MacroDonut userId={userId} todayNutrition={todayNutrition} goalPlan={goalPlan} />
-              <TodayMealPlan userId={userId} />
+        {/* Streak strip — only when streak > 0. The AppShell's
+            mob-topbar already renders the brand + avatar at the
+            very top of the viewport, so we add only the streak
+            pill here to avoid duplicating UI. */}
+        {streak > 0 && (
+          <div className="hd-m-streak-row">
+            <div className="hd-m-streak-pill" title={`${streak} day streak`}>
+              <span aria-hidden="true">🔥</span>
+              <span className="hd-m-streak-pill__num">{streak}d</span>
             </div>
-            <ConsistencyCard userId={userId} streak={streak} />
+          </div>
+        )}
+
+        {/* Nutrition card — kicker, big kcal, donut ring, macro bars */}
+        <div className="hd-m-nutrition">
+          <div className="hd-m-nutrition__kicker">
+            <span className="hd-m-nutrition__kicker-dot" />
+            <span className="hd-m-nutrition__kicker-text">{formatTime()} · {greetingCtx.greeting}</span>
+          </div>
+          <div className="hd-m-nutrition__main">
+            <div className="hd-m-nutrition__main-left">
+              <div className="hd-m-nutrition__label">Calories today</div>
+              <div className={`hd-m-nutrition__kcal ${todayNutrition.calories === 0 ? 'hd-m-nutrition__kcal--empty' : ''}`}>
+                {todayNutrition.calories === 0 ? '—' : todayNutrition.calories.toLocaleString()}
+              </div>
+              <div className="hd-m-nutrition__remaining">
+                {todayNutrition.calories === 0 ? (
+                  calGoal ? (
+                    <>
+                      <span className="hd-m-nutrition__remaining-value hd-m-nutrition__remaining-value--muted">
+                        {calGoal.toLocaleString()} kcal
+                      </span>{' '}
+                      to spend
+                    </>
+                  ) : (
+                    'Set a calorie goal to get started.'
+                  )
+                ) : calGoal ? (
+                  <>
+                    <span className="hd-m-nutrition__remaining-value">
+                      {Math.max(0, calGoal - todayNutrition.calories).toLocaleString()} kcal
+                    </span>{' '}
+                    left · {calGoal.toLocaleString()} target
+                  </>
+                ) : (
+                  `${todayNutrition.calories.toLocaleString()} logged`
+                )}
+              </div>
+            </div>
+            <svg className="hd-m-nutrition__ring" viewBox="0 0 100 100" aria-hidden="true">
+              <circle className="hd-m-nutrition__ring-track" cx="50" cy="50" r="42" />
+              {todayNutrition.calories > 0 && calGoal > 0 && (
+                <circle
+                  className="hd-m-nutrition__ring-fill"
+                  cx="50" cy="50" r="42"
+                  style={{
+                    strokeDashoffset: 264 - 264 * Math.min(1, todayNutrition.calories / calGoal),
+                  }}
+                />
+              )}
+            </svg>
+          </div>
+          <div className="hd-m-nutrition__bars">
+            {/* Protein */}
+            <div className="hd-m-macro-row">
+              <div className="hd-m-macro-row__head">
+                <span className="hd-m-macro-row__label">
+                  <span className={`hd-m-macro-row__dot hd-m-macro-row__dot--protein ${todayNutrition.protein === 0 ? 'hd-m-macro-row__dot--empty' : ''}`} />
+                  Protein
+                </span>
+                <span className="hd-m-macro-row__values">
+                  {todayNutrition.protein}
+                  <span className="hd-m-macro-row__values-target">/{macroProGoal}g</span>
+                </span>
+              </div>
+              <div className="hd-m-macro-row__track">
+                <div
+                  className="hd-m-macro-row__fill hd-m-macro-row__fill--protein"
+                  style={{ width: `${macroProGoal > 0 ? Math.min(100, (todayNutrition.protein / macroProGoal) * 100) : 0}%` }}
+                />
+              </div>
+            </div>
+            {/* Carbs */}
+            <div className="hd-m-macro-row">
+              <div className="hd-m-macro-row__head">
+                <span className="hd-m-macro-row__label">
+                  <span className={`hd-m-macro-row__dot hd-m-macro-row__dot--carbs ${todayNutrition.carbs === 0 ? 'hd-m-macro-row__dot--empty' : ''}`} />
+                  Carbs
+                </span>
+                <span className="hd-m-macro-row__values">
+                  {todayNutrition.carbs}
+                  <span className="hd-m-macro-row__values-target">/{macroCarbGoal}g</span>
+                </span>
+              </div>
+              <div className="hd-m-macro-row__track">
+                <div
+                  className="hd-m-macro-row__fill hd-m-macro-row__fill--carbs"
+                  style={{ width: `${macroCarbGoal > 0 ? Math.min(100, (todayNutrition.carbs / macroCarbGoal) * 100) : 0}%` }}
+                />
+              </div>
+            </div>
+            {/* Fat */}
+            <div className="hd-m-macro-row">
+              <div className="hd-m-macro-row__head">
+                <span className="hd-m-macro-row__label">
+                  <span className={`hd-m-macro-row__dot hd-m-macro-row__dot--fat ${todayNutrition.fat === 0 ? 'hd-m-macro-row__dot--empty' : ''}`} />
+                  Fat
+                </span>
+                <span className="hd-m-macro-row__values">
+                  {todayNutrition.fat}
+                  <span className="hd-m-macro-row__values-target">/{macroFatGoal}g</span>
+                </span>
+              </div>
+              <div className="hd-m-macro-row__track">
+                <div
+                  className="hd-m-macro-row__fill hd-m-macro-row__fill--fat"
+                  style={{ width: `${macroFatGoal > 0 ? Math.min(100, (todayNutrition.fat / macroFatGoal) * 100) : 0}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Status row — This week + Weight */}
+        <div className="hd-m-status-row">
+          {/* This week */}
+          <div className="hd-m-status-card">
+            <div className="hd-m-status-card__label">This week</div>
+            <div className="hd-m-status-card__value">
+              {weekWorkouts}<span className="hd-m-status-card__value-sub">/4</span>
+            </div>
+            <div className="hd-m-status-card__caption">
+              {weekWorkouts === 0 ? 'starting fresh' : 'workouts logged'}
+            </div>
+            <div className="hd-m-status-card__strip">
+              {weekCells.map((on, i) => (
+                <div
+                  key={i}
+                  className={`hd-m-status-card__strip-cell ${on ? 'hd-m-status-card__strip-cell--filled' : ''}`}
+                />
+              ))}
+            </div>
           </div>
 
-      </motion.div>
+          {/* Weight */}
+          <div className="hd-m-status-card">
+            <div className="hd-m-status-card__label">Weight</div>
+            {currentWeight != null ? (
+              <>
+                <div className="hd-m-status-card__value">
+                  {currentWeight.toFixed(1)}<span className="hd-m-status-card__value-sub"> lb</span>
+                </div>
+                <div className={`hd-m-status-card__caption ${isRecentWeight && weightDelta30 != null ? 'hd-m-status-card__caption--accent' : ''}`}>
+                  {isRecentWeight && weightDelta30 != null
+                    ? `${weightDelta30 < 0 ? '−' : '+'}${Math.abs(weightDelta30).toFixed(1)} lb / 30d`
+                    : `last ${lastWeightAgo}`}
+                </div>
+                {sparkMobile && (
+                  <svg className="hd-m-status-card__spark" viewBox="0 0 120 16" preserveAspectRatio="none">
+                    <polyline
+                      points={sparkMobile}
+                      fill="none"
+                      stroke="var(--accent-light)"
+                      strokeWidth="1.3"
+                      opacity={isRecentWeight ? 1 : 0.5}
+                    />
+                  </svg>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="hd-m-status-card__value">—</div>
+                <button
+                  type="button"
+                  className="hd-m-status-card__cta"
+                  onClick={() => navigate('/progress')}
+                >
+                  Add your first weight →
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Quick actions — primary card + 2 secondary squares */}
+        <div className="hd-m-actions">
+          <div className="hd-m-actions__heading">Quick actions</div>
+
+          <button
+            type="button"
+            className="hd-m-action-primary"
+            onClick={() => navigate('/goalplanner', { state: { spotlight: 'nutrition' } })}
+          >
+            <div className="hd-m-action-primary__glow" />
+            <div className="hd-m-action-primary__body">
+              <div className="hd-m-action-primary__icon"><UtensilsCrossed size={20} /></div>
+              <div className="hd-m-action-primary__text">
+                <div className="hd-m-action-primary__kicker">
+                  {todayNutrition.calories === 0 ? 'Start your day' : 'Next up'}
+                </div>
+                <div className="hd-m-action-primary__title">
+                  Log {getNextMealLabel().toLowerCase()}
+                </div>
+                <div className="hd-m-action-primary__sub">scan, search, or from your plan</div>
+              </div>
+              <div className="hd-m-action-primary__arrow">→</div>
+            </div>
+          </button>
+
+          <div className="hd-m-action-secondary-row">
+            <button
+              type="button"
+              className="hd-m-action-secondary"
+              onClick={() => navigate('/workouts')}
+            >
+              <div className="hd-m-action-secondary__icon-wrap"><Dumbbell size={17} /></div>
+              <div className="hd-m-action-secondary__title">Workout</div>
+              <div className="hd-m-action-secondary__sub">pick a template</div>
+            </button>
+            <button
+              type="button"
+              className="hd-m-action-secondary"
+              onClick={() => navigate('/progress')}
+            >
+              <div className="hd-m-action-secondary__icon-wrap"><Scale size={17} /></div>
+              <div className="hd-m-action-secondary__title">Weight</div>
+              <div className="hd-m-action-secondary__sub">
+                {currentWeight != null && lastWeightAgo
+                  ? `last ${Math.round(currentWeight)} lb · ${lastWeightAgo}`
+                  : 'no entries yet'}
+              </div>
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
