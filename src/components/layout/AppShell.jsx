@@ -16,6 +16,7 @@ const PAGE_META = {
   '/meal-planner': { title: 'Meal Planner' },
   '/workouts':    { title: 'Workouts' },
   '/progress':    { title: 'Progress' },
+  '/activity':    { title: 'Activity' },
   '/billing':     { title: 'Billing' },
   '/exercises':   { title: 'Exercise Library' },
   '/settings':    { title: 'Settings' },

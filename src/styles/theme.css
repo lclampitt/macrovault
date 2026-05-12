@@ -69,6 +69,13 @@
   --accent-border: var(--accent);
   --bar-track: var(--bg-hover);
   --topbar-bg: rgba(8, 12, 20, 0.85);
+
+  /* Activity calendar state colors */
+  --activity-workout-only: #A78BFA;
+  --activity-meals-only:   #5DCAA5;
+  --activity-both:         #FCA130;
+  --activity-empty:        rgba(255, 255, 255, 0.06);
+  --activity-future:       rgba(255, 255, 255, 0.025);
 }
 
 [data-theme="light"] {
@@ -104,6 +111,13 @@
   --bar-track: #F0F0E8;
   --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
   --topbar-bg: rgba(250, 250, 247, 0.85);
+
+  /* Activity calendar state colors */
+  --activity-workout-only: #7C3AED;
+  --activity-meals-only:   #1D9E75;
+  --activity-both:         #EA580C;
+  --activity-empty:        rgba(0, 0, 0, 0.06);
+  --activity-future:       rgba(0, 0, 0, 0.025);
 }
 
 /* ── Accent themes ─────────────────────────────────────────── */

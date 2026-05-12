@@ -13,6 +13,7 @@ import Dashboard    from './pages/dashboard';
 import Analyzer     from './pages/analyzer';
 import Calculators  from './pages/calculators';
 import ProgressPage from './pages/progress';
+import Activity      from './pages/activity';
 import AuthPage        from './pages/auth';
 import ResetPassword   from './pages/ResetPassword';
 import Contact         from './pages/Contact';
@@ -193,6 +194,7 @@ function App() {
       <Route path="/goalplanner"         element={protect(<GoalPlanner isPro={isPro} />)} />
       <Route path="/meal-planner"        element={protect(<MealPlanner isPro={isPro} isProPlus={isProPlus} />)} />
       <Route path="/progress"            element={protect(<ProgressPage isPro={isPro} />)} />
+      <Route path="/activity"            element={protect(<Activity />)} />
       <Route path="/workouts"            element={protect(<WorkoutLogger />)} />
       <Route path="/billing"             element={protect(<BillingPage />)} />
       <Route path="/settings"            element={protect(<SettingsPage />)} />

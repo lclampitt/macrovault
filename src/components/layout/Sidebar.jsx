@@ -28,6 +28,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   CalendarDays,
+  CalendarHeart,
   Zap,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
@@ -41,7 +42,8 @@ const NAV_GROUPS = [
   {
     label: 'ANALYZE',
     items: [
-      { to: '/progress',     label: 'Progress',     icon: TrendingUp,  pro: true },
+      { to: '/progress',     label: 'Progress',     icon: TrendingUp,   pro: true },
+      { to: '/activity',     label: 'Activity',     icon: CalendarHeart },
       { to: '/measurements', label: 'Measurements', icon: Ruler },
       { to: '/calculators',  label: 'Calculators',  icon: Calculator },
     ],
@@ -77,13 +79,14 @@ const MORE_PRO_PAGES = [
 ];
 
 const MORE_FREE_PAGES = [
-  { to: '/calculators',  icon: Calculator, label: 'Calculators' },
-  { to: '/exercises',    icon: BookOpen,   label: 'Exercise Library' },
-  { to: '/measurements', icon: Ruler,      label: 'Measurements' },
-  { to: '/settings',     icon: Settings,   label: 'Settings' },
+  { to: '/activity',     icon: CalendarHeart, label: 'Activity' },
+  { to: '/calculators',  icon: Calculator,    label: 'Calculators' },
+  { to: '/exercises',    icon: BookOpen,      label: 'Exercise Library' },
+  { to: '/measurements', icon: Ruler,         label: 'Measurements' },
+  { to: '/settings',     icon: Settings,      label: 'Settings' },
 ];
 
-const MORE_ROUTES = ['/workouts', '/goalplanner', '/calculators', '/exercises', '/measurements', '/settings'];
+const MORE_ROUTES = ['/workouts', '/goalplanner', '/activity', '/calculators', '/exercises', '/measurements', '/settings'];
 
 const QUICK_THEMES = [
   { id: 'teal',       label: 'Teal',       color: '#1D9E75' },
