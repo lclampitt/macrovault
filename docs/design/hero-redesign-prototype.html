@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MacroVault — Hero Redesign Prototype</title>
+<!--
+  Standalone HTML prototype of the redesigned hero section.
+  Reference this file for exact CSS values: colors, spacing, easing, transforms.
+  Companion: docs/design/landing-redesign-spec.md
+  Open in a browser to preview. Hover the dashboard to see the perspective tilt.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@latest/font/lucide.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050608; min-height: 100vh; font-family: 'Inter', system-ui, sans-serif; color: #E8EAED; padding: 20px; }
+  .prototype-frame { max-width: 1400px; margin: 0 auto; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+  #cta-primary:hover { background: #5DCAA5; transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(29,158,117,0.6); }
+  #cta-secondary:hover { border-color: #1D9E75; background: rgba(29,158,117,0.05); }
+  #cta-nav:hover { background: #5DCAA5; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: #E8EAED; }
+</style>
+</head>
+<body>
+<div class="prototype-frame">
+
+<div style="position: relative; width: 100%; min-height: 720px; background: #0A0B0F; border-radius: 16px; overflow: hidden; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #E8EAED;">
+
+  <!-- ambient depth: radial glow -->
+  <div style="position:absolute; top:-200px; right:-200px; width:700px; height:700px; background: radial-gradient(circle at center, rgba(29,158,117,0.18) 0%, rgba(29,158,117,0.05) 35%, transparent 65%); pointer-events:none; z-index:0;"></div>
+  <div style="position:absolute; bottom:-300px; left:-150px; width:600px; height:600px; background: radial-gradient(circle at center, rgba(29,158,117,0.08) 0%, transparent 60%); pointer-events:none; z-index:0;"></div>
+
+  <!-- grain texture -->
+  <div style="position:absolute; inset:0; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22/><feColorMatrix values=%220 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>'); opacity:0.5; pointer-events:none; mix-blend-mode:overlay; z-index:1;"></div>
+
+  <!-- subtle grid -->
+  <div style="position:absolute; inset:0; background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 60px 60px; pointer-events:none; z-index:1;"></div>
+
+  <!-- NAV -->
+  <nav style="position:relative; z-index:10; display:flex; align-items:center; justify-content:space-between; padding: 22px 40px; border-bottom: 1px solid rgba(255,255,255,0.04);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:30px; height:30px; background:#1D9E75; border-radius:7px; display:flex; align-items:center; justify-content:center; color:#04342C; font-weight:700; font-size:14px;">M</div>
+      <span style="font-weight:500; font-size:15px; letter-spacing:-0.01em;">MacroVault</span>
+      <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size:10px; color:#5DCAA5; background: rgba(29,158,117,0.1); padding: 2px 6px; border-radius: 3px; margin-left:4px;">v2.4</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:32px; font-size:13px; color:#9AA0A6;">
+      <a href="#" style="color:#9AA0A6;">Features</a>
+      <a href="#" style="color:#9AA0A6;">Demo</a>
+      <a href="#" style="color:#9AA0A6;">Pricing</a>
+      <a href="#" style="color:#9AA0A6;">Changelog</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <a href="#" style="font-size:13px; color:#9AA0A6;">Sign in</a>
+      <button id="cta-nav" style="background:#1D9E75; color:#04342C; border:none; padding: 8px 16px; border-radius: 8px; font-weight:500; font-size:13px; cursor:pointer; transition: all 0.2s ease;">Start tracking →</button>
+    </div>
+  </nav>
+
+  <!-- HERO GRID -->
+  <div style="position:relative; z-index:5; display:grid; grid-template-columns: 1.05fr 1fr; gap: 20px; padding: 70px 40px 40px; align-items:start;">
+
+    <!-- LEFT: copy -->
+    <div style="padding-top: 20px;">
+
+      <!-- kicker: replaces the green pill -->
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom: 36px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: #5DCAA5; letter-spacing: 0.08em; text-transform: uppercase;">
+        <span style="display:inline-block; width:6px; height:6px; background:#1D9E75; border-radius:50%; box-shadow: 0 0 12px #1D9E75;"></span>
+        <span>Shipping weekly — built solo</span>
+        <span style="color: #3A3F47;">/</span>
+        <span style="color:#9AA0A6;">2,847 athletes tracking</span>
+      </div>
+
+      <!-- headline: weight contrast, not color contrast -->
+      <h1 style="font-size: 76px; line-height: 0.94; letter-spacing: -0.045em; font-weight: 700; margin: 0 0 28px; color:#F4F5F7;">
+        Train like<br>
+        <span style="font-weight: 300; font-style: italic; color:#9AA0A6;">someone who</span><br>
+        reads the data.
+      </h1>
+
+      <p style="font-size: 16px; line-height: 1.6; color:#9AA0A6; max-width: 460px; margin: 0 0 40px;">
+        Most fitness apps optimize for motivation. MacroVault optimizes for the spreadsheet underneath it. Track macros, log lifts, model body comp — built for people who'd rather see the math.
+      </p>
+
+      <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 48px;">
+        <button id="cta-primary" style="background:#1D9E75; color:#04342C; border:none; padding: 14px 22px; border-radius: 10px; font-weight: 500; font-size: 14px; cursor:pointer; display:flex; align-items:center; gap:8px; transition: all 0.2s ease;">
+          Start tracking — free forever
+          <span style="font-size:16px;">→</span>
+        </button>
+        <button id="cta-secondary" style="background:transparent; color:#E8EAED; border:1px solid rgba(255,255,255,0.1); padding: 14px 18px; border-radius: 10px; font-weight: 400; font-size: 14px; cursor:pointer; display:flex; align-items:center; gap:8px; transition: all 0.2s ease;">
+          <span style="font-size:12px; color:#5DCAA5;">▶</span>
+          Open the live demo
+        </button>
+      </div>
+
+      <!-- proof row: monospace, specific, lived-in -->
+      <div style="display:flex; align-items:flex-start; gap: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div>
+          <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 22px; font-weight: 500; color:#F4F5F7; letter-spacing:-0.02em;">96<span style="color:#5DCAA5;">+</span></div>
+          <div style="font-size: 11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;">Exercises logged</div>
+        </div>
+        <div style="width:1px; height:36px; background:rgba(255,255,255,0.06); margin-top:4px;"></div>
+        <div>
+          <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 22px; font-weight: 500; color:#F4F5F7; letter-spacing:-0.02em;">0<span style="color:#6B7280;">.0s</span></div>
+          <div style="font-size: 11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;">Onboarding friction</div>
+        </div>
+        <div style="width:1px; height:36px; background:rgba(255,255,255,0.06); margin-top:4px;"></div>
+        <div>
+          <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 22px; font-weight: 500; color:#F4F5F7; letter-spacing:-0.02em;">$<span>0</span></div>
+          <div style="font-size: 11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;">Free tier, forever</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: dashboard, tilted, overflowing -->
+    <div id="dash-wrap" style="position:relative; perspective: 1800px; margin-right: -80px;">
+
+      <!-- floating label callout -->
+      <div style="position:absolute; top:-12px; right:90px; z-index:20; background:#0A0B0F; border:1px solid rgba(29,158,117,0.3); padding: 6px 11px; border-radius: 999px; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:10px; color:#5DCAA5; letter-spacing:0.06em; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+        <span style="width:5px; height:5px; background:#1D9E75; border-radius:50%; animation: pulse 2s ease-in-out infinite;"></span>
+        Live · macro-vault.com
+      </div>
+
+      <div id="dash" style="transform: rotateY(-8deg) rotateX(4deg) translateZ(0); transform-style: preserve-3d; transform-origin: left center; background: linear-gradient(160deg, #14171E 0%, #0F1117 100%); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; box-shadow: 0 60px 100px -40px rgba(0,0,0,0.8), 0 30px 60px -30px rgba(29,158,117,0.15), 0 0 0 1px rgba(29,158,117,0.04); transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);">
+
+        <!-- dash header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 22px;">
+          <div>
+            <div style="font-size: 11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:3px;">Monday morning</div>
+            <div style="font-size: 19px; font-weight: 500; color:#F4F5F7; letter-spacing:-0.02em;">Push day · Week 3</div>
+          </div>
+        </div>
+
+        <!-- big stat -->
+        <div style="background: linear-gradient(135deg, rgba(29,158,117,0.12) 0%, rgba(29,158,117,0.02) 100%); border: 1px solid rgba(29,158,117,0.18); border-radius: 11px; padding: 18px; margin-bottom: 14px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:0; right:0; width:140px; height:80px; background: radial-gradient(circle at top right, rgba(29,158,117,0.3) 0%, transparent 70%);"></div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+            <div>
+              <div style="font-size: 11px; color:#5DCAA5; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">Calories today</div>
+              <div style="font-family:'JetBrains Mono', ui-monospace, monospace; font-size: 34px; font-weight:500; color:#F4F5F7; letter-spacing:-0.03em; line-height:1;">1,640<span style="font-size:14px; color:#6B7280; font-weight:400;"> / 2,180</span></div>
+              <div style="font-size:11px; color:#9AA0A6; margin-top:8px; font-family:'JetBrains Mono', ui-monospace, monospace;">540 kcal remaining · 75% there</div>
+            </div>
+          </div>
+          <!-- mini progress -->
+          <div style="margin-top:14px; height:4px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden;">
+            <div id="bar-cal" style="width:0%; height:100%; background: linear-gradient(90deg, #1D9E75, #5DCAA5); transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);"></div>
+          </div>
+        </div>
+
+        <!-- macro grid -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:14px;">
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:9px; padding:13px;">
+            <div style="display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+              <span style="width:6px; height:6px; background:#A78BFA; border-radius:50%;"></span>
+              <span style="font-size:10px; color:#9AA0A6; text-transform:uppercase; letter-spacing:0.08em;">Protein</span>
+            </div>
+            <div style="font-family:'JetBrains Mono', ui-monospace, monospace; font-size:18px; color:#F4F5F7; font-weight:500;">120<span style="font-size:11px; color:#6B7280;">g</span></div>
+            <div style="height:3px; background:rgba(255,255,255,0.04); border-radius:2px; margin-top:8px; overflow:hidden;">
+              <div id="bar-p" style="width:0%; height:100%; background:#A78BFA; transition: width 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;"></div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:9px; padding:13px;">
+            <div style="display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+              <span style="width:6px; height:6px; background:#5DCAA5; border-radius:50%;"></span>
+              <span style="font-size:10px; color:#9AA0A6; text-transform:uppercase; letter-spacing:0.08em;">Carbs</span>
+            </div>
+            <div style="font-family:'JetBrains Mono', ui-monospace, monospace; font-size:18px; color:#F4F5F7; font-weight:500;">204<span style="font-size:11px; color:#6B7280;">g</span></div>
+            <div style="height:3px; background:rgba(255,255,255,0.04); border-radius:2px; margin-top:8px; overflow:hidden;">
+              <div id="bar-c" style="width:0%; height:100%; background:#5DCAA5; transition: width 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;"></div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:9px; padding:13px;">
+            <div style="display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+              <span style="width:6px; height:6px; background:#EF9F27; border-radius:50%;"></span>
+              <span style="font-size:10px; color:#9AA0A6; text-transform:uppercase; letter-spacing:0.08em;">Fat</span>
+            </div>
+            <div style="font-family:'JetBrains Mono', ui-monospace, monospace; font-size:18px; color:#F4F5F7; font-weight:500;">48<span style="font-size:11px; color:#6B7280;">g</span></div>
+            <div style="height:3px; background:rgba(255,255,255,0.04); border-radius:2px; margin-top:8px; overflow:hidden;">
+              <div id="bar-f" style="width:0%; height:100%; background:#EF9F27; transition: width 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- workout log -->
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:9px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:11px; color:#9AA0A6; text-transform:uppercase; letter-spacing:0.08em;">Last session</div>
+            <div style="font-family:'JetBrains Mono', ui-monospace, monospace; font-size:10px; color:#6B7280;">2 days ago · 47min</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:7px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+              <span style="color:#E8EAED;">Bench press</span>
+              <span style="font-family:'JetBrains Mono', ui-monospace, monospace; color:#9AA0A6;">4×8 <span style="color:#5DCAA5;">@ 185lb</span></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+              <span style="color:#E8EAED;">Incline DB press</span>
+              <span style="font-family:'JetBrains Mono', ui-monospace, monospace; color:#9AA0A6;">3×10 <span style="color:#5DCAA5;">@ 65lb</span></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+              <span style="color:#E8EAED;">Cable fly</span>
+              <span style="font-family:'JetBrains Mono', ui-monospace, monospace; color:#9AA0A6;">3×12 <span style="color:#5DCAA5;">@ 30lb</span></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- bottom strip: replaces generic feature footer -->
+  <div style="position:relative; z-index:5; margin: 30px 40px 40px; padding: 22px 28px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; display:flex; align-items:center; justify-content:space-between; gap:24px;">
+    <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
+      <div>
+        <div style="font-size:12px; color:#E8EAED; font-weight:500;">Macro calculator</div>
+        <div style="font-size:11px; color:#6B7280; font-family:'JetBrains Mono', ui-monospace, monospace;">6 steps · ~90s</div>
+      </div>
+      <div>
+        <div style="font-size:12px; color:#E8EAED; font-weight:500;">Body comp model</div>
+        <div style="font-size:11px; color:#6B7280; font-family:'JetBrains Mono', ui-monospace, monospace;">NHANES-trained</div>
+      </div>
+      <div>
+        <div style="font-size:12px; color:#E8EAED; font-weight:500;">Exercise library</div>
+        <div style="font-size:11px; color:#6B7280; font-family:'JetBrains Mono', ui-monospace, monospace;">96 illustrated</div>
+      </div>
+    </div>
+    <button style="background:transparent; color:#9AA0A6; border:1px solid rgba(255,255,255,0.08); padding: 9px 14px; border-radius: 8px; font-size: 12px; cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap;">
+      See all features →
+    </button>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+(function(){
+  // animate progress bars on load
+  setTimeout(function(){
+    var bc = document.getElementById('bar-cal'); if (bc) bc.style.width = '75%';
+    var bp = document.getElementById('bar-p'); if (bp) bp.style.width = '100%';
+    var bcb = document.getElementById('bar-c'); if (bcb) bcb.style.width = '71%';
+    var bf = document.getElementById('bar-f'); if (bf) bf.style.width = '79%';
+  }, 200);
+
+  // mouse-tracked dashboard tilt
+  var wrap = document.getElementById('dash-wrap');
+  var dash = document.getElementById('dash');
+  if (wrap && dash) {
+    wrap.addEventListener('mousemove', function(e){
+      var r = wrap.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      var rotY = -8 + (x * 6);
+      var rotX = 4 - (y * 6);
+      dash.style.transform = 'rotateY(' + rotY + 'deg) rotateX(' + rotX + 'deg) translateZ(0)';
+    });
+    wrap.addEventListener('mouseleave', function(){
+      dash.style.transform = 'rotateY(-8deg) rotateX(4deg) translateZ(0)';
+    });
+  }
+})();
+</script>
+</body>
+</html>
