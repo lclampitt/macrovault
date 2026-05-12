@@ -809,12 +809,12 @@
     border-radius: 50%;
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 6px 16px -2px rgba(var(--accent-rgb), 0.55);
+    box-shadow: 0 4px 14px -4px rgba(var(--accent-rgb), 0.25);
     transition: transform 0.15s, box-shadow 0.15s;
   }
 
   .mob-nav-log-btn--active svg {
-    box-shadow: 0 8px 20px -2px rgba(var(--accent-rgb), 0.70);
+    box-shadow: 0 6px 18px -4px rgba(var(--accent-rgb), 0.40);
     transform: scale(1.05);
   }
 
