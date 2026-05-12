@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   motion,
@@ -387,15 +387,6 @@ function TiltedPreviewFrame({ children }) {
 /* ------------------------------------------------------------------ */
 
 function DashboardPreview({ reduced }) {
-  const today = useMemo(() => {
-    const d = new Date();
-    return d.toLocaleDateString(undefined, {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    });
-  }, []);
-
   const floatAnim = reduced
     ? {}
     : { y: [0, -12, 0] };
@@ -410,93 +401,162 @@ function DashboardPreview({ reduced }) {
       transition={floatTrans}
     >
       <TiltedPreviewFrame>
-        {/* Dashboard body */}
-        <div className="lp-preview__body">
-          <div className="lp-preview__greet-row">
-            <span className="lp-preview__eyebrow">GOOD MORNING</span>
-            <span className="lp-preview__date">{today}</span>
-          </div>
-
-          {/* 2x2 stat grid */}
-          <div className="lp-preview__stats">
-            <div className="lp-preview__stat-card">
-              <div className="lp-preview__stat-label">CALORIES</div>
-              <div className="lp-preview__stat-value">1,640</div>
-              <div className="lp-preview__stat-sub lp-preview__stat-sub--teal">540 kcal remaining</div>
+        {/* Action-first dashboard snapshot — mirrors the shipped
+            .hd-desktop layout (greeting / 3 action cards / nutrition /
+            status row). All values are intentional marketing copy. */}
+        <div className="lp-preview__body lp-preview-v2-body">
+          {/* Greeting bar */}
+          <div className="lp-preview-v2-greeting">
+            <div className="lp-preview-v2-greeting__left">
+              <div className="lp-preview-v2-kicker">
+                <span className="lp-preview-v2-kicker__dot" />
+                <span>MONDAY · 2:47 PM</span>
+              </div>
+              <div className="lp-preview-v2-heading">Afternoon.</div>
+              <div className="lp-preview-v2-sub">
+                You're <span className="lp-preview-v2-sub__accent">540 kcal under</span>. Lunch is the next big window.
+              </div>
             </div>
-            <div className="lp-preview__stat-card">
-              <div className="lp-preview__stat-label">PROTEIN</div>
-              <div className="lp-preview__stat-value">120g</div>
-              <div className="lp-preview__stat-sub lp-preview__stat-sub--teal">on track for goal</div>
-            </div>
-            <div className="lp-preview__stat-card">
-              <div className="lp-preview__stat-label">WORKOUTS</div>
-              <div className="lp-preview__stat-value">3</div>
-              <div className="lp-preview__stat-sub">this week</div>
-            </div>
-            <div className="lp-preview__stat-card">
-              <div className="lp-preview__stat-label">STREAK</div>
-              <div className="lp-preview__stat-value">11d</div>
-              <div className="lp-preview__stat-sub lp-preview__stat-sub--teal">keep it going</div>
+            <div className="lp-preview-v2-streak-pill">
+              <span aria-hidden="true">🔥</span>
+              <span className="lp-preview-v2-streak-pill__num">11</span>
+              <span className="lp-preview-v2-streak-pill__label">day streak</span>
             </div>
           </div>
 
-          {/* Macro split */}
-          <div className="lp-preview__card">
-            <div className="lp-preview__card-title">MACRO SPLIT</div>
-            <div className="lp-preview__bars">
-              <div className="lp-preview__bar-row">
-                <span className="lp-preview__bar-label">Protein</span>
-                <div className="lp-preview__bar-track">
+          {/* Three action cards */}
+          <div className="lp-preview-v2-actions">
+            <div className="lp-preview-v2-action lp-preview-v2-action--primary">
+              <div className="lp-preview-v2-action__kicker">LOG A MEAL</div>
+              <div className="lp-preview-v2-action__row">
+                <span className="lp-preview-v2-action__title">Lunch</span>
+                <span className="lp-preview-v2-action__arrow">→</span>
+              </div>
+              <div className="lp-preview-v2-action__sub">scan, search, or pick from your plan</div>
+            </div>
+            <div className="lp-preview-v2-action">
+              <div className="lp-preview-v2-action__kicker">LOG A WORKOUT</div>
+              <div className="lp-preview-v2-action__row">
+                <span className="lp-preview-v2-action__title">Push day</span>
+                <span className="lp-preview-v2-action__arrow">→</span>
+              </div>
+              <div className="lp-preview-v2-action__sub">on your schedule · 8 exercises</div>
+            </div>
+            <div className="lp-preview-v2-action">
+              <div className="lp-preview-v2-action__kicker">LOG WEIGHT</div>
+              <div className="lp-preview-v2-action__row">
+                <span className="lp-preview-v2-action__title">Daily</span>
+                <span className="lp-preview-v2-action__arrow">→</span>
+              </div>
+              <div className="lp-preview-v2-action__sub">last logged 1d ago · 174 lb</div>
+            </div>
+          </div>
+
+          {/* Today's nutrition */}
+          <div className="lp-preview-v2-nutrition">
+            <div className="lp-preview-v2-nutrition__head">
+              <div>
+                <div className="lp-preview-v2-nutrition__label">TODAY'S NUTRITION</div>
+                <div className="lp-preview-v2-nutrition__kcal">
+                  <span className="lp-preview-v2-nutrition__kcal-current">1,640</span>
+                  <span className="lp-preview-v2-nutrition__kcal-target">/ 2,180 kcal</span>
+                </div>
+              </div>
+              <div className="lp-preview-v2-nutrition__pills">
+                <span className="lp-preview-v2-nutrition__pill lp-preview-v2-nutrition__pill--active">Today</span>
+                <span className="lp-preview-v2-nutrition__pill">7D</span>
+                <span className="lp-preview-v2-nutrition__pill">30D</span>
+              </div>
+            </div>
+            <div className="lp-preview-v2-bars">
+              <div className="lp-preview-v2-bar">
+                <div className="lp-preview-v2-bar__head">
+                  <span className="lp-preview-v2-bar__label">
+                    <span className="lp-preview-v2-bar__dot lp-preview-v2-bar__dot--protein" />Protein
+                  </span>
+                  <span className="lp-preview-v2-bar__num">120 / 145g</span>
+                </div>
+                <div className="lp-preview-v2-bar__track">
                   <motion.div
-                    className="lp-preview__bar-fill"
-                    style={{ background: '#7f77dd' }}
-                    initial={reduced ? { width: '100%' } : { width: 0 }}
-                    whileInView={{ width: '100%' }}
+                    className="lp-preview-v2-bar__fill lp-preview-v2-bar__fill--protein"
+                    initial={reduced ? { width: '82%' } : { width: 0 }}
+                    whileInView={{ width: '82%' }}
                     viewport={{ once: true }}
-                    transition={reduced ? { duration: 0 } : { duration: 1.2, delay: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                    transition={reduced ? { duration: 0 } : { duration: 1.0, delay: 0.5, ease: [0.4, 0, 0.2, 1] }}
                   />
                 </div>
               </div>
-              <div className="lp-preview__bar-row">
-                <span className="lp-preview__bar-label">Carbs</span>
-                <div className="lp-preview__bar-track">
-                  <motion.div
-                    className="lp-preview__bar-fill"
-                    style={{ background: '#1D9E75' }}
-                    initial={reduced ? { width: '65%' } : { width: 0 }}
-                    whileInView={{ width: '65%' }}
-                    viewport={{ once: true }}
-                    transition={reduced ? { duration: 0 } : { duration: 1.2, delay: 0.8, ease: [0.4, 0, 0.2, 1] }}
-                  />
+              <div className="lp-preview-v2-bar">
+                <div className="lp-preview-v2-bar__head">
+                  <span className="lp-preview-v2-bar__label">
+                    <span className="lp-preview-v2-bar__dot lp-preview-v2-bar__dot--carbs" />Carbs
+                  </span>
+                  <span className="lp-preview-v2-bar__num">152 / 218g</span>
                 </div>
-              </div>
-              <div className="lp-preview__bar-row">
-                <span className="lp-preview__bar-label">Fat</span>
-                <div className="lp-preview__bar-track">
+                <div className="lp-preview-v2-bar__track">
                   <motion.div
-                    className="lp-preview__bar-fill"
-                    style={{ background: '#f59e0b' }}
+                    className="lp-preview-v2-bar__fill lp-preview-v2-bar__fill--carbs"
                     initial={reduced ? { width: '70%' } : { width: 0 }}
                     whileInView={{ width: '70%' }}
                     viewport={{ once: true }}
-                    transition={reduced ? { duration: 0 } : { duration: 1.2, delay: 1.0, ease: [0.4, 0, 0.2, 1] }}
+                    transition={reduced ? { duration: 0 } : { duration: 1.0, delay: 0.7, ease: [0.4, 0, 0.2, 1] }}
+                  />
+                </div>
+              </div>
+              <div className="lp-preview-v2-bar">
+                <div className="lp-preview-v2-bar__head">
+                  <span className="lp-preview-v2-bar__label">
+                    <span className="lp-preview-v2-bar__dot lp-preview-v2-bar__dot--fat" />Fat
+                  </span>
+                  <span className="lp-preview-v2-bar__num">42 / 61g</span>
+                </div>
+                <div className="lp-preview-v2-bar__track">
+                  <motion.div
+                    className="lp-preview-v2-bar__fill lp-preview-v2-bar__fill--fat"
+                    initial={reduced ? { width: '69%' } : { width: 0 }}
+                    whileInView={{ width: '69%' }}
+                    viewport={{ once: true }}
+                    transition={reduced ? { duration: 0 } : { duration: 1.0, delay: 0.9, ease: [0.4, 0, 0.2, 1] }}
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Meal plan */}
-          <div className="lp-preview__card">
-            <div className="lp-preview__card-title">TODAY&apos;S MEAL PLAN</div>
-            <div className="lp-preview__meal-row">
-              <span className="lp-preview__meal-name">Protein Smoothie Bowl</span>
-              <span className="lp-preview__meal-kcal">580 kcal</span>
+          {/* Status row — This week + Weight trend */}
+          <div className="lp-preview-v2-status">
+            <div className="lp-preview-v2-status__card">
+              <div className="lp-preview-v2-status__head">
+                <span className="lp-preview-v2-status__label">THIS WEEK</span>
+                <span className="lp-preview-v2-status__badge">on track</span>
+              </div>
+              <div className="lp-preview-v2-status__big">
+                <span className="lp-preview-v2-status__num">3</span>
+                <span className="lp-preview-v2-status__bigSub">of 4 workouts</span>
+              </div>
+              <div className="lp-preview-v2-status__strip">
+                <div className="lp-preview-v2-status__strip-cell lp-preview-v2-status__strip-cell--filled" />
+                <div className="lp-preview-v2-status__strip-cell lp-preview-v2-status__strip-cell--filled" />
+                <div className="lp-preview-v2-status__strip-cell lp-preview-v2-status__strip-cell--filled" />
+                <div className="lp-preview-v2-status__strip-cell" />
+                <div className="lp-preview-v2-status__strip-cell" />
+                <div className="lp-preview-v2-status__strip-cell" />
+                <div className="lp-preview-v2-status__strip-cell" />
+              </div>
             </div>
-            <div className="lp-preview__meal-row">
-              <span className="lp-preview__meal-name">Chicken Rice Bowl</span>
-              <span className="lp-preview__meal-kcal">600 kcal</span>
+            <div className="lp-preview-v2-status__card">
+              <div className="lp-preview-v2-status__head">
+                <span className="lp-preview-v2-status__label">WEIGHT TREND</span>
+                <span className="lp-preview-v2-status__badge">−2.1 lb / 30d</span>
+              </div>
+              <div className="lp-preview-v2-status__big">
+                <span className="lp-preview-v2-status__num">
+                  174.2<span className="lp-preview-v2-status__unit"> lb</span>
+                </span>
+              </div>
+              <svg className="lp-preview-v2-status__spark" viewBox="0 0 240 30" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="0,18 30,16 60,12 90,14 120,10 150,8 180,12 210,10 240,8" fill="none" stroke="var(--lp-teal-light)" strokeWidth="1.5" />
+              </svg>
             </div>
           </div>
         </div>
@@ -753,235 +813,149 @@ const HOME_CAL_DAYS = [
 ];
 
 function DemoHome() {
-  /* Gauge math — half circle of radius 80 */
-  const halfCirc = Math.PI * 80;
-  const pPct = 0.22; // protein share of kcal
-  const cPct = 0.53; // carbs share of kcal
-  const fPct = 0.25; // fat share of kcal
-  const pLen = halfCirc * pPct;
-  const cLen = halfCirc * cPct;
-  const fLen = halfCirc * fPct;
-
   return (
-    <div className="lp-demo__panel">
-      {/* Greeting */}
-      <div className="lp-demo__home-head">
-        <h3 className="lp-demo__home-greeting">Good morning</h3>
-        <p className="lp-demo__home-date">Wednesday, April 22</p>
-      </div>
-
-      {/* 4-stat row */}
-      <div className="lp-demo__stat-grid">
-        <div className="lp-demo__stat">
-          <div className="lp-demo__stat-label">
-            <span className="lp-demo__stat-dot" /> CALORIES
+    <div className="lp-demo__panel lp-demo__home-v2">
+      {/* Greeting bar */}
+      <div className="lp-demo__home-v2-greeting">
+        <div className="lp-demo__home-v2-greeting-left">
+          <div className="lp-demo__home-v2-kicker">
+            <span className="lp-demo__home-v2-kicker-dot" />
+            <span>MONDAY · 2:47 PM</span>
           </div>
-          <div className="lp-demo__stat-value">2,180</div>
-          <div className="lp-demo__stat-sub lp-demo__stat-sub--teal">0 kcal remaining</div>
+          <h3 className="lp-demo__home-v2-heading">Afternoon.</h3>
+          <p className="lp-demo__home-v2-sub">
+            You&apos;re <span className="lp-demo__home-v2-sub-accent">540 kcal under</span>. Lunch is the next big window.
+          </p>
         </div>
-        <div className="lp-demo__stat">
-          <div className="lp-demo__stat-label">
-            <span className="lp-demo__stat-dot" /> PROTEIN
-          </div>
-          <div className="lp-demo__stat-value">120g</div>
-          <div className="lp-demo__stat-sub lp-demo__stat-sub--teal">on track for goal</div>
-        </div>
-        <div className="lp-demo__stat">
-          <div className="lp-demo__stat-label">
-            <span className="lp-demo__stat-dot" /> WORKOUTS
-          </div>
-          <div className="lp-demo__stat-value">0</div>
-          <div className="lp-demo__stat-sub">this week</div>
-        </div>
-        <div className="lp-demo__stat">
-          <div className="lp-demo__stat-label">
-            <span className="lp-demo__stat-dot" /> STREAK
-          </div>
-          <div className="lp-demo__stat-value">2d</div>
-          <div className="lp-demo__stat-sub">day streak</div>
+        <div className="lp-demo__home-v2-streak">
+          <span aria-hidden="true">🔥</span>
+          <span className="lp-demo__home-v2-streak-num">11</span>
+          <span className="lp-demo__home-v2-streak-label">day streak</span>
         </div>
       </div>
 
-      {/* Macro split + consistency row */}
-      <div className="lp-demo__home-split">
-        {/* Macro split */}
-        <div className="lp-demo__card">
-          <div className="lp-demo__macro-split-head">
-            <h4 className="lp-demo__card-heading">Macro split</h4>
-            <div className="lp-demo__macro-tabs">
-              <button type="button" className="lp-demo__macro-tab is-active" onClick={preventClick}>Today</button>
-              <button type="button" className="lp-demo__macro-tab" onClick={preventClick}>7D</button>
-              <button type="button" className="lp-demo__macro-tab" onClick={preventClick}>30D</button>
-              <Locked>
-                <button type="button" className="lp-demo__macro-tab is-primary">Log nutrition</button>
-              </Locked>
+      {/* Three action cards */}
+      <div className="lp-demo__home-v2-actions">
+        <Locked>
+          <div className="lp-demo__home-v2-action lp-demo__home-v2-action--primary" role="button" tabIndex={0}>
+            <div className="lp-demo__home-v2-action-kicker">LOG A MEAL</div>
+            <div className="lp-demo__home-v2-action-row">
+              <span className="lp-demo__home-v2-action-title">Lunch</span>
+              <span className="lp-demo__home-v2-action-arrow">→</span>
+            </div>
+            <div className="lp-demo__home-v2-action-sub">scan, search, or pick from your plan</div>
+          </div>
+        </Locked>
+        <Locked>
+          <div className="lp-demo__home-v2-action" role="button" tabIndex={0}>
+            <div className="lp-demo__home-v2-action-kicker">LOG A WORKOUT</div>
+            <div className="lp-demo__home-v2-action-row">
+              <span className="lp-demo__home-v2-action-title">Push day</span>
+              <span className="lp-demo__home-v2-action-arrow">→</span>
+            </div>
+            <div className="lp-demo__home-v2-action-sub">on your schedule · 8 exercises</div>
+          </div>
+        </Locked>
+        <Locked>
+          <div className="lp-demo__home-v2-action" role="button" tabIndex={0}>
+            <div className="lp-demo__home-v2-action-kicker">LOG WEIGHT</div>
+            <div className="lp-demo__home-v2-action-row">
+              <span className="lp-demo__home-v2-action-title">Daily</span>
+              <span className="lp-demo__home-v2-action-arrow">→</span>
+            </div>
+            <div className="lp-demo__home-v2-action-sub">last logged 1d ago · 174 lb</div>
+          </div>
+        </Locked>
+      </div>
+
+      {/* Today's nutrition */}
+      <div className="lp-demo__home-v2-nutrition">
+        <div className="lp-demo__home-v2-nutrition-head">
+          <div>
+            <div className="lp-demo__home-v2-nutrition-label">TODAY&apos;S NUTRITION</div>
+            <div className="lp-demo__home-v2-nutrition-kcal">
+              <span className="lp-demo__home-v2-nutrition-kcal-current">1,640</span>
+              <span className="lp-demo__home-v2-nutrition-kcal-target">/ 2,180 kcal</span>
             </div>
           </div>
+          <div className="lp-demo__home-v2-nutrition-pills">
+            <button type="button" className="lp-demo__home-v2-nutrition-pill is-active" onClick={preventClick}>Today</button>
+            <button type="button" className="lp-demo__home-v2-nutrition-pill" onClick={preventClick}>7D</button>
+            <button type="button" className="lp-demo__home-v2-nutrition-pill" onClick={preventClick}>30D</button>
+          </div>
+        </div>
 
-          <div className="lp-demo__home-gauge-wrap">
-            <svg viewBox="0 0 200 120" className="lp-demo__home-gauge" aria-hidden="true">
-              {/* Background track */}
-              <path
-                d="M 20 100 A 80 80 0 0 1 180 100"
-                fill="none"
-                stroke="rgba(255,255,255,0.08)"
-                strokeWidth="12"
-                strokeLinecap="round"
-              />
-              {/* Fat (orange) — only the last slice, round cap at 100% mark */}
-              <path
-                d="M 20 100 A 80 80 0 0 1 180 100"
-                fill="none"
-                stroke="#f59e0b"
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeDasharray={`${fLen} ${halfCirc}`}
-                strokeDashoffset={-(pLen + cLen)}
-              />
-              {/* Carbs (teal) — draws 0 to (pLen+cLen), butt caps keep seams clean */}
-              <path
-                d="M 20 100 A 80 80 0 0 1 180 100"
-                fill="none"
-                stroke="#1d9e75"
-                strokeWidth="12"
-                strokeLinecap="butt"
-                strokeDasharray={`${pLen + cLen} ${halfCirc}`}
-              />
-              {/* Protein (purple) — drawn last so it sits at the "start" with round left cap */}
-              <path
-                d="M 20 100 A 80 80 0 0 1 180 100"
-                fill="none"
-                stroke="#7f77dd"
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeDasharray={`${pLen} ${halfCirc}`}
-              />
-            </svg>
-            <div className="lp-demo__home-gauge-center">
-              <div className="lp-demo__home-gauge-value">2,180</div>
-              <div className="lp-demo__home-gauge-label">kcal today</div>
+        <div className="lp-demo__home-v2-bars">
+          <div className="lp-demo__home-v2-bar">
+            <div className="lp-demo__home-v2-bar-head">
+              <span className="lp-demo__home-v2-bar-label">
+                <span className="lp-demo__home-v2-bar-dot" style={{ background: '#A78BFA' }} />Protein
+              </span>
+              <span className="lp-demo__home-v2-bar-num">120 / 145g</span>
+            </div>
+            <div className="lp-demo__home-v2-bar-track">
+              <div className="lp-demo__home-v2-bar-fill" style={{ width: '82%', background: '#A78BFA' }} />
             </div>
           </div>
-
-          <div className="lp-demo__home-macros">
-            <div className="lp-demo__home-macro-row">
-              <span className="lp-demo__home-macro-dot" style={{ background: '#7f77dd' }} />
-              <span className="lp-demo__home-macro-name">Protein</span>
-              <span className="lp-demo__home-macro-pct">22%</span>
-              <span className="lp-demo__home-macro-val">120 / 120g</span>
+          <div className="lp-demo__home-v2-bar">
+            <div className="lp-demo__home-v2-bar-head">
+              <span className="lp-demo__home-v2-bar-label">
+                <span className="lp-demo__home-v2-bar-dot" style={{ background: '#1d9e75' }} />Carbs
+              </span>
+              <span className="lp-demo__home-v2-bar-num">152 / 218g</span>
             </div>
-            <div className="lp-demo__home-macro-row">
-              <span className="lp-demo__home-macro-dot" style={{ background: '#1d9e75' }} />
-              <span className="lp-demo__home-macro-name">Carbs</span>
-              <span className="lp-demo__home-macro-pct">53%</span>
-              <span className="lp-demo__home-macro-val">288 / 288g</span>
-            </div>
-            <div className="lp-demo__home-macro-row">
-              <span className="lp-demo__home-macro-dot" style={{ background: '#f59e0b' }} />
-              <span className="lp-demo__home-macro-name">Fat</span>
-              <span className="lp-demo__home-macro-pct">25%</span>
-              <span className="lp-demo__home-macro-val">61 / 61g</span>
+            <div className="lp-demo__home-v2-bar-track">
+              <div className="lp-demo__home-v2-bar-fill" style={{ width: '70%', background: '#1d9e75' }} />
             </div>
           </div>
+          <div className="lp-demo__home-v2-bar">
+            <div className="lp-demo__home-v2-bar-head">
+              <span className="lp-demo__home-v2-bar-label">
+                <span className="lp-demo__home-v2-bar-dot" style={{ background: '#FCA130' }} />Fat
+              </span>
+              <span className="lp-demo__home-v2-bar-num">42 / 61g</span>
+            </div>
+            <div className="lp-demo__home-v2-bar-track">
+              <div className="lp-demo__home-v2-bar-fill" style={{ width: '69%', background: '#FCA130' }} />
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <div className="lp-demo__home-remaining">
-            <span className="lp-demo__home-macro-dot" style={{ background: '#f59e0b' }} />
-            <span className="lp-demo__home-macro-name">Remaining</span>
-            <span className="lp-demo__home-remaining-val">
-              0 <small>kcal left</small>
+      {/* Status row — This week + Weight trend */}
+      <div className="lp-demo__home-v2-status">
+        <div className="lp-demo__home-v2-status-card">
+          <div className="lp-demo__home-v2-status-head">
+            <span className="lp-demo__home-v2-status-label">THIS WEEK</span>
+            <span className="lp-demo__home-v2-status-badge">on track</span>
+          </div>
+          <div className="lp-demo__home-v2-status-big">
+            <span className="lp-demo__home-v2-status-num">3</span>
+            <span className="lp-demo__home-v2-status-bigsub">of 4 workouts</span>
+          </div>
+          <div className="lp-demo__home-v2-status-strip">
+            <div className="lp-demo__home-v2-status-strip-cell is-filled" />
+            <div className="lp-demo__home-v2-status-strip-cell is-filled" />
+            <div className="lp-demo__home-v2-status-strip-cell is-filled" />
+            <div className="lp-demo__home-v2-status-strip-cell" />
+            <div className="lp-demo__home-v2-status-strip-cell" />
+            <div className="lp-demo__home-v2-status-strip-cell" />
+            <div className="lp-demo__home-v2-status-strip-cell" />
+          </div>
+        </div>
+        <div className="lp-demo__home-v2-status-card">
+          <div className="lp-demo__home-v2-status-head">
+            <span className="lp-demo__home-v2-status-label">WEIGHT TREND</span>
+            <span className="lp-demo__home-v2-status-badge">−2.1 lb / 30d</span>
+          </div>
+          <div className="lp-demo__home-v2-status-big">
+            <span className="lp-demo__home-v2-status-num">
+              174.2<span className="lp-demo__home-v2-status-unit"> lb</span>
             </span>
           </div>
-        </div>
-
-        {/* Consistency calendar */}
-        <div className="lp-demo__card">
-          <div className="lp-demo__calendar-head">
-            <h4 className="lp-demo__card-heading">Consistency</h4>
-            <span className="lp-demo__calendar-month">‹ April 2026</span>
-          </div>
-
-          <div className="lp-demo__calendar-grid">
-            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-              <span key={`h-${i}`} className="lp-demo__calendar-dow">{d}</span>
-            ))}
-            {HOME_CAL_DAYS.map((d, i) =>
-              d === null ? (
-                <span key={i} className="lp-demo__calendar-cell lp-demo__calendar-cell--empty" />
-              ) : (
-                <span
-                  key={i}
-                  className={`lp-demo__calendar-cell lp-demo__calendar-cell--${d.state}`}
-                >
-                  {d.n}
-                </span>
-              ),
-            )}
-          </div>
-
-          <div className="lp-demo__calendar-legend">
-            <span><span className="lp-demo__cal-dot lp-demo__cal-dot--both" /> Both</span>
-            <span><span className="lp-demo__cal-dot lp-demo__cal-dot--partial" /> Partial</span>
-            <span><span className="lp-demo__cal-dot lp-demo__cal-dot--missed" /> Missed</span>
-            <span className="lp-demo__cal-pct">23% this month</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Today's meal plan */}
-      <div className="lp-demo__card">
-        <div className="lp-demo__meal-plan-head">
-          <h4 className="lp-demo__card-heading">Today&apos;s Meal Plan</h4>
-          <Locked>
-            <button type="button" className="lp-demo__link-btn">View full plan →</button>
-          </Locked>
-        </div>
-
-        <div className="lp-demo__meal-plan-grid">
-          <div className="lp-demo__plan-meal">
-            <div className="lp-demo__plan-slot">BREAKFAST</div>
-            <div className="lp-demo__plan-name">
-              Greek Yogurt Parfait with Berries and Granola
-            </div>
-            <div className="lp-demo__plan-macros">
-              <span>Cal: <b>380</b></span>
-              <span>P: <b>16g</b></span>
-              <span>C: <b>54g</b></span>
-              <span>F: <b>10g</b></span>
-            </div>
-            <div className="lp-demo__plan-log lp-demo__plan-log--logged">
-              <Check size={13} /> Logged
-            </div>
-          </div>
-          <div className="lp-demo__plan-meal">
-            <div className="lp-demo__plan-slot">LUNCH</div>
-            <div className="lp-demo__plan-name">
-              Tuna Salad with Whole Grain Crackers
-            </div>
-            <div className="lp-demo__plan-macros">
-              <span>Cal: <b>580</b></span>
-              <span>P: <b>42g</b></span>
-              <span>C: <b>48g</b></span>
-              <span>F: <b>22g</b></span>
-            </div>
-            <div className="lp-demo__plan-log lp-demo__plan-log--logged">
-              <Check size={13} /> Logged
-            </div>
-          </div>
-          <div className="lp-demo__plan-meal">
-            <div className="lp-demo__plan-slot">DINNER</div>
-            <div className="lp-demo__plan-name">
-              Baked Chicken Thighs with Quinoa and Roasted Vegetables
-            </div>
-            <div className="lp-demo__plan-macros">
-              <span>Cal: <b>1220</b></span>
-              <span>P: <b>62g</b></span>
-              <span>C: <b>186g</b></span>
-              <span>F: <b>29g</b></span>
-            </div>
-            <div className="lp-demo__plan-log lp-demo__plan-log--logged">
-              <Check size={13} /> Logged
-            </div>
-          </div>
+          <svg className="lp-demo__home-v2-status-spark" viewBox="0 0 240 30" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="0,18 30,16 60,12 90,14 120,10 150,8 180,12 210,10 240,8" fill="none" stroke="#5dcaa5" strokeWidth="1.5" />
+          </svg>
         </div>
       </div>
     </div>

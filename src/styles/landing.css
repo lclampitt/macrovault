@@ -367,7 +367,7 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
+  grid-template-columns: 1fr 1.1fr;
   gap: 32px;
   align-items: start;
   max-width: 1280px;
@@ -533,11 +533,21 @@
 .lp-preview {
   position: relative;
   width: 100%;
-  max-width: 560px;
+  max-width: 600px;
   margin-right: -60px;
   perspective: 1800px;
   transform: none;
   filter: none;
+}
+
+/* Mobile (≤767px per CLAUDE.md): hide the dashboard preview entirely.
+   Above this breakpoint the existing 960px collapse rule already
+   stacks the preview below the hero copy — at true phone widths it
+   adds vertical noise without selling the product, so we drop it. */
+@media (max-width: 767px) {
+  .lp-preview {
+    display: none;
+  }
 }
 
 .lp-preview__frame {
@@ -563,135 +573,375 @@
   gap: 14px;
 }
 
-.lp-preview__greet-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 2px;
+/* ── v2 hero preview — mirrors shipped .hd-desktop layout ───
+   Internal content is scaled ~80% relative to the real dashboard
+   since the preview frame is smaller than a real viewport. */
+
+.lp-preview-v2-body {
+  padding: 14px;
+  gap: 10px;
 }
 
-.lp-preview__eyebrow {
-  font-size: 10px;
+/* Greeting bar */
+.lp-preview-v2-greeting {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.lp-preview-v2-greeting__left {
+  min-width: 0;
+}
+
+.lp-preview-v2-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--lp-font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--lp-teal-light);
+  margin-bottom: 3px;
+}
+
+.lp-preview-v2-kicker__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lp-teal);
+  box-shadow: 0 0 8px var(--lp-teal);
+  animation: lp-pulse 2s ease-in-out infinite;
+}
+
+.lp-preview-v2-heading {
+  font-size: 22px;
   font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--lp-text-soft);
+}
+
+.lp-preview-v2-sub {
+  font-size: 11px;
+  color: var(--lp-muted);
+  margin-top: 4px;
+}
+
+.lp-preview-v2-sub__accent {
+  color: var(--lp-teal-light);
+  font-weight: 500;
+}
+
+.lp-preview-v2-streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--lp-border);
+  border-radius: 7px;
+  flex-shrink: 0;
+  font-size: 9px;
+}
+
+.lp-preview-v2-streak-pill__num {
+  font-family: var(--lp-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--lp-text-soft);
+}
+
+.lp-preview-v2-streak-pill__label {
+  font-size: 9px;
+  color: var(--lp-muted);
+}
+
+/* Three action cards */
+.lp-preview-v2-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.lp-preview-v2-action {
+  position: relative;
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
+  border-radius: 9px;
+  padding: 11px 12px;
+  overflow: hidden;
+}
+
+.lp-preview-v2-action--primary {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--lp-teal) 16%, var(--lp-surface)) 0%, var(--lp-surface) 100%);
+  border-color: rgba(29, 158, 117, 0.25);
+}
+
+.lp-preview-v2-action--primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 50px;
+  background: radial-gradient(circle at top right, rgba(29, 158, 117, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.lp-preview-v2-action__kicker {
+  font-family: var(--lp-font-mono);
+  font-size: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
   letter-spacing: 0.1em;
+  color: var(--lp-muted);
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.lp-preview-v2-action--primary .lp-preview-v2-action__kicker {
   color: var(--lp-teal-light);
 }
 
-.lp-preview__date {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.35);
+.lp-preview-v2-action__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  position: relative;
 }
 
-/* 2x2 stat grid */
-.lp-preview__stats {
+.lp-preview-v2-action__title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lp-text-soft);
+}
+
+.lp-preview-v2-action__arrow {
+  font-family: var(--lp-font-mono);
+  font-size: 10px;
+  color: var(--lp-muted);
+}
+
+.lp-preview-v2-action--primary .lp-preview-v2-action__arrow {
+  color: var(--lp-teal-light);
+}
+
+.lp-preview-v2-action__sub {
+  font-size: 9px;
+  color: var(--lp-muted);
+  margin-top: 3px;
+  position: relative;
+}
+
+/* Today's nutrition */
+.lp-preview-v2-nutrition {
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
+  border-radius: 9px;
+  padding: 13px 14px;
+}
+
+.lp-preview-v2-nutrition__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.lp-preview-v2-nutrition__label {
+  font-family: var(--lp-font-mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lp-muted);
+  margin-bottom: 3px;
+}
+
+.lp-preview-v2-nutrition__kcal {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.lp-preview-v2-nutrition__kcal-current {
+  font-family: var(--lp-font-mono);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--lp-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-preview-v2-nutrition__kcal-target {
+  font-family: var(--lp-font-mono);
+  font-size: 10px;
+  color: var(--lp-muted);
+}
+
+.lp-preview-v2-nutrition__pills {
+  display: flex;
+  gap: 3px;
+}
+
+.lp-preview-v2-nutrition__pill {
+  font-family: var(--lp-font-mono);
+  font-size: 9px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--lp-muted);
+  border: 1px solid transparent;
+}
+
+.lp-preview-v2-nutrition__pill--active {
+  background: rgba(29, 158, 117, 0.12);
+  color: var(--lp-teal-light);
+  border-color: rgba(29, 158, 117, 0.3);
+}
+
+.lp-preview-v2-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.lp-preview-v2-bar__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+
+.lp-preview-v2-bar__label {
+  font-size: 10px;
+  color: var(--lp-text-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lp-preview-v2-bar__dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.lp-preview-v2-bar__dot--protein { background: #A78BFA; }
+.lp-preview-v2-bar__dot--carbs   { background: var(--lp-teal); }
+.lp-preview-v2-bar__dot--fat     { background: #FCA130; }
+
+.lp-preview-v2-bar__num {
+  font-family: var(--lp-font-mono);
+  font-size: 9px;
+  color: var(--lp-muted);
+}
+
+.lp-preview-v2-bar__track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.lp-preview-v2-bar__fill {
+  height: 100%;
+  border-radius: 99px;
+}
+
+.lp-preview-v2-bar__fill--protein { background: #A78BFA; }
+.lp-preview-v2-bar__fill--carbs   { background: var(--lp-teal); }
+.lp-preview-v2-bar__fill--fat     { background: #FCA130; }
+
+/* Status row */
+.lp-preview-v2-status {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.lp-preview__stat-card {
-  background: #0f1117;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 10px;
-  padding: 12px;
+.lp-preview-v2-status__card {
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
+  border-radius: 9px;
+  padding: 11px 12px;
+}
+
+.lp-preview-v2-status__head {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.lp-preview__stat-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-}
-
-.lp-preview__stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: -0.02em;
-}
-
-.lp-preview__stat-sub {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.lp-preview__stat-sub--teal {
-  color: var(--lp-teal);
-}
-
-.lp-preview__card {
-  background: #0f1117;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-
-.lp-preview__card-title {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-
-.lp-preview__bars {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.lp-preview__bar-row {
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  align-items: center;
-  gap: 10px;
-}
-
-.lp-preview__bar-label {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 500;
-}
-
-.lp-preview__bar-track {
-  height: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.lp-preview__bar-fill {
-  height: 100%;
-  border-radius: 3px;
-}
-
-.lp-preview__meal-row {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 6px;
 }
 
-.lp-preview__meal-row:last-child {
-  border-bottom: 0;
+.lp-preview-v2-status__label {
+  font-family: var(--lp-font-mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lp-muted);
 }
 
-.lp-preview__meal-name {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.75);
+.lp-preview-v2-status__badge {
+  font-family: var(--lp-font-mono);
+  font-size: 9px;
+  color: var(--lp-teal-light);
 }
 
-.lp-preview__meal-kcal {
-  font-size: 11px;
-  color: var(--lp-teal);
-  font-weight: 600;
+.lp-preview-v2-status__big {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
+
+.lp-preview-v2-status__num {
+  font-family: var(--lp-font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--lp-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-preview-v2-status__unit {
+  font-size: 10px;
+  color: var(--lp-muted);
+  font-weight: 400;
+}
+
+.lp-preview-v2-status__bigSub {
+  font-size: 10px;
+  color: var(--lp-muted);
+}
+
+.lp-preview-v2-status__strip {
+  display: flex;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.lp-preview-v2-status__strip-cell {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lp-preview-v2-status__strip-cell--filled {
+  background: var(--lp-teal);
+}
+
+.lp-preview-v2-status__spark {
+  width: 100%;
+  height: 18px;
+  margin-top: 6px;
+  display: block;
+}
+
 
 /* ==================================================================
    FEATURE STRIP
@@ -3912,6 +4162,405 @@
   .lp-demo__history-head span:nth-child(3),
   .lp-demo__history-row span:nth-child(3) {
     display: none;
+  }
+}
+
+
+/* ==================================================================
+   DEMO HOME — v2 (mirrors shipped .hd-desktop action-first layout)
+   ================================================================== */
+
+.lp-demo__home-v2 {
+  /* Inherits .lp-demo__panel flex-column + 18px gap; just sets a
+     tighter gap to fit four rows inside the demo viewport. */
+  gap: 16px;
+}
+
+/* ── Greeting bar ─────────────────────────────────────────── */
+.lp-demo__home-v2-greeting {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.lp-demo__home-v2-greeting-left {
+  min-width: 0;
+}
+
+.lp-demo__home-v2-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--lp-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--lp-teal-light);
+  margin-bottom: 4px;
+}
+
+.lp-demo__home-v2-kicker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lp-teal);
+  box-shadow: 0 0 10px var(--lp-teal);
+  animation: lp-pulse 2s ease-in-out infinite;
+}
+
+.lp-demo__home-v2-heading {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--lp-text-soft);
+  margin: 0;
+}
+
+.lp-demo__home-v2-sub {
+  font-size: 13px;
+  color: var(--lp-muted);
+  margin: 5px 0 0;
+}
+
+.lp-demo__home-v2-sub-accent {
+  color: var(--lp-teal-light);
+  font-weight: 500;
+}
+
+.lp-demo__home-v2-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--lp-border);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.lp-demo__home-v2-streak-num {
+  font-family: var(--lp-font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lp-text-soft);
+}
+
+.lp-demo__home-v2-streak-label {
+  font-size: 11px;
+  color: var(--lp-muted);
+}
+
+/* ── Three action cards ───────────────────────────────────── */
+.lp-demo__home-v2-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.lp-demo__home-v2-action {
+  position: relative;
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.lp-demo__home-v2-action:hover {
+  border-color: rgba(29, 158, 117, 0.3);
+  transform: translateY(-1px);
+}
+
+.lp-demo__home-v2-action--primary {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--lp-teal) 16%, var(--lp-surface)) 0%, var(--lp-surface) 100%);
+  border-color: rgba(29, 158, 117, 0.25);
+}
+
+.lp-demo__home-v2-action--primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 110px;
+  height: 70px;
+  background: radial-gradient(circle at top right, rgba(29, 158, 117, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.lp-demo__home-v2-action-kicker {
+  font-family: var(--lp-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lp-muted);
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.lp-demo__home-v2-action--primary .lp-demo__home-v2-action-kicker {
+  color: var(--lp-teal-light);
+}
+
+.lp-demo__home-v2-action-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  position: relative;
+}
+
+.lp-demo__home-v2-action-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lp-text-soft);
+}
+
+.lp-demo__home-v2-action-arrow {
+  font-family: var(--lp-font-mono);
+  font-size: 12px;
+  color: var(--lp-muted);
+}
+
+.lp-demo__home-v2-action--primary .lp-demo__home-v2-action-arrow {
+  color: var(--lp-teal-light);
+}
+
+.lp-demo__home-v2-action-sub {
+  font-size: 11px;
+  color: var(--lp-muted);
+  margin-top: 4px;
+  position: relative;
+}
+
+/* ── Today's nutrition card ───────────────────────────────── */
+.lp-demo__home-v2-nutrition {
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.lp-demo__home-v2-nutrition-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.lp-demo__home-v2-nutrition-label {
+  font-family: var(--lp-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lp-muted);
+  margin-bottom: 4px;
+}
+
+.lp-demo__home-v2-nutrition-kcal {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.lp-demo__home-v2-nutrition-kcal-current {
+  font-family: var(--lp-font-mono);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--lp-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-demo__home-v2-nutrition-kcal-target {
+  font-family: var(--lp-font-mono);
+  font-size: 12px;
+  color: var(--lp-muted);
+}
+
+.lp-demo__home-v2-nutrition-pills {
+  display: flex;
+  gap: 4px;
+}
+
+.lp-demo__home-v2-nutrition-pill {
+  font-family: var(--lp-font-mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: var(--lp-muted);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.lp-demo__home-v2-nutrition-pill:hover {
+  color: var(--lp-text-soft);
+}
+
+.lp-demo__home-v2-nutrition-pill.is-active {
+  background: rgba(29, 158, 117, 0.12);
+  color: var(--lp-teal-light);
+  border-color: rgba(29, 158, 117, 0.3);
+}
+
+.lp-demo__home-v2-bars {
+  display: grid;
+  gap: 11px;
+}
+
+.lp-demo__home-v2-bar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.lp-demo__home-v2-bar-label {
+  font-size: 12px;
+  color: var(--lp-text-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lp-demo__home-v2-bar-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.lp-demo__home-v2-bar-num {
+  font-family: var(--lp-font-mono);
+  font-size: 11px;
+  color: var(--lp-muted);
+}
+
+.lp-demo__home-v2-bar-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.lp-demo__home-v2-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+}
+
+/* ── Status row — This week + Weight trend ────────────────── */
+.lp-demo__home-v2-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.lp-demo__home-v2-status-card {
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.lp-demo__home-v2-status-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.lp-demo__home-v2-status-label {
+  font-family: var(--lp-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lp-muted);
+}
+
+.lp-demo__home-v2-status-badge {
+  font-family: var(--lp-font-mono);
+  font-size: 11px;
+  color: var(--lp-teal-light);
+}
+
+.lp-demo__home-v2-status-big {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.lp-demo__home-v2-status-num {
+  font-family: var(--lp-font-mono);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--lp-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-demo__home-v2-status-unit {
+  font-size: 12px;
+  color: var(--lp-muted);
+  font-weight: 400;
+}
+
+.lp-demo__home-v2-status-bigsub {
+  font-size: 12px;
+  color: var(--lp-muted);
+}
+
+.lp-demo__home-v2-status-strip {
+  display: flex;
+  gap: 3px;
+  margin-top: 10px;
+}
+
+.lp-demo__home-v2-status-strip-cell {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lp-demo__home-v2-status-strip-cell.is-filled {
+  background: var(--lp-teal);
+}
+
+.lp-demo__home-v2-status-spark {
+  width: 100%;
+  height: 22px;
+  margin-top: 8px;
+  display: block;
+}
+
+/* ── Mobile collapse ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .lp-demo__home-v2-actions {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .lp-demo__home-v2-status {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .lp-demo__home-v2-heading {
+    font-size: 22px;
+  }
+  .lp-demo__home-v2-nutrition-kcal-current {
+    font-size: 24px;
+  }
+  .lp-demo__home-v2-status-num {
+    font-size: 19px;
   }
 }
 
