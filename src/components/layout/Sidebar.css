@@ -705,20 +705,23 @@
     cursor: pointer;
   }
 
-  /* ── Mobile bottom nav — 5 tabs ── */
+  /* ── Mobile bottom nav — floating glassy pill ── */
   .mob-bottom-nav {
     display: flex;
     align-items: center;
     justify-content: space-around;
     position: fixed;
-    bottom: 0;
+    bottom: env(safe-area-inset-bottom, 0px);
     left: 0;
     right: 0;
-    height: calc(56px + env(safe-area-inset-bottom));
-    background: var(--bg-surface);
-    border-top: 1px solid var(--border);
-    padding: 0 4px;
-    padding-bottom: env(safe-area-inset-bottom);
+    margin: 0 14px 14px 14px;
+    background: rgba(20, 23, 30, 0.72);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 8px;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
     z-index: 50;
     overflow: visible;
   }
@@ -728,34 +731,41 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    padding: 6px 8px;
+    padding: 8px 4px;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 18px;
     flex: 1;
-    transition: background 0.15s;
+    background: transparent;
+    transition: background 0.2s ease;
     -webkit-tap-highlight-color: transparent;
-    background: none;
     border: none;
     font-family: inherit;
     position: relative;
   }
 
   .mob-nav-tab svg {
-    color: var(--text-muted);
+    width: 18px;
+    height: 18px;
+    color: #9AA0A6;
   }
 
   .mob-nav-tab__label {
     font-size: 10px;
     font-weight: 400;
-    color: var(--text-muted);
+    color: #9AA0A6;
+  }
+
+  .mob-nav-tab--active {
+    background: rgba(29, 158, 117, 0.14);
   }
 
   .mob-nav-tab--active svg {
-    color: var(--accent);
+    color: #5DCAA5;
   }
 
   .mob-nav-tab--active .mob-nav-tab__label {
-    color: var(--accent);
+    color: #5DCAA5;
+    font-weight: 500;
   }
 
   .mob-nav-tab__dot {
@@ -779,8 +789,9 @@
     border: none;
     font-family: inherit;
     position: relative;
-    flex: 1;
-    margin-top: -12px;
+    width: 56px;
+    flex: 0 0 56px;
+    margin-top: -22px;
     overflow: visible;
     touch-action: manipulation;
     z-index: 1;
@@ -789,29 +800,24 @@
   .mob-nav-log-btn svg {
     width: 48px;
     height: 48px;
-    padding: 12px;
+    padding: 13px;
     border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    box-shadow:
-      0 0 0 3px rgba(var(--accent-rgb), 0.10),
-      0 4px 12px rgba(var(--accent-rgb), 0.28);
-    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.22));
-    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    background: #1D9E75;
+    color: #04342C;
+    border: 3px solid #0A0B0F;
+    box-shadow: 0 6px 16px -2px rgba(29, 158, 117, 0.55);
+    transition: transform 0.15s, box-shadow 0.15s;
   }
 
   .mob-nav-log-btn--active svg {
-    box-shadow:
-      0 0 0 4px rgba(var(--accent-rgb), 0.12),
-      0 4px 14px rgba(var(--accent-rgb), 0.36);
-    filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.30));
+    box-shadow: 0 8px 20px -2px rgba(29, 158, 117, 0.70);
     transform: scale(1.05);
   }
 
   .mob-nav-log-btn__label {
     font-size: 10px;
     font-weight: 500;
-    color: var(--accent);
+    color: #5DCAA5;
     margin-top: 2px;
     white-space: nowrap;
   }

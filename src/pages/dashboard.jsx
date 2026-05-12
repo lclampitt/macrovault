@@ -827,6 +827,7 @@ export default function Dashboard() {
 
   const [session, setSession] = useState(null);
   const [streak, setStreak] = useState(0);
+  const [displayName, setDisplayName] = useState('');
 
   // Nutrition state
   const [todayNutrition, setTodayNutrition] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
@@ -861,6 +862,17 @@ export default function Dashboard() {
   }, []);
 
   const userId = session?.user?.id;
+
+  // Fetch profile display_name for the greeting
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    supabase.from('profiles').select('display_name').eq('id', userId).maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setDisplayName(data?.display_name?.trim() || '');
+      });
+    return () => { cancelled = true; };
+  }, [userId]);
 
   // Fetch goals + today's food totals
   useEffect(() => {
@@ -988,8 +1000,11 @@ export default function Dashboard() {
         : { text: `${proGoal - todayNutrition.protein}g remaining`, color: '--text-muted' }
     : null;
 
-  // Get user first name from session metadata
-  const firstName = session?.user?.user_metadata?.first_name
+  // Get user first name — prefer profiles.display_name, fall back to
+  // auth user_metadata so users who set their name during signup still
+  // see it before the profile fetch settles.
+  const firstName = (displayName && displayName.split(' ')[0])
+    || session?.user?.user_metadata?.first_name
     || session?.user?.user_metadata?.full_name?.split(' ')[0]
     || '';
 

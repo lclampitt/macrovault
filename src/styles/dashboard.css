@@ -981,7 +981,7 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 4px;
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 11px;
     font-weight: 500;
     text-transform: uppercase;
@@ -1035,7 +1035,7 @@
   }
 
   .hd-d-greeting__streak-num {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 13px;
     color: var(--text-primary);
     font-weight: 500;
@@ -1113,7 +1113,7 @@
   }
 
   .hd-d-action__kicker {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 10px;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -1140,7 +1140,7 @@
   }
 
   .hd-d-action__arrow {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 12px;
     color: var(--text-muted);
   }
@@ -1175,7 +1175,7 @@
   }
 
   .hd-d-nutrition__label {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 10px;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -1190,7 +1190,7 @@
   }
 
   .hd-d-nutrition__kcal-current {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 32px;
     color: var(--text-primary);
     font-weight: 500;
@@ -1199,7 +1199,7 @@
   }
 
   .hd-d-nutrition__kcal-target {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 14px;
     color: var(--text-muted);
   }
@@ -1210,7 +1210,7 @@
   }
 
   .hd-d-nutrition__pill {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 11px;
     padding: 5px 10px;
     border-radius: 999px;
@@ -1220,7 +1220,7 @@
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   .hd-d-nutrition__pill--active {
@@ -1263,7 +1263,7 @@
   .hd-d-macro-bar__dot--empty { opacity: 0.4; }
 
   .hd-d-macro-bar__num {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 11px;
     color: var(--text-secondary);
   }
@@ -1308,7 +1308,7 @@
   }
 
   .hd-d-card__label {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 10px;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -1316,7 +1316,7 @@
   }
 
   .hd-d-card__badge {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 11px;
     color: var(--accent-light);
   }
@@ -1332,7 +1332,7 @@
   }
 
   .hd-d-card__big-num {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 24px;
     color: var(--text-primary);
     font-weight: 500;
@@ -1414,7 +1414,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 12px;
   color: var(--text-primary);
   font-weight: 500;
@@ -1450,7 +1450,7 @@
 }
 
 .hd-m-nutrition__kicker-text {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 10px;
   color: var(--accent-light);
   text-transform: uppercase;
@@ -1476,7 +1476,7 @@
 }
 
 .hd-m-nutrition__label {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 10px;
   color: var(--text-hint);
   text-transform: uppercase;
@@ -1485,7 +1485,7 @@
 }
 
 .hd-m-nutrition__kcal {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 34px;
   color: var(--text-primary);
   font-weight: 500;
@@ -1576,7 +1576,7 @@
 .hd-m-macro-row__dot--empty { opacity: 0.4; }
 
 .hd-m-macro-row__values {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 11px;
   color: var(--text-muted);
 }
@@ -1619,7 +1619,7 @@
 }
 
 .hd-m-status-card__label {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 9px;
   color: var(--text-hint);
   text-transform: uppercase;
@@ -1628,7 +1628,7 @@
 }
 
 .hd-m-status-card__value {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 19px;
   color: var(--text-primary);
   font-weight: 500;
@@ -1698,7 +1698,7 @@
 }
 
 .hd-m-actions__heading {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 10px;
   color: var(--text-hint);
   text-transform: uppercase;
@@ -1769,7 +1769,7 @@
 }
 
 .hd-m-action-primary__kicker {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 9px;
   color: var(--accent-light);
   text-transform: uppercase;
@@ -1793,7 +1793,7 @@
 }
 
 .hd-m-action-primary__arrow {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   color: var(--accent-light);
   flex-shrink: 0;

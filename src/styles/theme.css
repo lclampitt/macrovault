@@ -1,6 +1,5 @@
-/* Inter (app-wide) + JetBrains Mono (landing-page numerics only).
-   See docs/design/landing-redesign-spec.md §2 for rationale. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Inter (app-wide). */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&display=swap');
 
 /* ============================================================
    GAINLYTICS V2 — GLOBAL THEME & CSS VARIABLES
