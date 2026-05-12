@@ -1017,20 +1017,26 @@ export default function Dashboard() {
     const remaining = gl ? gl - cal : null;
     const nextMeal = getNextMealLabel();
 
+    // The kcal phrase ("930 kcal", "540 kcal under", etc.) renders in
+    // teal via `.hd-d-greeting__sub-accent`. The surrounding sentence
+    // stays in the default muted color. Mobile uses its own
+    // `.hd-m-nutrition__remaining-value` for the same effect.
+    const accent = (text) => <span className="hd-d-greeting__sub-accent">{text}</span>;
+
     let sub;
     if (!gl) {
       sub = 'Pick a calorie goal to get started.';
     } else if (cal === 0) {
-      sub = `Fresh day. ${gl.toLocaleString()} kcal to spend. ${nextMeal} is your first window.`;
+      sub = <>Fresh day. {accent(`${gl.toLocaleString()} kcal`)} to spend. {nextMeal} is your first window.</>;
     } else if (cal >= gl) {
       sub = 'Day logged. Nice work.';
     } else if (remaining < 300 && remaining > 0) {
       // Priority: midday near-target. Triggers any time of day.
-      sub = `Within range. ${remaining} kcal left for the rest of the day.`;
+      sub = <>Within range. {accent(`${remaining} kcal`)} left for the rest of the day.</>;
     } else if (remaining < 400 && hour >= 17) {
-      sub = `Within range. ${remaining} kcal left before bed.`;
+      sub = <>Within range. {accent(`${remaining} kcal`)} left before bed.</>;
     } else if (remaining > 0) {
-      sub = `You're ${remaining.toLocaleString()} kcal under. ${nextMeal} is the next big window.`;
+      sub = <>You're {accent(`${remaining.toLocaleString()} kcal under`)}. {nextMeal} is the next big window.</>;
     } else {
       sub = 'Day logged. Nice work.';
     }
