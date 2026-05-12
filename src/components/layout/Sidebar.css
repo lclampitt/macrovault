@@ -4,11 +4,15 @@
 
 .sidebar {
   width: var(--sidebar-width);
-  height: 100vh;
+  height: calc(100vh - 28px);
   position: sticky;
-  top: 0;
+  top: 14px;
+  z-index: 2;
+  margin: 14px 14px 14px 14px;
   background: var(--bg-surface);
-  border-right: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   transition: width var(--transition-med);
@@ -27,7 +31,6 @@
   gap: 10px;
   padding: 0 18px;
   height: 60px;
-  border-bottom: 1px solid var(--border);
   overflow: hidden;
   white-space: nowrap;
   flex-shrink: 0;
@@ -112,8 +115,8 @@
   position: absolute;
   inset: 0;
   border-radius: 8px;
-  background: rgba(var(--accent-rgb), 0.15);
-  border: 1px solid rgba(var(--accent-rgb), 0.2);
+  background: rgba(var(--accent-rgb), 0.18);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
   z-index: 0;
 }
 
